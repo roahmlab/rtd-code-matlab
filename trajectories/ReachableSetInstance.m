@@ -1,0 +1,21 @@
+classdef ReachableSetInstance < handle
+    % ReachableSetInstance
+    % This is just an individual instance of a reachable set.
+    properties (Abstract)
+        parameter_limits
+        output_limits
+    end
+    methods (Abstract)
+        % An example constructor, but can take anything needed for the
+        % respective ReachableSets class.
+        %self = ReachableSets( ...
+        %            robotInfo ...
+        %        )
+        
+        % Handles the obstacle-frs pair or similar to generate the
+        % nlconstraint.
+        % Returns a function handle for the nlconstraint generated
+        % where the function's return type is [c, ceq, gc, gceq]
+        nlconFunction = genNLConstraint(self, worldState)
+    end
+end
