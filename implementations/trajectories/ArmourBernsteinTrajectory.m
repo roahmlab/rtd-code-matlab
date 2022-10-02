@@ -10,7 +10,7 @@ classdef ArmourBernsteinTrajectory < Trajectory
     properties
         % The JRS which contains the center and range to scale the
         % parameters
-        jrsInstance
+        % jrsInstance
         % Initial parameters from the robot used to calculate the desired
         % trajectory
         n_q     {mustBeNumeric, mustBeScalarOrEmpty}
@@ -25,7 +25,7 @@ classdef ArmourBernsteinTrajectory < Trajectory
         function self = ArmourBernsteinTrajectory(     ...
                     trajOptProps,         ...
                     robotState,         ...
-                    reachableSets,      ...
+                    rsInstances,      ...
                     trajectoryParams,   ...
                     varargin            ...
                 )
@@ -35,12 +35,13 @@ classdef ArmourBernsteinTrajectory < Trajectory
             end
             
             % Look for the JRS
-            for i = 1:length(reachableSets)
-                if isa(reachableSets{i}, 'BernsteinJRSInstance')
-                    self.jrsInstance = reachableSets{i};
+            jrsInstance = [];
+            for i = 1:length(rsInstances)
+                if isa(rsInstances{i}, 'BernsteinJRSInstance')
+                    jrsInstance = rsInstances{i};
                 end
             end
-            if isempty(self.jrsInstance)
+            if isempty(jrsInstance)
                 % Do something if we don't have the JRS
             end
             
@@ -50,9 +51,9 @@ classdef ArmourBernsteinTrajectory < Trajectory
             self.startTime = robotState.time;
             
             % Parameters of our class
-            self.q_goal = self.jrsInstance.c_k_bernstein + P.jrs_info.g_k_bernstein.*trajectoryParams;
-            % Propose change name to k_center_bernstein or k_c_bernstein
-            % and k_range_bernstein or k_g_bernstein?
+            out = jrsInstance.output_range;
+            in = jrsInstance.parameter_range;
+            self.q_goal = rescale(trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             self.n_q = length(robotState.q);
             self.alpha = zeros(self.n_q, 6);
             for j = 1:self.n_q  % Modified to use matrix instead of cells
@@ -116,6 +117,7 @@ classdef ArmourBernsteinTrajectory < Trajectory
                 command.q_des = zeros(self.n_q, 1);
                 command.q_dot_des = zeros(self.n_q, 1);
                 command.q_ddot_des = zeros(self.n_q, 1);
+                % TODO: Figure out how to adapt this!!!
             
                 for j = 1:self.n_q
                     for coeff_idx = 0:5

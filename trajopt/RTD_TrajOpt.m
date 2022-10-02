@@ -2,8 +2,8 @@ classdef RTD_TrajOpt < handle
     % This object handles the necessary calls to perform the actual
     % trajectory optimization when requested.
     properties
-        timeout
-        horizon
+        trajOptProps % t_plan is timeout
+        %horizon % t_final
     end
     properties(Access = 'protected')
         robotInfo
@@ -19,8 +19,7 @@ classdef RTD_TrajOpt < handle
         % aspection of RTD & ideally need very little specialization
         % between versions.
         function self = RTD_TrajOpt(    ...
-                    timeout,            ...
-                    horizon,            ...
+                    trajOptProps,       ...
                     robotInfo,          ...
                     worldInfo,          ...
                     reachableSets,      ...
@@ -28,8 +27,7 @@ classdef RTD_TrajOpt < handle
                     optimizationEngine, ...
                     trajectoryFactory   ...
                 )
-            self.timeout = timeout;
-            self.horizon = horizon;
+            self.trajOptProps = trajOptProps;
             self.robotInfo = robotInfo; % there's a chance these two info
             self.worldInfo = worldInfo; % structures won't be needed
             self.reachableSets = reachableSets;
@@ -50,15 +48,34 @@ classdef RTD_TrajOpt < handle
             % To implement, below is an outline
             
             % shown is just one, but for all reachablesets.
-            rs = self.reachableSets.getReachableSet(robotState);
-            nlconCallback = rs.genNLConstraint(worldState);
+            rsInstances = {};
+            nlconCallbacks = {};
+            n_k = 0;
+            param_bounds = [];
+            for i=1:length(self.reachableSets)
+                rs = self.reachableSets{i}.getReachableSet(robotState, false);
+                new_n_k = max(n_k, rs.n_k);
+                comp = min(n_k, rs.n_k);
+                % compute new bounds
+                % TODO: consider multiple RS's with slack variables
+                new_bounds = zeros(n_k, 2);
+                new_bounds(1:n_k,:) = param_bounds;
+                new_bounds(1:rs.n_k,:) = rs.parameter_range;
+                new_bounds(1:comp, 1) = max(param_bounds(1:comp, 1), new_bounds(1:comp, 1));
+                new_bounds(1:comp, 2) = min(param_bounds(1:comp, 2), new_bounds(1:comp, 2));
+                n_k = new_n_k;
+                param_bounds = new_bounds;
+                % store instances and callbacks
+                rsInstances = [rsInstances, rs];
+                nlconCallbacks = [nlconCallbacks, rs.genNLConstraint(worldState)];
+            end
             
             % Combine nlconCallback with any other constraints needed
-            constraintCallback = nlconCallback;
+            constraintCallback = @(k) merge_constraints(k, n_k, rsInstances, nlconCallbacks);
             
             % create bounds (robotInfo and worldInfo come into play here?)
-            bounds.param_limits = rs.parameter_limits;
-            bounds.ouput_limits = rs.output_limits;
+            bounds.param_limits = param_bounds;
+            bounds.ouput_limits = [];
             
             % Create the objective
             objectiveCallback = self.objective.genObjective(robotState, ...
@@ -73,11 +90,30 @@ classdef RTD_TrajOpt < handle
             
             % Optimize
             success, parameters, cost = self.optimizationEngine(guess, ...
-                objectiveCallback, constraintCallback, bounds, ...
-                self.timeout);
+                objectiveCallback, constraintCallback, bounds);
             
             % if success
-            trajectory = self.trajectoryFactory(robotState, parameters);
+            if success
+                trajectory = self.trajectoryFactory(robotState, rsInstances, parameters);
+            else
+                trajectory = [];
+            end
         end
+    end
+end
+
+function [h, heq, grad_h, grad_heq] = merge_constraints(k, n_k, rsInstances, nlconCallbacks)
+    h = [];
+    heq = [];
+    grad_h = [];
+    grad_heq = [];
+    
+    for i=1:length(nlconCallbacks)
+        temp_k = rsInstances{i}.n_k;
+        [rs_h, rs_heq, rs_grad_h, rs_grad_heq] = nlconCallbacks{i}(k(1:temp_k));
+        h = [h; rs_h];
+        heq = [heq; rs_heq];
+        grad_h = [grad_h, [rs_grad_h;zeros(n_k-temp_k, length(rs_h))]];
+        grad_heq = [grad_heq, [rs_grad_heq;zeros(n_k-temp_k, length(rs_heq))]];
     end
 end

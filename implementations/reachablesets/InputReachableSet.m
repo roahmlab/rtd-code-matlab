@@ -1,0 +1,128 @@
+classdef InputReachableSet < ReachableSets
+    % ArmTdForwardOccupancy
+    % This either encapsulates the reachable sets in memory, or enables the
+    % online computation of reachable sets. It acts as a generator for a
+    % single instance of ReachableSet
+    properties
+        cache_size = 1
+        robotInfo
+        jrsHandle
+        use_robust_input
+    end
+    methods
+        % An example constructor, but can take anything needed
+        function self = InputReachableSet( ...
+                    robotInfo, jrsHandle, use_robust_input ...
+                )
+            self.robotInfo = robotInfo;
+            self.jrsHandle = jrsHandle;
+            self.use_robust_input = use_robust_input;
+        end
+        
+        % Obtains the relevant reachable set for the robotstate provided
+        % and outputs the singular instance of a reachable set.
+        % Returns ReachbleSet
+        function reachableSet = generateReachableSet(self, robotState)
+            % Computes the forward kinematics and occupancy
+            
+            % First get the JRS (allow the use of a cached value if it
+            % exists)
+            jrsInstance = self.jrsHandle.getReachableSet(robotState, false);
+            
+            % set up zeros and overapproximation of r
+            for j = 1:jrsInstance.n_q
+                zero_cell{j, 1} = polyZonotope_ROAHM(0); 
+                r{j, 1} = polyZonotope_ROAHM(0, [], self.robotInfo.LLC_info.ultimate_bound);
+            end
+            
+            for i = 1:jrsInstance.n_t
+                tau_nom{i, 1} = poly_zonotope_rnea( ...
+                        jrsInstance.R{i}, ...
+                        jrsInstance.R_t{i}, ...
+                        jrsInstance.dq{i}, ...
+                        jrsInstance.dq_a{i}, ...
+                        jrsInstance.ddq_a{i}, ...
+                        true, ...
+                        self.robotInfo.params.pz_nominal);
+                if self.use_robust_input
+                    [tau_int{i, 1}, f_int{i, 1}, n_int{i, 1}] = ...
+                        poly_zonotope_rnea( ...
+                            jrsInstance.R{i}, ...
+                            jrsInstance.R_t{i}, ...
+                            jrsInstance.dq{i}, ...
+                            jrsInstance.dq_a{i}, ...
+                            jrsInstance.ddq_a{i}, ...
+                            true, ...
+                            self.robotInfo.params.pz_interval);
+                    
+                    for j = 1:jrsInstance.n_q
+                        w{i, 1}{j, 1} = tau_int{i, 1}{j, 1} - tau_nom{i, 1}{j, 1};
+                        w{i, 1}{j, 1} = reduce(w{i, 1}{j, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+                    end
+                    
+                    V_cell = poly_zonotope_rnea( ...
+                        jrsInstance.R{i}, ...
+                        jrsInstance.R_t{i}, ...
+                        zero_cell, ...
+                        zero_cell, ...
+                        r, ...
+                        false, ...
+                        self.robotInfo.params.pz_interval);
+                    V{i, 1} = 0;
+                    for j = 1:jrsInstance.n_q
+                        V{i, 1} = V{i, 1} + 0.5.*r{j, 1}.*V_cell{j, 1};
+                        V{i, 1} = reduce(V{i, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+                    end
+                    V_diff{i, 1} = V{i, 1} - V{i, 1};
+                    V_diff{i, 1} = reduce(V_diff{i, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+                    V_diff_int{i, 1} = interval(V_diff{i, 1});
+                end
+            end
+            % % get max effect of disturbance r'*w... couple of ways to do this
+            % % can overapproximate r and compute r'*w as a PZ
+            % % can slice w first, then get the norm?
+            % for i = 1:jrs_info.n_t
+            %     r_dot_w{i, 1} = 0;
+            %     for j = 1:jrs_info.n_q
+            %         r_dot_w{i, 1} = r_dot_w{i, 1} + r{j, 1}.*w{i, 1}{j, 1};
+            %         r_dot_w{i, 1} = reduce(r_dot_w{i, 1}, 'girard', P.params.pz_interval.zono_order);
+            %     end
+            % end
+            % can get ||w|| <= ||\rho(\Phi)||, and compute the norm using interval arithmetic
+            if self.use_robust_input
+                for i = 1:jrs_info.n_t
+                    for j = 1:jrsInstance.n_q
+                        w_int{i, 1}(j, 1) = interval(w{i, 1}{j, 1});
+                    end
+                    rho_max{i, 1} = norm(max(abs(w_int{i, 1}.inf), abs(w_int{i, 1}.sup)));
+                end
+
+                % compute robust input bound tortatotope:
+                for i = 1:jrsInstance.n_t
+                    v_norm{i, 1} = (self.robotInfo.LLC_info.alpha_constant*V_diff_int{i, 1}.sup).*(1/self.robotInfo.LLC_info.ultimate_bound) + rho_max{i, 1};
+%                     v_norm{i, 1} = reduce(v_norm{i, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
+                end
+            else
+                for i = 1:jrsInstance.n_t
+                    v_norm{i, 1} = 0;
+                end
+            end
+
+            % compute total input tortatotope
+            for i = 1:jrsInstance.n_t
+                for j = 1:jrsInstance.n_q
+                    u_ub_tmp = tau_nom{i, 1}{j, 1} + v_norm{i, 1};
+                    u_lb_tmp = tau_nom{i, 1}{j, 1} - v_norm{i, 1};
+                    u_ub_tmp = remove_dependence(u_ub_tmp, jrsInstance.k_id(end));
+                    u_lb_tmp = remove_dependence(u_lb_tmp, jrsInstance.k_id(end));
+                    u_ub_buff = sum(abs(u_ub_tmp.Grest));
+                    u_lb_buff = -sum(abs(u_lb_tmp.Grest));
+                    u_ub{i, 1}{j, 1} = polyZonotope_ROAHM(u_ub_tmp.c + u_ub_buff, u_ub_tmp.G, [], u_ub_tmp.expMat, u_ub_tmp.id) - self.robotInfo.joint_input_limits(2, j);
+                    u_lb{i, 1}{j, 1} = -1*polyZonotope_ROAHM(u_lb_tmp.c + u_lb_buff, u_lb_tmp.G, [], u_lb_tmp.expMat, u_lb_tmp.id) + self.robotInfo.joint_input_limits(1, j);
+                end
+            end
+            
+            reachableSet = IRSInstance(u_ub, u_lb, jrsInstance);
+        end
+    end
+end

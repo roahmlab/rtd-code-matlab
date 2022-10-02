@@ -2,8 +2,8 @@ classdef ReachableSetInstance < handle
     % ReachableSetInstance
     % This is just an individual instance of a reachable set.
     properties (Abstract)
-        parameter_limits
-        output_limits
+        parameter_range
+        output_range
     end
     methods (Abstract)
         % An example constructor, but can take anything needed for the

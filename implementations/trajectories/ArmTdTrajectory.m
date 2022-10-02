@@ -23,6 +23,7 @@ classdef ArmTdTrajectory < Trajectory
         q_end      {mustBeNumeric}
         % The parameters of the trajopt instance (move to parent?)
         trajOptProps
+        robotState
     end
     methods
         % An example constructor for the trajectory object. Should be
@@ -30,50 +31,51 @@ classdef ArmTdTrajectory < Trajectory
         function self = ArmTdTrajectory(     ...
                     trajOptProps,         ...
                     robotState,         ...
-                    reachableSets,      ...
+                    rsInstances,      ...
                     trajectoryParams,   ...
                     varargin            ...
                 )
+            % Always requires this (add to parent)
+            self.trajOptProps = trajOptProps;
+            
+            % If none of the args exist, just create the empty object
+            if ~exist('robotState','var')
+                return
+            end
+            
             % Validate RobotState
             if ~isa(robotState, 'ArmRobotState')
                 error('Robot must inherit an ArmRobotState to use ArmTdTrajectory');
             end
+            self.robotState = robotState;
+            
+            % Clean up, but if reachableSet is nonexistant, end (invert
+            % logic later)
+            if ~exist('reachableSets','var')
+                return
+            end
             
             % Look for the JRS
-            for i = 1:length(reachableSets)
-                if isa(reachableSets{i}, 'JRSInstance')
-                    self.jrsInstance = reachableSets{i};
+            for i = 1:length(rsInstances)
+                if isa(rsInstances{i}, 'JRSInstance')
+                    self.jrsInstance = rsInstances{i};
                 end
             end
             if isempty(self.jrsInstance)
                 % Do something if we don't have the JRS
+                error('No handle for a JRSInstance was found');
             end
             
-            % Set all parameters
-            % Required parameters from parent classes
+            % Clean up, but if reachableSet is nonexistant, end (invert
+            % logic later)
+            if ~exist('trajectoryParams','var')
+                return
+            end
             self.trajectoryParams = trajectoryParams;
-            self.startTime = robotState.time;
-            
-            % Parameters of our class
-            self.trajOptProps = trajOptProps;
-            self.q_0 = robotState.q;
-            self.q_dot_0 = robotState.q_dot;
-            self.q_ddot_0 = robotState.q_ddot;
-            
-            % Precompute peak and stop parameters
-            k_scaled = self.jrsInstance.c_k + self.jrsInstance.g_k.*trajectoryParams;
-            self.q_peak = self.q_0 + ...
-                self.q_dot_0 * trajOptProps.timeout + ...
-                (1/2) * k_scaled * trajOptProps.timeout^2;
-            self.q_dot_peak = self.q_dot_0 + ...
-                k_scaled * trajOptProps.timeout;
-            self.q_ddot_stop = (0-self.q_dot_peak) / ...
-                (trajOptProps.horizon - trajOptProps.timeout);
-            self.q_end = self.q_peak + ...
-                self.q_dot_peak * trajOptProps.horizon + ...
-                (1/2) * self.q_ddot_stop * trajOptProps.horizon^2;
+
             
             % TODO: Make invalid trajectory case.
+            self.internalUpdate();
         end
         
         % A validated method to set the parameters for the trajectory.
@@ -85,20 +87,113 @@ classdef ArmTdTrajectory < Trajectory
                     robotState          ...
                 )
             % TODO: make
+            % Clean up, but if reachableSet is nonexistant, end (invert
+            % logic later)
+            if ~exist('trajectoryParams','var')
+                return
+            end
+            self.trajectoryParams = trajectoryParams;
+            
+            % Clean up, but if reachableSet is nonexistant, end (invert
+            % logic later)
+            if ~exist('reachableSets','var')
+                return
+            end
+            
+            % Look for the JRS
+            for i = 1:length(reachableSets)
+                if isa(reachableSets{i}, 'JRSInstance')
+                    self.jrsInstance = reachableSets{i};
+                end
+            end
+            if isempty(self.jrsInstance)
+                % Do something if we don't have the JRS
+                error('No handle for a JRSInstance was found');
+            end
+            
+            % If none of the args exist, just create the empty object
+            if ~exist('robotState','var')
+                return
+            end
+            
+            % Validate RobotState
+            if ~isa(robotState, 'ArmRobotState')
+                error('Robot must inherit an ArmRobotState to use ArmTdTrajectory');
+            end
+            self.robotState = robotState;
+            
+            self.internalUpdate();
         end
+        
+        function internalUpdate(self)
+            % internal update if valid
+            if ~self.validate()
+                return
+            end
+            
+            % Set all parameters
+            % Required parameters from parent classes
+            self.startTime = self.robotState.time;
+            
+            % Parameters of our class
+            self.q_0 = self.robotState.q;
+            self.q_dot_0 = self.robotState.q_dot;
+            self.q_ddot_0 = self.robotState.q_ddot;
+            
+            % Precompute peak and stop parameters
+            out = self.jrsInstance.output_range;
+            in = self.jrsInstance.parameter_range;
+            k_scaled = rescale(trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            
+            self.q_peak = self.q_0 + ...
+                self.q_dot_0 * self.trajOptProps.timeout + ...
+                (1/2) * k_scaled * self.trajOptProps.timeout^2;
+            self.q_dot_peak = self.q_dot_0 + ...
+                k_scaled * self.trajOptProps.timeout;
+            self.q_ddot_stop = (0-self.q_dot_peak) / ...
+                (self.trajOptProps.horizon - self.trajOptProps.timeout);
+            self.q_end = self.q_peak + ...
+                self.q_dot_peak * self.trajOptProps.horizon + ...
+                (1/2) * self.q_ddot_stop * self.trajOptProps.horizon^2;
+        end
+        
+        function valid = validate(self, throwOnError)
+            valid = not( ...
+                isempty(self.trajectoryParams) || ...
+                isempty(self.jrsInstance) || ...
+                isempty(self.robotState));
+            
+            % Throw if wanted
+            if exist('throwOnError','var') && ~valid && throwOnError
+                errMsg = MException('RTD:InvalidTrajectory', ...
+                    'Called trajectory object does not have complete parameterization!');
+                throw(errMsg)
+            end
+        end
+            
         
         % A validated method to get the trajectory parameters.
         % throws RTD:InvalidTrajectory if there isn't a trajectory to get.
-        function [trajectoryParams, startTime] = getTrajParams(self)
+        function [trajectoryParams, startState] = getTrajParams(self)
+            % Validate, if invalid, throw
+            self.validate(true)
             % TODO: make into the base class!
+            trajectoryParams = self.trajectoryParams;
+            startState.robotState = self.robotState;
+            startState.jrsInstance = self.jrsInstance;
         end
         
         % Computes the actual input commands for the given time.
         % throws RTD:InvalidTrajectory if the trajectory isn't set
         function command = getCommand(self, time)
+            % Validate, if invalid, throw
+            self.validate(true)
             % TODO: throw invalid trajectory
             t = time - startTime;
-            k_scaled = self.jrsInstance.c_k + self.jrsInstance.g_k.*self.trajectoryParams;
+            
+            out = self.jrsInstance.output_range;
+            in = self.jrsInstance.parameter_range;
+            k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             
             % Ensure time is valid
             if t < 0
