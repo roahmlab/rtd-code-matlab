@@ -46,6 +46,15 @@ classdef JRSInstance < ReachableSetInstance
         % nlconstraint.
         % Returns a function handle for the nlconstraint generated
         % where the function's return type is [c, ceq, gc, gceq]
-        nlconFunction = genNLConstraint(self, worldState)
+        function nlconFunction = genNLConstraint(self, worldState)
+            nlconFunction = @NOP;
+        end
     end
+end
+
+function [h, heq, grad_h, grad_heq] = NOP(varargin)
+    h = [];
+    heq = [];
+    grad_h = [];
+    grad_heq = [];
 end

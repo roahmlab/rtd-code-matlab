@@ -51,7 +51,7 @@ classdef ArmTdTrajectory < Trajectory
             
             % Clean up, but if reachableSet is nonexistant, end (invert
             % logic later)
-            if ~exist('reachableSets','var')
+            if ~exist('rsInstances','var')
                 return
             end
             
@@ -83,27 +83,35 @@ classdef ArmTdTrajectory < Trajectory
         function setTrajectory(         ...
                     self,               ...
                     trajectoryParams,   ...
-                    reachableSets,      ...
+                    rsInstances,      ...
                     robotState          ...
                 )
             % TODO: make
             % Clean up, but if reachableSet is nonexistant, end (invert
             % logic later)
             if ~exist('trajectoryParams','var')
+                try
+                    self.internalUpdate();
+                catch
+                end
                 return
             end
             self.trajectoryParams = trajectoryParams;
             
             % Clean up, but if reachableSet is nonexistant, end (invert
             % logic later)
-            if ~exist('reachableSets','var')
+            if ~exist('rsInstances','var')
+                try
+                    self.internalUpdate();
+                catch
+                end
                 return
             end
             
             % Look for the JRS
-            for i = 1:length(reachableSets)
-                if isa(reachableSets{i}, 'JRSInstance')
-                    self.jrsInstance = reachableSets{i};
+            for i = 1:length(rsInstances)
+                if isa(rsInstances{i}, 'JRSInstance')
+                    self.jrsInstance = rsInstances{i};
                 end
             end
             if isempty(self.jrsInstance)
@@ -113,6 +121,10 @@ classdef ArmTdTrajectory < Trajectory
             
             % If none of the args exist, just create the empty object
             if ~exist('robotState','var')
+                try
+                    self.internalUpdate();
+                catch
+                end
                 return
             end
             
@@ -143,7 +155,7 @@ classdef ArmTdTrajectory < Trajectory
             % Precompute peak and stop parameters
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.parameter_range;
-            k_scaled = rescale(trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             
             self.q_peak = self.q_0 + ...
                 self.q_dot_0 * self.trajOptProps.timeout + ...
@@ -176,7 +188,7 @@ classdef ArmTdTrajectory < Trajectory
         % throws RTD:InvalidTrajectory if there isn't a trajectory to get.
         function [trajectoryParams, startState] = getTrajParams(self)
             % Validate, if invalid, throw
-            self.validate(true)
+            self.validate(true);
             % TODO: make into the base class!
             trajectoryParams = self.trajectoryParams;
             startState.robotState = self.robotState;
@@ -187,9 +199,9 @@ classdef ArmTdTrajectory < Trajectory
         % throws RTD:InvalidTrajectory if the trajectory isn't set
         function command = getCommand(self, time)
             % Validate, if invalid, throw
-            self.validate(true)
+            self.validate(true);
             % TODO: throw invalid trajectory
-            t = time - startTime;
+            t = time - self.startTime;
             
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.parameter_range;

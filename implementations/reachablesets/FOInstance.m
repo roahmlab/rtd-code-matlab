@@ -45,7 +45,7 @@ classdef FOInstance < ReachableSetInstance
         function nlconFunction = genNLConstraint(self, worldState)
             
             if ~self.smooth_obs
-                c = {};
+                obs_constraints = {};
             else
                 smooth_obs_constraints = {};
                 smooth_obs_constraints_A = {};
@@ -86,10 +86,10 @@ classdef FOInstance < ReachableSetInstance
                         
                         % save
                         if ~self.smooth_obs
-                            obs_constraints{end+1, 1} = @(k) self.evaluate_obs_constraint(obs_constraint_pz_slice, grad_obs_constraint_pz_slice, k);
+                            obs_constraints{end+1, 1} = @(k) self.indiv_obs_constraint(obs_constraint_pz_slice, grad_obs_constraint_pz_slice, k);
                         else
                             smooth_obs_constraints_A{end+1, 1} = A_obs;
-                            smooth_obs_constraints{end+1, 1} = @(k, lambda) self.evaluate_smooth_obs_constraint(obs_constraint_pz_slice, grad_obs_constraint_pz_slice, k, lambda);
+                            smooth_obs_constraints{end+1, 1} = @(k, lambda) self.indiv_smooth_obs_constraint(obs_constraint_pz_slice, grad_obs_constraint_pz_slice, k, lambda);
                             if isempty(smooth_obs_lambda_index)
                                 smooth_obs_lambda_index{end+1, 1} = (1:size(obs_constraint_pz.c, 1))';
                             else
@@ -161,7 +161,7 @@ function [h, heq, grad_h, grad_heq] = eval_constraint(k, n_c, obs_constraints)
     h = zeros(n_c, 1);
     grad_h = zeros(length(k), n_c);
 
-    for i = 1:n_obs_c
+    for i = 1:n_c
         [h_i, grad_h_i] = obs_constraints{i}(k);
         h(i) = h_i;
         grad_h(:, i) = grad_h_i;

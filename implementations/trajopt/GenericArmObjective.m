@@ -25,7 +25,7 @@ classdef GenericArmObjective < Objective
             q_des = waypoint; % Rename just for past readability
             trajectoryObj = self.trajectoryFactory(robotState, reachableSets);
             objectiveCallback = @(trajectoryParams) ...
-                evalTrajectory(trajectoryParams, trajectoryObj, q_des, self.t_cost);
+                evalTrajectory(trajectoryParams, trajectoryObj, q_des, robotState.time + self.t_cost);
             
             % This takes the RobotState and Waypoint, and reads properties
             % from ReachableSet to greate the cost function.
@@ -37,6 +37,6 @@ end
 
 function [cost] = evalTrajectory(trajectoryParams, trajectoryObj, q_des, t_cost)
     trajectoryObj.setTrajectory(trajectoryParams);
-    plan = getCommand(t_cost);
+    plan = trajectoryObj.getCommand(t_cost);
     cost = sum((plan.q_des - q_des).^2);
 end

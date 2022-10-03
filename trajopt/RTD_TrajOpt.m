@@ -5,7 +5,7 @@ classdef RTD_TrajOpt < handle
         trajOptProps % t_plan is timeout
         %horizon % t_final
     end
-    properties(Access = 'protected')
+    properties%(Access = 'protected')
         robotInfo
         worldInfo
         reachableSets
@@ -61,13 +61,15 @@ classdef RTD_TrajOpt < handle
                 new_bounds = zeros(n_k, 2);
                 new_bounds(1:n_k,:) = param_bounds;
                 new_bounds(1:rs.n_k,:) = rs.parameter_range;
-                new_bounds(1:comp, 1) = max(param_bounds(1:comp, 1), new_bounds(1:comp, 1));
-                new_bounds(1:comp, 2) = min(param_bounds(1:comp, 2), new_bounds(1:comp, 2));
+                if comp > 0
+                    new_bounds(1:comp, 1) = max(param_bounds(1:comp, 1), new_bounds(1:comp, 1));
+                    new_bounds(1:comp, 2) = min(param_bounds(1:comp, 2), new_bounds(1:comp, 2));
+                end
                 n_k = new_n_k;
                 param_bounds = new_bounds;
                 % store instances and callbacks
-                rsInstances = [rsInstances, rs];
-                nlconCallbacks = [nlconCallbacks, rs.genNLConstraint(worldState)];
+                rsInstances = [rsInstances, {rs}];
+                nlconCallbacks = [nlconCallbacks, {rs.genNLConstraint(worldState)}];
             end
             
             % Combine nlconCallback with any other constraints needed
@@ -79,17 +81,22 @@ classdef RTD_TrajOpt < handle
             
             % Create the objective
             objectiveCallback = self.objective.genObjective(robotState, ...
-                waypoint, self.reachableSets);
+                waypoint, rsInstances);
             
             % If initialGuess is none, or invalid, make a zero
-            try
-                [guess,~] = initialGuess.getTrajParams();
-            catch
-                guess = zeros(initialGuess.num_params);
+            if exist('initialGuess','var')
+                try
+                    [guess,~] = initialGuess.getTrajParams();
+                catch
+                    guess = zeros(initialGuess.num_params);
+                end
+            else
+                guess = [];
             end
             
+            
             % Optimize
-            success, parameters, cost = self.optimizationEngine(guess, ...
+            [success, parameters, cost] = self.optimizationEngine.performOptimization(guess, ...
                 objectiveCallback, constraintCallback, bounds);
             
             % if success

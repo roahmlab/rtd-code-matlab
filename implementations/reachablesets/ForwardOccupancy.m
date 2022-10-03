@@ -39,7 +39,7 @@ classdef ForwardOccupancy < ReachableSets
                end
             end
             
-            reachableSet = ArmTdFOInstance(self.robotInfo, R_w, p_w, FO, jrsInstance, self.smooth_obs);
+            reachableSet = FOInstance(self.robotInfo, R_w, p_w, FO, jrsInstance, self.smooth_obs);
         end
     end
 end
