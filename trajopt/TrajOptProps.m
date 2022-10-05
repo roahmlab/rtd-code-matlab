@@ -1,6 +1,9 @@
 classdef TrajOptProps < handle
     properties
-        timeout
-        horizon
+        timeForCost
+        planTime
+        horizonTime
+        doTimeout
+        timeoutTime
     end
 end

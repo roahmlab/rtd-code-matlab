@@ -112,7 +112,7 @@ classdef ArmourBernsteinTrajectory < Trajectory
                 throw(ME)
             
             % Valid time of trajectory
-            elseif t < self.trajOptProps.horizon
+            elseif t < self.trajOptProps.horizonTime
                 % Original implementation adapted
                 command.q_des = zeros(self.n_q, 1);
                 command.q_dot_des = zeros(self.n_q, 1);

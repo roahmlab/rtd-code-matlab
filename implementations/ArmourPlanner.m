@@ -3,6 +3,13 @@ classdef ArmourPlanner < RTD_Planner
         %trajOptProps
         %robotInfo
         %worldInfo
+        jrsHandle
+        foHandle
+        irsHandle
+        reachableSets
+        objective
+        optimizationEngine
+        trajectoryFactory
         
         trajopt
     end
@@ -18,7 +25,7 @@ classdef ArmourPlanner < RTD_Planner
         % - Create RTD_TrajOpt for each trajectory type
         % - Create initial trajectories for each trajectory type
         function self = ArmourPlanner( ...
-                    trajOptProps, timeForCost, robotInfo, worldInfo, ...
+                    trajOptProps, robotInfo, worldInfo, ...
                     input_constraints_flag, use_robust_input, smooth_obs, traj_type ...
                 )
             
@@ -38,23 +45,23 @@ classdef ArmourPlanner < RTD_Planner
             %smooth_obs = false;
             
             % Create our reachable sets
-            jrsHandle = JointReachableSetsOnline(robotInfo);
-            foHandle = ForwardOccupancy(robotInfo, jrsHandle, smooth_obs);
-            reachableSets = {jrsHandle, foHandle};
+            self.jrsHandle = JointReachableSetsOnline(robotInfo);
+            self.foHandle = ForwardOccupancy(robotInfo, self.jrsHandle, smooth_obs);
+            self.reachableSets = {self.jrsHandle, self.foHandle};
             if input_constraints_flag
-                irsHandle = InputReachableSet(robotInfo, jrsHandle, use_robust_input);
-                reachableSets = [reachableSets, irsHandle];
+                self.irsHandle = InputReachableSet(robotInfo, self.jrsHandle, use_robust_input);
+                self.reachableSets = [self.reachableSets, irsHandle];
             end
             
             % Create the trajectoryFactory
             if strcmp(traj_type,'orig')
-                trajectoryFactory = ...
+                self.trajectoryFactory = ...
                     @(varargin)...
                     ArmTdTrajectory(...
                         trajOptProps,       ...
                         varargin{:});
             else
-                trajectoryFactory = ...
+                self.trajectoryFactory = ...
                     @(varargin)...
                     ArmourBernsteinTrajectory(...
                         trajOptProps,       ...
@@ -62,20 +69,20 @@ classdef ArmourPlanner < RTD_Planner
             end
             
             % Create the objective
-            objective = GenericArmObjective(trajectoryFactory, timeForCost);
+            self.objective = GenericArmObjective(trajOptProps, self.trajectoryFactory);
             
             % Selection the optimization engine
-            optimizationEngine = FminconOptimizationEngine(trajOptProps,false);
+            self.optimizationEngine = FminconOptimizationEngine(trajOptProps);
             
             % Create the trajopt object.
             self.trajopt = {RTD_TrajOpt( ...
                 trajOptProps,           ...
                 robotInfo,              ...
                 worldInfo,              ...
-                reachableSets,          ...
-                objective,              ...
-                optimizationEngine,     ...
-                trajectoryFactory)};
+                self.reachableSets,          ...
+                self.objective,              ...
+                self.optimizationEngine,     ...
+                self.trajectoryFactory)};
         end
     
         % Then on each waypoint, we call for a trajectory plan:

@@ -1,4 +1,4 @@
-classdef ReachableSetInstance < handle
+classdef ReachableSetInstance < UUIDbase & handle
     % ReachableSetInstance
     % This is just an individual instance of a reachable set.
     properties (Abstract)

@@ -1,4 +1,4 @@
-classdef RobotState < handle
+classdef RobotState < UUIDbase & handle
     properties
         time
         % An relevant robot properties that evolve over time

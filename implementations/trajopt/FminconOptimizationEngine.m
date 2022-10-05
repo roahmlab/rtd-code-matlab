@@ -1,21 +1,18 @@
 classdef FminconOptimizationEngine < OptimizationEngine
     properties
-        trajOptProps
+        trajOptProps TrajOptProps
         options
-        timeoutEnabled
     end
     % This class should create a parameterized instance of some nonlinear
     % optimizer. For example, in MATLAB, this would be fmincon.
     methods
         function self = FminconOptimizationEngine( ...
                 trajOptProps, ...
-                timeoutEnabled, ...
                 options, ...
                 varargin)
             self.trajOptProps = trajOptProps;
-            self.timeoutEnabled = timeoutEnabled;
             default = optimoptions('fmincon','SpecifyConstraintGradient',true);
-            if exist('trajectoryParams','var')
+            if exist('options','var')
                 to_merge = namedargs2cell(options);
             else
                 to_merge = {};
@@ -49,7 +46,7 @@ classdef FminconOptimizationEngine < OptimizationEngine
             
             % timeout function
             opts = self.options;
-            if self.timeoutEnabled
+            if self.trajOptProps.doTimeout
                 start_tic = tic;
                 stop_fcn = @(~,~,~) self.timeout_fcn(start_tic);
                 opts = optimoptions(opts,"OutputFcn",[{stop_fcn}, opts.OutputFcn]);
@@ -67,7 +64,7 @@ classdef FminconOptimizationEngine < OptimizationEngine
         end
         function stop = timeout_fcn(self, startTime)
             elapsed = toc(startTime);
-            stop = elapsed > self.trajOptProps.timeout;
+            stop = elapsed > self.trajOptProps.timeoutTime;
         end
     end
 end

@@ -1,4 +1,4 @@
-classdef IRSInstance < ReachableSetInstance
+classdef IRSInstance < ReachableSetInstance & NamedClass
     % JRSInstance
     % This is just an individual instance of an original ARMTD JRS.
     properties
@@ -42,7 +42,8 @@ classdef IRSInstance < ReachableSetInstance
                     u_ub_int = interval(self.u_ub{i, 1}{j, 1});
                     if ~(u_ub_int.sup < 0)
                         % add constraint and gradient
-                        fprintf('ADDED UPPER BOUND INPUT CONSTRAINT ON JOINT %d \n', j);
+                        msg = sprintf('ADDED UPPER BOUND INPUT CONSTRAINT ON JOINT %d \n', j);
+                        self.vdisp(msg);
                         constraints{end+1, 1} = @(k) slice(self.u_ub{i, 1}{j, 1}, k);
                         grad_u_ub = grad(self.u_ub{i, 1}{j, 1}, self.n_q);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_u_ub);
@@ -51,7 +52,8 @@ classdef IRSInstance < ReachableSetInstance
                     u_lb_int = interval(self.u_lb{i, 1}{j, 1});
                     if ~(u_lb_int.sup < 0)
                         % add constraint and gradient
-                        fprintf('ADDED LOWER BOUND INPUT CONSTRAINT ON JOINT %d \n', j);
+                        msg = sprintf('ADDED LOWER BOUND INPUT CONSTRAINT ON JOINT %d \n', j);
+                        self.vdisp(msg);
                         constraints{end+1, 1} = @(k) slice(self.u_lb{i, 1}{j, 1}, k);
                         grad_u_lb = grad(self.u_lb{i, 1}{j, 1}, self.n_q);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_u_lb);

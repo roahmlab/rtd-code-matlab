@@ -1,4 +1,4 @@
-classdef JointReachableSetsOnline < ReachableSets
+classdef JointReachableSetsOnline < ReachableSets & NamedClass
     % JointReachableSetsOnline
     % This either encapsulates the reachable sets in memory, or enables the
     % online computation of reachable sets. It acts as a generator for a
@@ -29,6 +29,7 @@ classdef JointReachableSetsOnline < ReachableSets
             % initialize the remaining properties from this loaded data.
             rs = JRSInstance;
             
+            self.vdisp("Following message is from create_jrs_online");
             % Generate it online as per the original implementation
             [rs.q_des, rs.dq_des, rs.ddq_des,            ...
                 rs.q, rs.dq, rs.dq_a, rs.ddq_a,             ...

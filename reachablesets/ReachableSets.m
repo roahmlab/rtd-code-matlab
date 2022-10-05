@@ -26,7 +26,7 @@ classdef ReachableSets < handle
     end
     methods
         function reachableSet = getReachableSet(self, robotState, ignore_cache, varargin)
-            if ignore_cache || self.cache_size < 1
+            if ignore_cache || self.cache_max_size < 1
                 reachableSet = generateReachableSet(self, robotState, varargin{:});
                 return
             end
@@ -45,8 +45,8 @@ classdef ReachableSets < handle
             % iterating over the cache that exists.
             if self.cache_size > 0
                 for idx=circshift((self.cache_size:-1:1), self.cache_index)
-                    if hash == self.cache{idx, 1}
-                        reachableSet = {idx, 2};
+                    if strcmp(hash, self.cache{idx, 1})
+                        reachableSet = self.cache{idx, 2};
                         return
                     end
                 end

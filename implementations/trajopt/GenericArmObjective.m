@@ -12,9 +12,9 @@ classdef GenericArmObjective < Objective
         % Recommended Constructor. RobotInfo would hold the parameters
         % loaded from the URDF or similar file. This could be used to
         % compute robot dynamics
-        function self = GenericArmObjective(trajectoryFactory, timeForCost)
+        function self = GenericArmObjective(trajOptProps, trajectoryFactory)
             self.trajectoryFactory = trajectoryFactory;
-            self.t_cost = timeForCost;
+            self.t_cost = trajOptProps.timeForCost;
         end
         
         % Given the information, generate a handle for an objective

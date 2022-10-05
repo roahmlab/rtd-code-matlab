@@ -67,12 +67,14 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             
             % Here's where the wrapper really starts
             trajOptProps = TrajOptProps;
-            trajOptProps.timeout = P.t_move;
-            trajOptProps.horizon = P.t_stop;
+            trajOptProps.planTime = P.t_move;
+            trajOptProps.horizonTime = P.t_stop;
+            trajOptProps.doTimeout = false;
+            trajOptProps.timeoutTime = P.t_move;
             if P.use_q_plan_for_cost
-                timeForCost = P.t_move;
+                trajOptProps.timeForCost = P.t_move;
             else
-                timeForCost = P.t_stop;
+                trajOptProps.timeForCost = P.t_stop;
             end
             
             robotInfo = ArmRobotInfo;
@@ -92,7 +94,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             smooth_obs = P.smooth_obstacle_constraints_flag;
             
             P.planner = ArmourPlanner( ...
-                    trajOptProps, timeForCost, robotInfo, worldInfo, ...
+                    trajOptProps, robotInfo, worldInfo, ...
                     input_constraints_flag, use_robust_input, smooth_obs, P.traj_type ...
                 );
         end
@@ -131,6 +133,18 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             % generate a waypoint in configuration space
             P.vdisp('Generating cost function',6)
             if P.first_iter_pause_flag && P.iter == 0
+                % Create initial trajectory
+                P.vdisp('Generating initial trajectory', 6)
+                robotState = ArmRobotState;
+                robotState.time = 0.0;
+                robotState.q = q_0;
+                robotState.q_dot = q_dot_0;
+                robotState.q_ddot = q_ddot_0;
+                rs = P.planner.jrsHandle.getReachableSet(robotState, false);
+                traj = P.planner.trajectoryFactory(robotState,{rs});
+                traj.setTrajectory(zeros(traj.param_shape,1));
+                P.info.desired_trajectory = [P.info.desired_trajectory, {@(t) unwrap_traj(traj.getCommand(t))}];
+                
                 P.vdisp('Press Enter to Continue:',6)
                 pause; 
             end

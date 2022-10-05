@@ -158,15 +158,15 @@ classdef ArmTdTrajectory < Trajectory
             k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             
             self.q_peak = self.q_0 + ...
-                self.q_dot_0 * self.trajOptProps.timeout + ...
-                (1/2) * k_scaled * self.trajOptProps.timeout^2;
+                self.q_dot_0 * self.trajOptProps.planTime + ...
+                (1/2) * k_scaled * self.trajOptProps.planTime^2;
             self.q_dot_peak = self.q_dot_0 + ...
-                k_scaled * self.trajOptProps.timeout;
+                k_scaled * self.trajOptProps.planTime;
             self.q_ddot_stop = (0-self.q_dot_peak) / ...
-                (self.trajOptProps.horizon - self.trajOptProps.timeout);
+                (self.trajOptProps.horizonTime - self.trajOptProps.planTime);
             self.q_end = self.q_peak + ...
-                self.q_dot_peak * self.trajOptProps.horizon + ...
-                (1/2) * self.q_ddot_stop * self.trajOptProps.horizon^2;
+                self.q_dot_peak * self.trajOptProps.horizonTime + ...
+                (1/2) * self.q_ddot_stop * self.trajOptProps.horizonTime^2;
         end
         
         function valid = validate(self, throwOnError)
@@ -214,7 +214,7 @@ classdef ArmTdTrajectory < Trajectory
                 throw(ME)
                 
             % First half of the trajectory
-            elseif t < self.trajOptProps.timeout
+            elseif t < self.trajOptProps.planTime
                 command.q_des = self.q_0 + ...
                     self.q_dot_0 * t + ...
                     (1/2) * k_scaled * t^2;
@@ -223,9 +223,9 @@ classdef ArmTdTrajectory < Trajectory
                 command.q_ddot_des = k_scaled;
             
             % Second half of the trajectory
-            elseif t < self.trajOptProps.horizon
+            elseif t < self.trajOptProps.horizonTime
                 % Shift time for ease
-                t = t - self.trajOptProps.timeout;
+                t = t - self.trajOptProps.planTime;
                 
                 command.q_des = self.q_peak + ...
                     self.q_dot_peak * t + ...

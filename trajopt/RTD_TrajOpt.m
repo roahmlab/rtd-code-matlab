@@ -1,4 +1,4 @@
-classdef RTD_TrajOpt < handle
+classdef RTD_TrajOpt < handle & NamedClass
     % This object handles the necessary calls to perform the actual
     % trajectory optimization when requested.
     properties
@@ -47,6 +47,7 @@ classdef RTD_TrajOpt < handle
                 )
             % To implement, below is an outline
             
+            self.vdisp("Generating RS's and constraints!")
             % shown is just one, but for all reachablesets.
             rsInstances = {};
             nlconCallbacks = {};
@@ -96,6 +97,7 @@ classdef RTD_TrajOpt < handle
             
             
             % Optimize
+            self.vdisp("Optimizing!")
             [success, parameters, cost] = self.optimizationEngine.performOptimization(guess, ...
                 objectiveCallback, constraintCallback, bounds);
             
