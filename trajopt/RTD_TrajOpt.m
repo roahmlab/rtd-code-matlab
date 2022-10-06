@@ -38,7 +38,7 @@ classdef RTD_TrajOpt < handle & NamedClass
         
         % Execute the solver for trajectory optimization.
         % Returns a Trajectory object and an associated cost.
-        function [trajectory, cost] = solveTrajOpt(  ...
+        function [trajectory, cost, info] = solveTrajOpt(  ...
                     self,                   ...
                     robotState,             ...
                     worldState,             ...
@@ -107,6 +107,19 @@ classdef RTD_TrajOpt < handle & NamedClass
             else
                 trajectory = [];
             end
+            
+            % Create an info struct for return
+            info.worldState = worldState;
+            info.robotState = robotState;
+            info.rsInstances = rsInstances;
+            info.nlconCallbacks = nlconCallbacks;
+            info.objectiveCallback = objectiveCallback;
+            info.waypoint = waypoint;
+            info.bounds = bounds;
+            info.n_k = n_k;
+            info.guess = guess;
+            info.trajectory = trajectory;
+            info.cost = cost;
         end
     end
 end

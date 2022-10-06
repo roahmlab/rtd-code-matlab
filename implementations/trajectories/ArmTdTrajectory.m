@@ -223,7 +223,7 @@ classdef ArmTdTrajectory < Trajectory
                 command.q_ddot_des = k_scaled;
             
             % Second half of the trajectory
-            elseif t < self.trajOptProps.horizonTime
+            elseif t <= self.trajOptProps.horizonTime
                 % Shift time for ease
                 t = t - self.trajOptProps.planTime;
                 

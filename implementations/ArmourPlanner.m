@@ -88,7 +88,7 @@ classdef ArmourPlanner < RTD_Planner
         % Then on each waypoint, we call for a trajectory plan:
         % Use RTD to solve for a trajectory and return either
         % the parameters or invalid signal (continue)
-        function trajectory = planTrajectory(self, robotState, worldState, waypoint)
+        function [trajectory, info] = planTrajectory(self, robotState, worldState, waypoint)
             % Loops over each RTD_TrajOpt instance (thus, each trajectory
             % type) with the given RobotState, WorldState, Waypoint, and
             % initial guess
@@ -105,7 +105,7 @@ classdef ArmourPlanner < RTD_Planner
             %        robotState, worldState, waypoint);
             %wait(f);
             %[trajectory, ~] = fetchOutputs(f);
-            [trajectory, ~] = self.trajopt{1}.solveTrajOpt(robotState, worldState, waypoint);
+            [trajectory, ~, info] = self.trajopt{1}.solveTrajOpt(robotState, worldState, waypoint);
         end
     end
 end

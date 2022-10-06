@@ -169,7 +169,9 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             
             waypoint = q_des;
             
-            trajectory = P.planner.planTrajectory(robotState, worldState, waypoint);
+            [trajectory, plan_info] = P.planner.planTrajectory(robotState, worldState, waypoint);
+            FO = plan_info.rsInstances{2}.FO;
+            jrsinfo = plan_info.rsInstances{1}.jrs_info;
             
             % process result            
             %if ~trajectory.validate()
@@ -185,11 +187,13 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
                 k_opt = trajectory.getTrajParams();
                 P.vdisp('New trajectory found!',3);
                 P.latest_trajectory = trajectory;
+                trajopt_failed = false;
             catch
                 % If invalid trajectory, just make k_opt nan, and don't
                 % update the latest trajectory.
                 P.vdisp('Unable to find new trajectory!',3)
                 k_opt = nan;
+                trajopt_failed = true;
             end
             
             % save info
@@ -200,23 +204,23 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             P.info.q_0 = [P.info.q_0, {q_0}] ;
             P.info.q_dot_0 = [P.info.q_dot_0, {q_dot_0}] ;
             P.info.k_opt = [P.info.k_opt, {k_opt}] ;
-            %if P.save_FO_zono_flag
-            %    for i = 1:P.jrs_info.n_t
-            %        for j = 1:P.agent_info.params.pz_nominal.num_bodies
-            %            FO_zono{i}{j} = zonotope(FO{i}{j});
-            %            if trajopt_failed
-            %                % no safe slice
-            %                sliced_FO_zono{i}{j} = [];
-            %            else
-            %                % slice and save
-            %                fully_sliceable_tmp = polyZonotope_ROAHM(FO{i}{j}.c, FO{i}{j}.G, [], FO{i}{j}.expMat, FO{i}{j}.id);
-            %                sliced_FO_zono{i}{j} = zonotope([slice(fully_sliceable_tmp, k_opt), FO{i}{j}.Grest]);
-            %            end
-            %        end
-            %    end
-            %    P.info.FO_zono = [P.info.FO_zono, {FO_zono}];
-            %    P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {sliced_FO_zono}];
-            %end
+            if P.save_FO_zono_flag
+                for i = 1:jrsinfo.n_t
+                    for j = 1:P.agent_info.params.pz_nominal.num_bodies
+                        FO_zono{i}{j} = zonotope(FO{i}{j});
+                        if trajopt_failed
+                            % no safe slice
+                            sliced_FO_zono{i}{j} = [];
+                        else
+                            % slice and save
+                            fully_sliceable_tmp = polyZonotope_ROAHM(FO{i}{j}.c, FO{i}{j}.G, [], FO{i}{j}.expMat, FO{i}{j}.id);
+                            sliced_FO_zono{i}{j} = zonotope([slice(fully_sliceable_tmp, k_opt), FO{i}{j}.Grest]);
+                        end
+                    end
+                end
+                P.info.FO_zono = [P.info.FO_zono, {FO_zono}];
+                P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {sliced_FO_zono}];
+            end
 
             % create outputs:
             T = 0:P.time_discretization:P.t_stop ;
