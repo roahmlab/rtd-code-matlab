@@ -38,8 +38,12 @@ classdef FminconOptimizationEngine < OptimizationEngine
             lb = boundsStruct.param_limits(:,1);
             ub = boundsStruct.param_limits(:,2);
             % Replace with rand_range
-            initial_extra = rand_range(lb(end-n_remainder+1:end), ...
-                                       lb(end-n_remainder+1:end));
+            if self.trajOptProps.randomInit
+                initial_extra = rand_range(lb(end-n_remainder+1:end), ...
+                                           ub(end-n_remainder+1:end));
+            else
+                initial_extra = zeros(n_remainder, 1);
+            end
             
             % build initial guess
             initial = [initialGuess(:); initial_extra(:)];

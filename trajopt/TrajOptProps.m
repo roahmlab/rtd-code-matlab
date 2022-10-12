@@ -5,5 +5,6 @@ classdef TrajOptProps < handle
         horizonTime
         doTimeout
         timeoutTime
+        randomInit
     end
 end

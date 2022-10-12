@@ -9,6 +9,8 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
         latest_trajectory
         new_info
         wait_on_first_run = true
+        random_init = false
+        comparison_delta = 1e-8
 
         % housekeeping
         time_discretization = 0.01;        
@@ -73,6 +75,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             trajOptProps.horizonTime = P.t_stop;
             trajOptProps.doTimeout = false;
             trajOptProps.timeoutTime = P.t_move;
+            trajOptProps.randomInit = P.random_init;
             if P.use_q_plan_for_cost
                 trajOptProps.timeForCost = P.t_move;
             else
@@ -289,10 +292,11 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
                 [q_tmp, qd_tmp, ~] = P.info.desired_trajectory{end}(T(i));
                 % COMPARE
                 [q_tmp_comp, qd_tmp_comp, ~] = P.new_info.desired_trajectory{end}(T(i));
-                if ~(norm(q_tmp-q_tmp_comp) < 1e-3 && norm(qd_tmp-qd_tmp_comp) < 1e-3)
+                if i < length(T)/2 && ~(norm(q_tmp-q_tmp_comp) < P.comparison_delta && norm(qd_tmp-qd_tmp_comp) < P.comparison_delta)
                     % Put breakpoint here for comparison!
                     P.vdisp('Disparity between old and new planner detected!');
                     P.vdisp('Using old planner values!');
+                    error_count = error_count + 1;
                 end
                 Z(agent_info.joint_state_indices, i) = q_tmp;
                 Z(agent_info.joint_speed_indices, i) = qd_tmp;
@@ -559,7 +563,11 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
                 ub = ones(n_k, 1);
             end
 
-            initial_guess = rand_range(lb, ub);
+            if P.random_init
+                initial_guess = rand_range(lb, ub);
+            else
+                initial_guess = lb*0.0;
+            end
            
             options = optimoptions('fmincon','SpecifyConstraintGradient',true);
 %             options = optimoptions('fmincon','SpecifyConstraintGradient',true, 'CheckGradients', true);

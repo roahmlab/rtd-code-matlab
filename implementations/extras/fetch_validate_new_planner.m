@@ -110,6 +110,7 @@ W = fetch_base_world_static('include_base_obstacle', true, 'goal_radius', pi/30,
 P = uarmtd_planner_wrapped_comparison(...
     'agent', A, ...
     'verbose', verbosity, ...
+    'random_init', false, ... % Random init results in less similar optimizations
     'first_iter_pause_flag', first_iter_pause_flag, ...
     'use_q_plan_for_cost', use_q_plan_for_cost, ...
     'input_constraints_flag', input_constraints_flag, ...
@@ -165,7 +166,7 @@ disp("Proceeding to auto-test")
 old_time = [];
 new_time = [];
 errored = [];
-for i = 1:10
+for i = 1:100
     W = fetch_base_world_static('include_base_obstacle', true, 'goal_radius', pi/30, 'N_random_obstacles', N_random_obstacles,'dimension',dimension,'workspace_goal_check', 0,...
         'verbose',verbosity, 'creation_buffer', 0.05, 'base_creation_buffer', 0.025) ;
 
@@ -205,7 +206,7 @@ end
 oldcumtime = cumsum([0; to_graph.old_time(:)]);
 newcumtime = cumsum([0; to_graph.new_time(:)]);
 x = 0:length(to_graph.old_time);
-clf(2); figure(2); hold on
+figure(2); clf(2); hold on
 plot(x,oldcumtime)
 plot(x,newcumtime)
 hold off

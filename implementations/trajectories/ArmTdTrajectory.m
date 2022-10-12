@@ -165,8 +165,8 @@ classdef ArmTdTrajectory < Trajectory
             self.q_ddot_stop = (0-self.q_dot_peak) / ...
                 (self.trajOptProps.horizonTime - self.trajOptProps.planTime);
             self.q_end = self.q_peak + ...
-                self.q_dot_peak * self.trajOptProps.horizonTime + ...
-                (1/2) * self.q_ddot_stop * self.trajOptProps.horizonTime^2;
+                self.q_dot_peak * self.trajOptProps.planTime + ...
+                (1/2) * self.q_ddot_stop * self.trajOptProps.planTime^2;
         end
         
         function valid = validate(self, throwOnError)
@@ -223,7 +223,7 @@ classdef ArmTdTrajectory < Trajectory
                 command.q_ddot_des = k_scaled;
             
             % Second half of the trajectory
-            elseif t <= self.trajOptProps.horizonTime
+            elseif t < self.trajOptProps.horizonTime
                 % Shift time for ease
                 t = t - self.trajOptProps.planTime;
                 
