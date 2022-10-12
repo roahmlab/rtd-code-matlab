@@ -50,7 +50,7 @@ classdef ArmourPlanner < RTD_Planner
             self.reachableSets = {self.jrsHandle, self.foHandle};
             if input_constraints_flag
                 self.irsHandle = InputReachableSet(robotInfo, self.jrsHandle, use_robust_input);
-                self.reachableSets = [self.reachableSets, irsHandle];
+                self.reachableSets = [self.reachableSets, {self.irsHandle}];
             end
             
             % Create the trajectoryFactory

@@ -1,10 +1,10 @@
-classdef InputReachableSet < ReachableSets
+classdef InputReachableSet < ReachableSets & NamedClass
     % ArmTdForwardOccupancy
     % This either encapsulates the reachable sets in memory, or enables the
     % online computation of reachable sets. It acts as a generator for a
     % single instance of ReachableSet
     properties
-        cache_size = 1
+        cache_max_size = 1
         robotInfo
         jrsHandle
         use_robust_input
@@ -30,12 +30,15 @@ classdef InputReachableSet < ReachableSets
             jrsInstance = self.jrsHandle.getReachableSet(robotState, false);
             
             % set up zeros and overapproximation of r
+            self.vdisp("Set up zeros for overapproximation")
             for j = 1:jrsInstance.n_q
                 zero_cell{j, 1} = polyZonotope_ROAHM(0); 
                 r{j, 1} = polyZonotope_ROAHM(0, [], self.robotInfo.LLC_info.ultimate_bound);
             end
             
+            self.vdisp("start RNEA")
             for i = 1:jrsInstance.n_t
+                self.vdisp("RNEA for nominal")
                 tau_nom{i, 1} = poly_zonotope_rnea( ...
                         jrsInstance.R{i}, ...
                         jrsInstance.R_t{i}, ...
@@ -45,6 +48,7 @@ classdef InputReachableSet < ReachableSets
                         true, ...
                         self.robotInfo.params.pz_nominal);
                 if self.use_robust_input
+                    self.vdisp("RNEA interval for robust input")
                     [tau_int{i, 1}, f_int{i, 1}, n_int{i, 1}] = ...
                         poly_zonotope_rnea( ...
                             jrsInstance.R{i}, ...
@@ -55,11 +59,13 @@ classdef InputReachableSet < ReachableSets
                             true, ...
                             self.robotInfo.params.pz_interval);
                     
+                    self.vdisp("calculate w from robust controller")
                     for j = 1:jrsInstance.n_q
                         w{i, 1}{j, 1} = tau_int{i, 1}{j, 1} - tau_nom{i, 1}{j, 1};
                         w{i, 1}{j, 1} = reduce(w{i, 1}{j, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
                     end
                     
+                    self.vdisp("calculate v_cell")
                     V_cell = poly_zonotope_rnea( ...
                         jrsInstance.R{i}, ...
                         jrsInstance.R_t{i}, ...
@@ -90,13 +96,15 @@ classdef InputReachableSet < ReachableSets
             % end
             % can get ||w|| <= ||\rho(\Phi)||, and compute the norm using interval arithmetic
             if self.use_robust_input
-                for i = 1:jrs_info.n_t
+                self.vdisp("another one bites the dust")
+                for i = 1:jrsInstance.n_t
                     for j = 1:jrsInstance.n_q
                         w_int{i, 1}(j, 1) = interval(w{i, 1}{j, 1});
                     end
                     rho_max{i, 1} = norm(max(abs(w_int{i, 1}.inf), abs(w_int{i, 1}.sup)));
                 end
 
+                self.vdisp("robust input bound tortatotope")
                 % compute robust input bound tortatotope:
                 for i = 1:jrsInstance.n_t
                     v_norm{i, 1} = (self.robotInfo.LLC_info.alpha_constant*V_diff_int{i, 1}.sup).*(1/self.robotInfo.LLC_info.ultimate_bound) + rho_max{i, 1};
@@ -109,6 +117,7 @@ classdef InputReachableSet < ReachableSets
             end
 
             % compute total input tortatotope
+            self.vdisp("Total input tortatotope")
             for i = 1:jrsInstance.n_t
                 for j = 1:jrsInstance.n_q
                     u_ub_tmp = tau_nom{i, 1}{j, 1} + v_norm{i, 1};

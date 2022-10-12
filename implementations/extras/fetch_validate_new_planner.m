@@ -25,7 +25,7 @@ verbosity = 10 ;
 allow_replan_errors = true ;
 first_iter_pause_flag = true;
 use_q_plan_for_cost = false; % otherwise use q_stop (q at final time)
-input_constraints_flag = false;
+input_constraints_flag = true;
 save_FO_zono_flag = true;
 
 %%% for agent
