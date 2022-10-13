@@ -1,6 +1,8 @@
 classdef WorldState
-    %WORLDSTATE Summary of this class goes here
-    %   Detailed explanation goes here
+    % WorldState
+    % This should hold atomic state instances of the world. Whether it is a
+    % predicted state or a measured state, it holds those relevant
+    % parameters that evolve over time for our code.
     
     properties
         obstacles

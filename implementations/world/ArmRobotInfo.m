@@ -1,6 +1,8 @@
 classdef ArmRobotInfo < RobotInfo
-    %ROBOTINFO Summary of this class goes here
-    %   Detailed explanation goes here
+    % ArmRobotInfo
+    % Unchanging parts of the ArmRobot that should only be set in the
+    % beginning. If you find any parts of this changing, it should either
+    % be a part of the RobotModel or RobotState!
     
     properties
         % kinematic and inertial params

@@ -1,6 +1,10 @@
 classdef ReachableSetInstance < UUIDbase & handle
     % ReachableSetInstance
-    % This is just an individual instance of a reachable set.
+    % This is just an individual instance of a reachable set. It should
+    % hold the necessary information to make a nonlinear constraint. If a
+    % generated nonlinear constraint function is not atomic, in that it may
+    % change class properties, the cache for the generating RS class should
+    % be disabled by setting cache_max_size to 0.
     properties (Abstract)
         parameter_range
         output_range

@@ -1,16 +1,13 @@
 classdef ForwardOccupancy < ReachableSets
-    % ArmTdForwardOccupancy
-    % This either encapsulates the reachable sets in memory, or enables the
-    % online computation of reachable sets. It acts as a generator for a
-    % single instance of ReachableSet
+    % ForwardOccupancy
+    % This acts as a generator for a single instance of a
+    % ForwardReachableSet, and return FOInstance
     properties
         cache_max_size = 0 % we don't want to cache any forward occupancy instances
-        robotInfo
         jrsHandle
         smooth_obs;
     end
     methods
-        % An example constructor, but can take anything needed
         function self = ForwardOccupancy( ...
                     robotInfo, jrsHandle, smooth_obs ...
                 )
@@ -21,7 +18,7 @@ classdef ForwardOccupancy < ReachableSets
         
         % Obtains the relevant reachable set for the robotstate provided
         % and outputs the singular instance of a reachable set.
-        % Returns ReachbleSet
+        % Returns FOInstance
         function reachableSet = generateReachableSet(self, robotState)
             % Computes the forward kinematics and occupancy
             

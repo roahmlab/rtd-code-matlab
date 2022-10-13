@@ -1,6 +1,7 @@
 classdef IRSInstance < ReachableSetInstance & NamedClass
-    % JRSInstance
-    % This is just an individual instance of an original ARMTD JRS.
+    % IRSInstance
+    % This is just an individual instance of input reachable set from
+    % armour.
     properties
         parameter_range = [-1.0, 1.0]
         output_range = []
@@ -13,8 +14,6 @@ classdef IRSInstance < ReachableSetInstance & NamedClass
         n_t
     end
     methods
-        % An example constructor, but can take anything needed for the
-        % respective ReachableSets class.
         function self = IRSInstance( ...
                     u_ub, u_lb, jrsInstance ...
                 )
@@ -28,8 +27,8 @@ classdef IRSInstance < ReachableSetInstance & NamedClass
             self.output_range = [];
         end
         
-        % Handles the obstacle-frs pair or similar to generate the
-        % nlconstraint.
+        % Generates an nlconstraint if needed, or will return a NOP
+        % function.
         % Returns a function handle for the nlconstraint generated
         % where the function's return type is [c, ceq, gc, gceq]
         function nlconFunction = genNLConstraint(self, worldState)

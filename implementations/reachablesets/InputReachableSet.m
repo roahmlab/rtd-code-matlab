@@ -1,16 +1,13 @@
 classdef InputReachableSet < ReachableSets & NamedClass
-    % ArmTdForwardOccupancy
-    % This either encapsulates the reachable sets in memory, or enables the
-    % online computation of reachable sets. It acts as a generator for a
-    % single instance of ReachableSet
+    % InputReachableSet
+    % This generates the upper and lower bound reachable sets on the input,
+    % and creates an IRSInstance object.
     properties
         cache_max_size = 1
-        robotInfo
         jrsHandle
         use_robust_input
     end
     methods
-        % An example constructor, but can take anything needed
         function self = InputReachableSet( ...
                     robotInfo, jrsHandle, use_robust_input ...
                 )
@@ -21,7 +18,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
         
         % Obtains the relevant reachable set for the robotstate provided
         % and outputs the singular instance of a reachable set.
-        % Returns ReachbleSet
+        % Returns IRSInstance
         function reachableSet = generateReachableSet(self, robotState)
             % Computes the forward kinematics and occupancy
             
@@ -131,6 +128,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
                 end
             end
             
+            % Save the generated reachable sets into the IRSInstance
             reachableSet = IRSInstance(u_ub, u_lb, jrsInstance);
         end
     end

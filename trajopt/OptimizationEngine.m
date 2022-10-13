@@ -1,4 +1,5 @@
 classdef OptimizationEngine < handle
+    % OptimizationEngine
     % This class should create a parameterized instance of some nonlinear
     % optimizer. For example, in MATLAB, this would be fmincon.
     methods (Abstract)

@@ -1,6 +1,7 @@
 classdef FOInstance < ReachableSetInstance
-    % JRSInstance
-    % This is just an individual instance of an original ARMTD JRS.
+    % FOInstance
+    % This is just an individual instance of an original ARMTD FO
+    % generation.
     properties
         parameter_range = [-1.0, 1.0]
         output_range = []
@@ -17,8 +18,6 @@ classdef FOInstance < ReachableSetInstance
         obs_frs_combs
     end
     methods
-        % An example constructor, but can take anything needed for the
-        % respective ReachableSets class.
         function self = FOInstance( ...
                     robotInfo, R_w, p_w, FO, jrsInstance, smooth_obs ...
                 )

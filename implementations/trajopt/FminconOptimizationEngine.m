@@ -1,16 +1,24 @@
 classdef FminconOptimizationEngine < OptimizationEngine
+    % FminconOptimizationEngine
+    % This class wraps the fmincon call to the format expected for
+    % OptimizationEngin subclasses. It includes our recommended default
+    % fmincon options and handles optimization timeout if requested.
     properties
+        % general trajectory optimiation properties
         trajOptProps TrajOptProps
+        % Fmincon options
         options
     end
-    % This class should create a parameterized instance of some nonlinear
-    % optimizer. For example, in MATLAB, this would be fmincon.
     methods
+        % Create an instance of this object. Merge any options for fmincon
+        % if provided.
         function self = FminconOptimizationEngine( ...
                 trajOptProps, ...
                 options, ...
                 varargin)
             self.trajOptProps = trajOptProps;
+
+            % Default options
             default = optimoptions('fmincon','SpecifyConstraintGradient',true);
             if exist('options','var')
                 to_merge = namedargs2cell(options);
@@ -30,14 +38,13 @@ classdef FminconOptimizationEngine < OptimizationEngine
                     constraintCallback,     ...
                     boundsStruct            ...
                 )
-            %P.vdisp('Running trajopt', 3)
-            
             % get how many extra variables we need
             n_remainder = size(boundsStruct.param_limits,1) - length(initialGuess);
             % get bounds
             lb = boundsStruct.param_limits(:,1);
             ub = boundsStruct.param_limits(:,2);
-            % Replace with rand_range
+            % Generate random values if requested, otherwise zeros for any
+            % thing not in our initial guess.
             if self.trajOptProps.randomInit
                 initial_extra = rand_range(lb(end-n_remainder+1:end), ...
                                            ub(end-n_remainder+1:end));
@@ -56,6 +63,7 @@ classdef FminconOptimizationEngine < OptimizationEngine
                 opts = optimoptions(opts,"OutputFcn",[{stop_fcn}, opts.OutputFcn]);
             end
             
+            % fmincon call
             [parameters, cost, exitflag, ~] = fmincon( ...
                 objectiveCallback, ...
                 initial, ...
@@ -66,6 +74,8 @@ classdef FminconOptimizationEngine < OptimizationEngine
             
             success = exitflag > 0 ;
         end
+
+        % timeout function
         function stop = timeout_fcn(self, startTime)
             elapsed = toc(startTime);
             stop = elapsed > self.trajOptProps.timeoutTime;
@@ -73,9 +83,7 @@ classdef FminconOptimizationEngine < OptimizationEngine
     end
 end
 
+% utility to generate a random range
 function n = rand_range(lo,hi)
     n = (hi-lo).*rand(size(hi)) + lo ;
 end
-
-    
-    

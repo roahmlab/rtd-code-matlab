@@ -1,10 +1,11 @@
 classdef RTD_TrajOpt < handle & NamedClass
+    % RTD_TrajOpt
     % This object handles the necessary calls to perform the actual
     % trajectory optimization when requested.
     properties
-        trajOptProps % t_plan is timeout
-        %horizon % t_final
+        trajOptProps TrajOptProps
     end
+    % Make protected later (Debate).
     properties%(Access = 'protected')
         robotInfo
         worldInfo
@@ -45,10 +46,8 @@ classdef RTD_TrajOpt < handle & NamedClass
                     waypoint,               ...
                     initialGuess            ...
                 )
-            % To implement, below is an outline
-            
+            % Generate reachable sets and their relevant constraints.
             self.vdisp("Generating RS's and constraints!")
-            % shown is just one, but for all reachablesets.
             rsInstances = {};
             nlconCallbacks = {};
             n_k = 0;
@@ -124,6 +123,7 @@ classdef RTD_TrajOpt < handle & NamedClass
     end
 end
 
+% Utility function to merge the constraints.
 function [h, heq, grad_h, grad_heq] = merge_constraints(k, n_k, rsInstances, nlconCallbacks)
     h = [];
     heq = [];

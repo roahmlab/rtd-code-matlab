@@ -1,9 +1,8 @@
 classdef Waypoint
-    %WAYPOINT Summary of this class goes here
-    %   Detailed explanation goes here
+    % Waypoint
+    % Unused, but remains in case abstraction is needed.
     
     properties
-        
     end
 end
 
