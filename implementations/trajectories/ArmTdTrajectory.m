@@ -67,11 +67,7 @@ classdef ArmTdTrajectory < Trajectory
             end
             
             % Perform an internal update (compute peak and stopping values)
-            % TODO: do something about the excessive try catch
-            try
-                self.internalUpdate();
-            catch
-            end
+            self.internalUpdate();
         end
         
         % Set the parameters of the trajectory, with a focus on the
@@ -110,12 +106,8 @@ classdef ArmTdTrajectory < Trajectory
             end
             
             % Perform an internal update (compute peak and stopping values)
-            % TODO: do something about the excessive try catch and code
-            % duplication
-            try
-                self.internalUpdate();
-            catch
-            end
+            % TODO: do something about the code duplication
+            self.internalUpdate();
         end
         
         % Validate that the trajectory is fully characterized

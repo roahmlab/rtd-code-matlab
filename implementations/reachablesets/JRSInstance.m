@@ -31,10 +31,18 @@ classdef JRSInstance < ReachableSetInstance
         %self = ReachableSets( ...
         %            robotInfo ...
         %        )
-        function initialize(self)
+        function initialize(self, traj_type)
             % expand the parameter range to match the number of joints
+            switch traj_type
+                case 'orig'
+                    c_k = self.jrs_info.c_k;
+                    g_k = self.jrs_info.g_k;
+                case 'bernstein'
+                    c_k = self.jrs_info.c_k_bernstein;
+                    g_k = self.jrs_info.g_k_bernstein;
+            end
             self.parameter_range = ones(self.jrs_info.n_k, 1) * self.parameter_range;
-            self.output_range = self.jrs_info.c_k + [-1.0, 1.0] .* self.jrs_info.g_k;
+            self.output_range = c_k + [-1.0, 1.0] .* g_k;
             
             self.n_q = self.jrs_info.n_q;
             self.n_k = self.jrs_info.n_k;

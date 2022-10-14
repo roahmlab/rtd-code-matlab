@@ -45,7 +45,7 @@ classdef ArmourPlanner < RTD_Planner
             %smooth_obs = false;
             
             % Create our reachable sets
-            self.jrsHandle = JointReachableSetsOnline(robotInfo);
+            self.jrsHandle = JointReachableSetsOnline(robotInfo, "traj_type", traj_type);
             self.foHandle = ForwardOccupancy(robotInfo, self.jrsHandle, smooth_obs);
             self.reachableSets = {self.jrsHandle, self.foHandle};
             if input_constraints_flag

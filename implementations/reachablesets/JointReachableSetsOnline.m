@@ -10,13 +10,19 @@ classdef JointReachableSetsOnline < ReachableSets & NamedClass
     end
     methods
         function self = JointReachableSetsOnline( ...
-                    robotInfo ...
+                    robotInfo, options ...
                 )
+                arguments
+                    robotInfo RobotInfo
+                    options.taylor_degree = 1
+                    options.add_ultimate_bound = true
+                    options.traj_type = 'orig'
+                end
+            
             self.robotInfo = robotInfo;
-            % TODO
-            self.taylor_degree = 1;
-            self.add_ultimate_bound = true;
-            self.traj_type = 'orig';
+            self.taylor_degree = options.taylor_degree;
+            self.add_ultimate_bound = options.add_ultimate_bound;
+            self.traj_type = options.traj_type;
         end
         
         % Obtains the relevant reachable set for the robotstate provided
@@ -44,7 +50,7 @@ classdef JointReachableSetsOnline < ReachableSets & NamedClass
                     self.add_ultimate_bound);
             
             % Initialize this particular instance and return
-            rs.initialize();
+            rs.initialize(self.traj_type);
             reachableSet = rs;
         end
     end
