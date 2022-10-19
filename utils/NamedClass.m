@@ -1,7 +1,7 @@
 classdef NamedClass < handle
     properties
         classname
-        verbose_level{mustBeScalarOrEmpty, mustBeNonnegative} = 0
+        verbose_level{mustBeScalarOrEmpty} = 0
     end
     methods
         function self = NamedClass()

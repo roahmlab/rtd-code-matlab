@@ -27,7 +27,7 @@ first_iter_pause_flag = true;
 use_q_plan_for_cost = false; % otherwise use q_stop (q at final time)
 input_constraints_flag = false;
 save_FO_zono_flag = true;
-traj_type = 'bernstein'; %'orig' or 'bernstein'
+traj_type = 'orig'; %'orig' or 'bernstein'
 
 %%% for agent
 % agent_urdf = 'fetch_arm_7DOF.urdf';
@@ -166,12 +166,35 @@ num_workers = 8;
 num_trials = 100;
 disp("Proceeding to auto-test")
 
+delete(gcp('nocreate'))
+parpool("Processes", num_workers)
+
+
 %% Auto test
-% Create 100 worlds
-old_time = [];
-new_time = [];
+% Create num_workers and num_trials worlds
+old_time = cell(1, num_trials);
+new_time = cell(1, num_trials);
 errored = [];
-for i = 1:100
+parfor i = 1:100
+    A = uarmtd_agent(robot, params,...
+                     'verbose', verbosity,...
+                     'animation_set_axes_flag', 0,... 
+                     'animation_set_view_flag', 0,...
+                     'move_mode', agent_move_mode,...
+                     'use_CAD_flag', use_CAD_flag,...
+                     'joint_speed_limits', joint_speed_limits, ...
+                     'joint_input_limits', joint_input_limits, ...
+                     'add_measurement_noise_', add_measurement_noise_, ...
+                     'measurement_noise_size_', measurement_noise_size_,...
+                     'M_min_eigenvalue', M_min_eigenvalue);
+    
+    % LLC
+    A.LLC = uarmtd_robust_CBF_LLC('verbose', verbosity, ...
+                                  'use_true_params_for_robust', use_true_params_for_robust);
+    % A.LLC = uarmtd_robust_CBF_MEX_LLC('verbose', verbosity, ...
+    %                               'use_true_params_for_robust', use_true_params_for_robust);
+    A.LLC.setup(A);
+
     W = fetch_base_world_static('include_base_obstacle', true, 'goal_radius', pi/30, 'N_random_obstacles', N_random_obstacles,'dimension',dimension,'workspace_goal_check', 0,...
         'verbose',verbosity, 'creation_buffer', 0.05, 'base_creation_buffer', 0.025) ;
 
@@ -202,8 +225,8 @@ for i = 1:100
     if (sum(P.info.error_count) > 0)
         errored = [errored, P];
     end
-    old_time = [old_time, P.info.planning_time];
-    new_time = [new_time, P.new_info.planning_time];
+    old_time(i) = {P.info.planning_time};
+    new_time(i) = {P.new_info.planning_time};
 end
 
 %% stats

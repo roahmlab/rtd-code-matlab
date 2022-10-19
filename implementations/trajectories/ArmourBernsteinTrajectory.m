@@ -136,7 +136,8 @@ classdef ArmourBernsteinTrajectory < Trajectory
             % Parameters of our class
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.parameter_range;
-            q_goal = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            %q_goal = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            q_goal = self.jrsInstance.jrs_info.c_k_bernstein + self.jrsInstance.jrs_info.g_k_bernstein.*self.trajectoryParams;
             self.n_q = length(self.robotState.q);
             self.alpha = zeros(self.n_q, 6);
             for j = 1:self.n_q  % Modified to use matrix instead of cells

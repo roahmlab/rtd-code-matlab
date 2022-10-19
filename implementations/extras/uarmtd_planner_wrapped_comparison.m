@@ -10,7 +10,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
         new_info
         wait_on_first_run = true
         random_init = false
-        comparison_delta = 1e-7
+        comparison_delta = 1e-8
 
         % housekeeping
         time_discretization = 0.01;        
