@@ -162,8 +162,8 @@ else
 end
 
 %% Test setup
-num_workers = 8;
-num_trials = 100;
+num_workers = 5;
+num_trials = 5;
 disp("Proceeding to auto-test")
 
 delete(gcp('nocreate'))
@@ -175,7 +175,7 @@ parpool("Processes", num_workers)
 old_time = cell(1, num_trials);
 new_time = cell(1, num_trials);
 errored = [];
-parfor i = 1:100
+parfor i = 1:num_trials
     A = uarmtd_agent(robot, params,...
                      'verbose', verbosity,...
                      'animation_set_axes_flag', 0,... 
