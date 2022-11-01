@@ -162,8 +162,8 @@ else
 end
 
 %% Test setup
-num_workers = 5;
-num_trials = 5;
+num_workers = 100;
+num_trials = 1000;
 disp("Proceeding to auto-test")
 
 delete(gcp('nocreate'))
@@ -174,7 +174,7 @@ parpool("Processes", num_workers)
 % Create num_workers and num_trials worlds
 old_time = cell(1, num_trials);
 new_time = cell(1, num_trials);
-errored = [];
+errored = cell(1, num_trials);
 parfor i = 1:num_trials
     A = uarmtd_agent(robot, params,...
                      'verbose', verbosity,...
@@ -223,7 +223,7 @@ parfor i = 1:num_trials
     S.run()
     
     if (sum(P.info.error_count) > 0)
-        errored = [errored, P];
+        errored(i) = {P};
     end
     old_time(i) = {P.info.planning_time};
     new_time(i) = {P.new_info.planning_time};
@@ -243,14 +243,30 @@ legend(["old time", "new time"],'Location','northwest');
 xlabel("Planning Iteration")
 ylabel("Cumulative Time (s)")
 
+% get the mask of successful trials
+success_mask = cellfun(@isempty, errored);
+
 % disp
 disp("Error count:")
-length(errored)
-disp("Old planner time stats:")
-mu = mean(old_time)
-sigma = std(old_time)
-med = median(old_time)
-disp("New planner time stats:")
-mu = mean(new_time)
-sigma = std(new_time)
-med = median(new_time)
+sum(~success_mask)
+
+disp("Old planner time stats (success)[mu,sigma,med]:")
+stats = stats_out(old_time, success_mask)
+
+disp("New planner time stats (success)[mu,sigma,med]:")
+stats = stats_out(new_time, success_mask)
+
+disp("Old planner time stats (fails)[mu,sigma,med]:")
+stats = stats_out(old_time, ~success_mask)
+
+disp("New planner time stats (fails)[mu,sigma,med]:")
+stats = stats_out(new_time, ~success_mask)
+
+
+function res = stats_out(times, success_mask)
+    temp = cell2mat(times(success_mask));
+    mu = mean(temp);
+    sigma = std(temp);
+    med = median(temp);
+    res = [mu, sigma, med];
+end
