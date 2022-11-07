@@ -6,6 +6,8 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
         agent
         planner
         latest_trajectory
+        wait_on_first_run = true
+        random_init = false
         
         % UNPROCESSED
         % housekeeping
@@ -71,6 +73,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             trajOptProps.horizonTime = P.t_stop;
             trajOptProps.doTimeout = false;
             trajOptProps.timeoutTime = P.t_move;
+            trajOptProps.randomInit = P.random_init;
             if P.use_q_plan_for_cost
                 trajOptProps.timeForCost = P.t_move;
             else
@@ -146,8 +149,10 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
                 P.info.desired_trajectory = [P.info.desired_trajectory, {@(t) unwrap_traj(traj.getCommand(t))}];
                 P.latest_trajectory = traj;
                 
-                P.vdisp('Press Enter to Continue:',6)
-                pause; 
+                if P.wait_on_first_run
+                    P.vdisp('Press Enter to Continue:')
+                    pause;
+                end
             end
             P.iter = P.iter + 1;
             planning_time = tic;

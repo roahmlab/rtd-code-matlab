@@ -27,9 +27,9 @@ first_iter_pause_flag = true;
 use_q_plan_for_cost = false; % otherwise use q_stop (q at final time)
 input_constraints_flag = false;
 save_FO_zono_flag = true;
-traj_type = 'bernstein'; %'orig' or 'bernstein'
+traj_type = 'orig'; %'orig' or 'bernstein'
 % For bernstein, due to precision errors in optimization, this actually needs to be greater!
-% 1e-8 works for orig, 1e-5 for bernstein.
+% 1e-8 works for orig, 2e-5 for bernstein.
 comparison_delta = 2e-5;
 random_init = false; % Random init results in less similar optimizations
 
@@ -167,16 +167,46 @@ else
 end
 
 %% Test setup
-num_workers = 8;
-num_trials = 100;
+num_workers = 50; % specify 0 to run without parallel pool
+num_trials = 1000;
+timeout = 3600;
 disp("Proceeding to auto-test")
 
+delete(gcp('nocreate'))
+if num_workers > 0
+    parpool("Processes", num_workers)
+end
+
+
 %% Auto test
-% Create 100 worlds
-old_time = [];
-new_time = [];
-errored = [];
-for i = 1:100
+% Create num_workers and num_trials worlds
+old_time = cell(1, num_trials);
+new_time = cell(1, num_trials);
+errored = cell(1, num_trials);
+summaries = cell(1, num_trials);
+timeouts = zeros(1, num_trials);
+clear summary
+% note that i runs in nondeterministic manner regardless!
+parfor (i = 1:num_trials, num_workers)
+    A = uarmtd_agent(robot, params,...
+                     'verbose', verbosity,...
+                     'animation_set_axes_flag', 0,... 
+                     'animation_set_view_flag', 0,...
+                     'move_mode', agent_move_mode,...
+                     'use_CAD_flag', use_CAD_flag,...
+                     'joint_speed_limits', joint_speed_limits, ...
+                     'joint_input_limits', joint_input_limits, ...
+                     'add_measurement_noise_', add_measurement_noise_, ...
+                     'measurement_noise_size_', measurement_noise_size_,...
+                     'M_min_eigenvalue', M_min_eigenvalue);
+    
+    % LLC
+    A.LLC = uarmtd_robust_CBF_LLC('verbose', verbosity, ...
+                                  'use_true_params_for_robust', use_true_params_for_robust);
+    % A.LLC = uarmtd_robust_CBF_MEX_LLC('verbose', verbosity, ...
+    %                               'use_true_params_for_robust', use_true_params_for_robust);
+    A.LLC.setup(A);
+
     W = fetch_base_world_static('include_base_obstacle', true, 'goal_radius', pi/30, 'N_random_obstacles', N_random_obstacles,'dimension',dimension,'workspace_goal_check', 0,...
         'verbose',verbosity, 'creation_buffer', 0.05, 'base_creation_buffer', 0.025) ;
 
@@ -200,17 +230,19 @@ for i = 1:100
     A.state(A.joint_state_indices) = W.start ;
 
     % create simulator
-    S = simulator_armtd(A,W,P,'allow_replan_errors',allow_replan_errors,'max_sim_time',3600,'max_sim_iterations',1000) ;
+    S = simulator_armtd(A,W,P,'allow_replan_errors',allow_replan_errors,'max_sim_time',timeout,'max_sim_iterations',1000) ;
     S.stop_sim_when_ultimate_bound_exceeded = false;
     
     % run the world
-    S.run()
+    summary = S.run()
     
     if (sum(P.info.error_count) > 0)
-        errored = [errored, P];
+        errored(i) = {P};
     end
-    old_time = [old_time, P.info.planning_time];
-    new_time = [new_time, P.new_info.planning_time];
+    old_time(i) = {P.info.planning_time};
+    new_time(i) = {P.new_info.planning_time};
+    summaries(i) = {summary};
+    timeouts(i) = summary.goal_check;
 end
 
 %% stats
@@ -227,14 +259,33 @@ legend(["old time", "new time"],'Location','northwest');
 xlabel("Planning Iteration")
 ylabel("Cumulative Time (s)")
 
+% get the mask of successful trials
+success_mask = cellfun(@isempty, errored);
+
 % disp
 disp("Error count:")
-length(errored)
-disp("Old planner time stats:")
-mu = mean(old_time)
-sigma = std(old_time)
-med = median(old_time)
-disp("New planner time stats:")
-mu = mean(new_time)
-sigma = std(new_time)
-med = median(new_time)
+sum(~success_mask)
+
+disp("Timeouts:")
+sum(timeouts)
+
+disp("Old planner time stats (success)[mu,sigma,med]:")
+stats = stats_out(old_time, success_mask)
+
+disp("New planner time stats (success)[mu,sigma,med]:")
+stats = stats_out(new_time, success_mask)
+
+disp("Old planner time stats (fails)[mu,sigma,med]:")
+stats = stats_out(old_time, ~success_mask)
+
+disp("New planner time stats (fails)[mu,sigma,med]:")
+stats = stats_out(new_time, ~success_mask)
+
+
+function res = stats_out(times, success_mask)
+    temp = cell2mat(times(success_mask));
+    mu = mean(temp);
+    sigma = std(temp);
+    med = median(temp);
+    res = [mu, sigma, med];
+end
