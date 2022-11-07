@@ -162,8 +162,9 @@ else
 end
 
 %% Test setup
-num_workers = 100;
+num_workers = 50;
 num_trials = 1000;
+timeout = 3600;
 disp("Proceeding to auto-test")
 
 delete(gcp('nocreate'))
@@ -175,6 +176,9 @@ parpool("Processes", num_workers)
 old_time = cell(1, num_trials);
 new_time = cell(1, num_trials);
 errored = cell(1, num_trials);
+%summaries = cell(1, num_trials);
+timeouts = zeros(1, num_trials);
+clear summary
 parfor i = 1:num_trials
     A = uarmtd_agent(robot, params,...
                      'verbose', verbosity,...
@@ -216,17 +220,19 @@ parfor i = 1:num_trials
     A.state(A.joint_state_indices) = W.start ;
 
     % create simulator
-    S = simulator_armtd(A,W,P,'allow_replan_errors',allow_replan_errors,'max_sim_time',3600,'max_sim_iterations',1000) ;
+    S = simulator_armtd(A,W,P,'allow_replan_errors',allow_replan_errors,'max_sim_time',timeout,'max_sim_iterations',1000) ;
     S.stop_sim_when_ultimate_bound_exceeded = false;
     
     % run the world
-    S.run()
+    summary = S.run()
     
     if (sum(P.info.error_count) > 0)
         errored(i) = {P};
     end
     old_time(i) = {P.info.planning_time};
     new_time(i) = {P.new_info.planning_time};
+    %summaries(i) = {summary};
+    timeouts(i) = summary.goal_check;
 end
 
 %% stats
@@ -249,6 +255,9 @@ success_mask = cellfun(@isempty, errored);
 % disp
 disp("Error count:")
 sum(~success_mask)
+
+disp("Timeouts:")
+sum(timeouts)
 
 disp("Old planner time stats (success)[mu,sigma,med]:")
 stats = stats_out(old_time, success_mask)
