@@ -144,6 +144,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
                 traj = P.planner.trajectoryFactory(robotState,{rs});
                 traj.setTrajectory(zeros(traj.param_shape,1));
                 P.info.desired_trajectory = [P.info.desired_trajectory, {@(t) unwrap_traj(traj.getCommand(t))}];
+                P.latest_trajectory = traj;
                 
                 P.vdisp('Press Enter to Continue:',6)
                 pause; 

@@ -152,6 +152,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
                 traj = P.planner.trajectoryFactory(robotState,{rs});
                 traj.setTrajectory(zeros(traj.param_shape,1));
                 P.new_info.desired_trajectory = [P.new_info.desired_trajectory, {@(t) unwrap_traj(traj.getCommand(t))}];
+                P.latest_trajectory = traj;
 
                 if P.wait_on_first_run
                     P.vdisp('Press Enter to Continue:')
