@@ -27,7 +27,7 @@ first_iter_pause_flag = true;
 use_q_plan_for_cost = false; % otherwise use q_stop (q at final time)
 input_constraints_flag = false;
 save_FO_zono_flag = true;
-traj_type = 'orig'; %'orig' or 'bernstein'
+traj_type = 'bernstein'; %'orig' or 'bernstein'
 % For bernstein, due to precision errors in optimization, this actually needs to be greater!
 % 1e-8 works for orig, 2e-5 for bernstein.
 comparison_delta = 2e-5;
@@ -167,7 +167,7 @@ else
 end
 
 %% Test setup
-num_workers = 50; % specify 0 to run without parallel pool
+num_workers = 120; % specify 0 to run without parallel pool
 num_trials = 1000;
 timeout = 3600;
 disp("Proceeding to auto-test")
@@ -187,7 +187,13 @@ summaries = cell(1, num_trials);
 timeouts = zeros(1, num_trials);
 clear summary
 % note that i runs in nondeterministic manner regardless!
-parfor (i = 1:num_trials, num_workers)
+subdiv = 10;
+subdiv_amount = num_trials/subdiv;
+max_eps_q = 0;
+max_eps_qd = 0;
+for k=0:subdiv-1
+bad_ids = [];
+parfor (i = k*subdiv_amount+1:(k+1)*subdiv_amount, num_workers)
     A = uarmtd_agent(robot, params,...
                      'verbose', verbosity,...
                      'animation_set_axes_flag', 0,... 
@@ -238,11 +244,20 @@ parfor (i = 1:num_trials, num_workers)
     
     if (sum(P.info.error_count) > 0)
         errored(i) = {P};
+        max_eps_q = max(P.max_eps_q, max_eps_q);
+        max_eps_qd = max(P.max_eps_qd, max_eps_qd);
+        bad_ids = [bad_ids, i];
     end
     old_time(i) = {P.info.planning_time};
     new_time(i) = {P.new_info.planning_time};
     summaries(i) = {summary};
     timeouts(i) = summary.goal_check;
+end
+if (max_eps_q > 0) || (max_eps_qd > 0)
+    max_eps_q
+    max_eps_qd
+    bad_ids
+end
 end
 
 %% stats
@@ -282,7 +297,78 @@ disp("New planner time stats (fails)[mu,sigma,med]:")
 stats = stats_out(new_time, ~success_mask)
 
 
-function res = stats_out(times, success_mask)
+%% Find max epsilon
+problems = errored(~success_mask);
+
+%Store
+max_eps_q = 0;
+max_eps_qd = 0;
+for i=1:length(problems)
+
+    % old_fun = problems{i}.info.desired_trajectory;
+    % new_fun = problems{i}.new_info.desired_trajectory;
+    % num_fun = length(old_fun);
+
+    % T = 0:problems{i}.time_discretization:problems{i}.t_stop/2;
+    % for j=1:num_fun
+    %     for k=1:length(T)
+    %         T(k)
+    %         [q_tmp, qd_tmp, ~] = old_fun{j}(T(k));
+    %         [q_tmp_comp, qd_tmp_comp, ~] = new_fun{j+1}(T(k));
+    
+    %         max_eps_q = max(norm(q_tmp-q_tmp_comp), max_eps_q);
+    %         max_eps_qd = max(norm(qd_tmp-qd_tmp_comp), max_eps_qd);
+    %     end
+    % end
+    % i
+    max_eps_q = max(problems{i}.max_eps_q, max_eps_q);
+    max_eps_qd = max(problems{i}.max_eps_qd, max_eps_qd);
+end
+max_eps_q
+max_eps_qd
+
+
+%% Extra stuff written for validation
+id = 99;
+full_q_old = [];
+full_q_new = [];
+full_qd_old = [];
+full_qd_new = [];
+for i=1:length(errored{id}.info.traj_q)
+    full_q_old = [full_q_old, errored{id}.info.traj_q{i}(:,1:50)];
+    full_q_new = [full_q_new, errored{id}.new_info.traj_q{i}(:,1:50)];
+    full_qd_old = [full_qd_old, errored{id}.info.traj_qd{i}(:,1:50)];
+    full_qd_new = [full_qd_new, errored{id}.new_info.traj_qd{i}(:,1:50)];
+end
+T=0:errored{id}.time_discretization:errored{id}.time_discretization*(length(full_q_old)-1);
+
+plot(T, full_q_old.'-full_q_new.')
+hold on
+plot(T, full_qd_old.'-full_qd_new.')
+plot(T, full_q_old.')
+plot(T, full_q_new.')
+plot(T, full_qd_new.')
+plot(T, full_qd_old.')
+hold off
+
+k_exists_int = cellfun(@isnan, errored{id}.info.k_opt, 'UniformOutput', false);
+k_exists = cellfun(@sum, k_exists_int);
+T_k = 0:errored{id}.t_plan:T(end);
+% Make it a solid step
+k_exists_step = [k_exists; k_exists];
+k_exists_step = k_exists_step(:).';
+T_k_step = [0:errored{id}.t_plan:T(end); ...
+            (0:errored{id}.t_plan:T(end)) + errored{id}.t_plan];
+T_k_step = T_k_step(:).';
+
+% Check
+plot(T, full_qd_new.')
+hold on
+plot(T, full_qd_old.')
+plot(T_k_step, k_exists_step)
+
+%% Extra Func
+function [size, res] = stats_out(times, success_mask)
     temp = cell2mat(times(success_mask));
     mu = mean(temp);
     sigma = std(temp);

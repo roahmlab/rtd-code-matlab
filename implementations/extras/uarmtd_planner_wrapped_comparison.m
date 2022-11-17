@@ -49,6 +49,9 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
         % for JRSs and trajectories:
         taylor_degree = 1;
         traj_type = 'orig'; % choose 'orig' for original ARMTD, or 'bernstein'
+
+        max_eps_q = 0;
+        max_eps_qd = 0;
     end
     
     methods
@@ -108,11 +111,11 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             P.info = struct('T',[],'U',[],'Z',[],'waypoint',[],...
                 'obstacles',[],'q_0',[],'q_dot_0',[],'k_opt',[],...
                 'desired_trajectory', [], 't_move', [], ...
-                'FO_zono', [], 'sliced_FO_zono', [], 'planning_time', [], 'error_count', []) ;
+                'FO_zono', [], 'sliced_FO_zono', [], 'planning_time', [], 'error_count', [], 'traj_q', [], 'traj_qd', []) ;
             P.new_info = struct('T',[],'U',[],'Z',[],'waypoint',[],...
                 'obstacles',[],'q_0',[],'q_dot_0',[],'k_opt',[],...
                 'desired_trajectory', [], 't_move', [], ...
-                'FO_zono', [], 'sliced_FO_zono', [], 'planning_time', []) ;
+                'FO_zono', [], 'sliced_FO_zono', [], 'planning_time', [], 'traj_q', [], 'traj_qd', []) ;
         end
         
         function [T, U, Z, info] = replan(P,agent_info,world_info)
@@ -288,17 +291,31 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             T = 0:P.time_discretization:P.t_stop ;
             U = zeros(agent_info.n_inputs, length(T));
             Z = zeros(agent_info.n_states, length(T));
+            P.info.traj_q = [P.info.traj_q, {[]}];
+            P.info.traj_qd = [P.info.traj_qd, {[]}];
+            P.new_info.traj_q = [P.new_info.traj_q, {[]}];
+            P.new_info.traj_qd = [P.new_info.traj_qd, {[]}];
             error_count = 0;
             for i = 1:length(T)
                 [q_tmp, qd_tmp, ~] = P.info.desired_trajectory{end}(T(i));
                 % COMPARE
                 [q_tmp_comp, qd_tmp_comp, ~] = P.new_info.desired_trajectory{end}(T(i));
-                if i < length(T)/2 && ~(norm(q_tmp-q_tmp_comp) < P.comparison_delta && norm(qd_tmp-qd_tmp_comp) < P.comparison_delta)
+                if i < length(T)/2 && ~(norm(q_tmp-q_tmp_comp) < P.comparison_delta ...
+                        && norm(qd_tmp-qd_tmp_comp) < P.comparison_delta) ...
+                        % Ignore the trajopt failed times just because of 
+                        && ~trajopt_failed
+
                     % Put breakpoint here for comparison!
                     P.vdisp('Disparity between old and new planner detected!');
                     P.vdisp('Using old planner values!');
                     error_count = error_count + 1;
+                    P.max_eps_q = max(norm(q_tmp-q_tmp_comp), P.max_eps_q);
+                    P.max_eps_qd = max(norm(qd_tmp-qd_tmp_comp), P.max_eps_qd);
                 end
+                P.info.traj_q{end} = [P.info.traj_q{end}, q_tmp];
+                P.info.traj_qd{end} = [P.info.traj_qd{end}, qd_tmp];
+                P.new_info.traj_q{end} = [P.new_info.traj_q{end}, q_tmp_comp];
+                P.new_info.traj_qd{end} = [P.new_info.traj_qd{end}, qd_tmp_comp];
                 Z(agent_info.joint_state_indices, i) = q_tmp;
                 Z(agent_info.joint_speed_indices, i) = qd_tmp;
             end
