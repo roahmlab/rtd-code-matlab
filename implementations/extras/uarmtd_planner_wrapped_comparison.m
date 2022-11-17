@@ -302,8 +302,9 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
                 [q_tmp_comp, qd_tmp_comp, ~] = P.new_info.desired_trajectory{end}(T(i));
                 if i < length(T)/2 && ~(norm(q_tmp-q_tmp_comp) < P.comparison_delta ...
                         && norm(qd_tmp-qd_tmp_comp) < P.comparison_delta) ...
-                        % Ignore the trajopt failed times just because of 
                         && ~trajopt_failed
+                        % Ignore the trajopt failed times just because of
+                        % comments here https://www.notion.so/Finish-verifying-Bernstein-trajectories-and-update-to-new-FRS-representation-5296d10b8ef54a219628f1af7cec38a5
 
                     % Put breakpoint here for comparison!
                     P.vdisp('Disparity between old and new planner detected!');
