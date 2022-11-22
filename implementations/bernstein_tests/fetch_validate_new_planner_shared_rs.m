@@ -112,7 +112,7 @@ W = fetch_base_world_static('include_base_obstacle', true, 'goal_radius', pi/30,
 %     plot_waypoint_arm_flag  = true ; % for HLP
 %     lookahead_distance = 0.1 ;
 
-P = uarmtd_planner_wrapped_comparison(...
+P = uarmtd_planner_wrapped_comparison_shared_frs(...
     'agent', A, ...
     'verbose', verbosity, ...
     'traj_type', traj_type, ...
@@ -167,7 +167,7 @@ else
 end
 
 %% Test setup
-num_workers = 120; % specify 0 to run without parallel pool
+num_workers = 100; % specify 0 to run without parallel pool
 num_trials = 1000;
 timeout = 3600;
 disp("Proceeding to auto-test")
@@ -186,14 +186,7 @@ errored = cell(1, num_trials);
 summaries = cell(1, num_trials);
 timeouts = zeros(1, num_trials);
 clear summary
-% note that i runs in nondeterministic manner regardless!
-subdiv = 10;
-subdiv_amount = num_trials/subdiv;
-max_eps_q = 0;
-max_eps_qd = 0;
-for k=0:subdiv-1
-bad_ids = [];
-parfor (i = k*subdiv_amount+1:(k+1)*subdiv_amount, num_workers)
+parfor (i = 1:num_trials, num_workers)
     A = uarmtd_agent(robot, params,...
                      'verbose', verbosity,...
                      'animation_set_axes_flag', 0,... 
@@ -217,14 +210,14 @@ parfor (i = k*subdiv_amount+1:(k+1)*subdiv_amount, num_workers)
         'verbose',verbosity, 'creation_buffer', 0.05, 'base_creation_buffer', 0.025) ;
 
     % Create new planner
-    P = uarmtd_planner_wrapped_comparison(...
+    P = uarmtd_planner_wrapped_comparison_shared_frs(...
         'agent', A, ...
         'wait_on_first_run', false, ...
         'verbose', verbosity, ...
         'traj_type', traj_type, ...
         'random_init', random_init, ...
         'comparison_delta', comparison_delta, ...
-        'first_iter_pause_flag', first_iter_pause_flag, ...
+        'first_iter_pause_flag', false, ...
         'use_q_plan_for_cost', use_q_plan_for_cost, ...
         'input_constraints_flag', input_constraints_flag, ...
         'save_FO_zono_flag', save_FO_zono_flag) ;
@@ -244,20 +237,14 @@ parfor (i = k*subdiv_amount+1:(k+1)*subdiv_amount, num_workers)
     
     if (sum(P.info.error_count) > 0)
         errored(i) = {P};
-        max_eps_q = max(P.max_eps_q, max_eps_q);
-        max_eps_qd = max(P.max_eps_qd, max_eps_qd);
-        bad_ids = [bad_ids, i];
+        %max_eps_q = max(P.max_eps_q, max_eps_q);
+        %max_eps_qd = max(P.max_eps_qd, max_eps_qd);
+        %bad_ids = [bad_ids, i];
     end
     old_time(i) = {P.info.planning_time};
     new_time(i) = {P.new_info.planning_time};
     summaries(i) = {summary};
     timeouts(i) = summary.goal_check;
-end
-if (max_eps_q > 0) || (max_eps_qd > 0)
-    max_eps_q
-    max_eps_qd
-    bad_ids
-end
 end
 
 %% stats

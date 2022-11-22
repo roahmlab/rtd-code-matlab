@@ -1,4 +1,4 @@
-classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
+classdef uarmtd_planner_wrapped_comparison_shared_frs < robot_arm_generic_planner
     % UARMTD_PLANNER implements new polynomial zonotope collision-avoidance
     % and input constraints
     
@@ -55,7 +55,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
     end
     
     methods
-        function P = uarmtd_planner_wrapped_comparison(varargin)
+        function P = uarmtd_planner_wrapped_comparison_shared_frs(varargin)
             t_move = 0.5;
             lookahead_distance = 0.4;
             HLP = robot_arm_straight_line_HLP( );
@@ -241,7 +241,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             old_planner_time = tic;
             % get current obstacles and create constraints
             P.vdisp('Generating constraints',6)
-            [P, FO] = P.generate_constraints(q_0, q_dot_0, q_ddot_0, world_info.obstacles);
+            [P, FO] = P.generate_constraints_from_new(plan_info, world_info.obstacles);
             
             % optimize
             P.vdisp('Replan is calling trajopt!',8)
@@ -326,101 +326,19 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
 
         end
         
-        function [P, FO] = generate_constraints(P, q_0, q_dot_0, q_ddot_0, O)
-            %% get JRSs:
-            [q_des, dq_des, ddq_des, q, dq, dq_a, ddq_a, R_des, R_t_des, R, R_t, jrs_info] = create_jrs_online(q_0, q_dot_0, q_ddot_0,...
-                P.agent_info.params.pz_nominal.joint_axes, P.taylor_degree, P.traj_type, P.use_robust_input);
+        function [P, FO] = generate_constraints_from_new(P, new_planner_info, O)
+            % JRS info (not directly used for constraints)
+            jrs_info = new_planner_info.rsInstances{1}.jrs_info;
             P.jrs_info = jrs_info;
 
-            %% create FO and input poly zonotopes:
-            % set up zeros and overapproximation of r
-            for j = 1:jrs_info.n_q
-                zero_cell{j, 1} = polyZonotope_ROAHM(0); 
-                r{j, 1} = polyZonotope_ROAHM(0, [], P.agent_info.LLC_info.ultimate_bound);
-            end
+            % FO (used later for constraints)
+            FO = new_planner_info.rsInstances{2}.FO;
             
-            % get forward kinematics and forward occupancy
-            for i = 1:jrs_info.n_t
-               [R_w{i, 1}, p_w{i, 1}] = pzfk(R{i, 1}, P.agent_info.params.pz_nominal); 
-               for j = 1:P.agent_info.params.pz_nominal.num_bodies
-                  FO{i, 1}{j, 1} = R_w{i, 1}{j, 1}*P.agent_info.link_poly_zonotopes{j, 1} + p_w{i, 1}{j, 1}; 
-                  FO{i, 1}{j, 1} = reduce(FO{i, 1}{j, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
-                  FO{i, 1}{j, 1} = remove_dependence(FO{i, 1}{j, 1}, jrs_info.k_id(end));
-               end
-            end
-
-            % get nominal inputs, disturbances, possible lyapunov functions:
-            % can possibly speed up by using tau_int - tau_int to get disturbance.
+            % the following may not exist
+            % TODO: struct-ify or name the rsInstaces.
             if P.input_constraints_flag
-                for i = 1:jrs_info.n_t
-                    tau_nom{i, 1} = poly_zonotope_rnea(R{i}, R_t{i}, dq{i}, dq_a{i}, ddq_a{i}, true, P.agent_info.params.pz_nominal);
-                    if P.use_robust_input
-                        [tau_int{i, 1}, f_int{i, 1}, n_int{i, 1}] = poly_zonotope_rnea(R{i}, R_t{i}, dq{i}, dq_a{i}, ddq_a{i}, true, P.agent_info.params.pz_interval);
-                        for j = 1:jrs_info.n_q
-                            w{i, 1}{j, 1} = tau_int{i, 1}{j, 1} - tau_nom{i, 1}{j, 1};
-                            w{i, 1}{j, 1} = reduce(w{i, 1}{j, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
-                        end
-                        V_cell = poly_zonotope_rnea(R{i}, R_t{i}, zero_cell, zero_cell, r, false, P.agent_info.params.pz_interval);
-                        V{i, 1} = 0;
-                        for j = 1:jrs_info.n_q
-                            V{i, 1} = V{i, 1} + 0.5.*r{j, 1}.*V_cell{j, 1};
-                            V{i, 1} = reduce(V{i, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
-                        end
-                        V_diff{i, 1} = V{i, 1} - V{i, 1};
-                        V_diff{i, 1} = reduce(V_diff{i, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
-                        V_diff_int{i, 1} = interval(V_diff{i, 1});
-                    end
-                end
-
-                % % get max effect of disturbance r'*w... couple of ways to do this
-                % % can overapproximate r and compute r'*w as a PZ
-                % % can slice w first, then get the norm?
-                % for i = 1:jrs_info.n_t
-                %     r_dot_w{i, 1} = 0;
-                %     for j = 1:jrs_info.n_q
-                %         r_dot_w{i, 1} = r_dot_w{i, 1} + r{j, 1}.*w{i, 1}{j, 1};
-                %         r_dot_w{i, 1} = reduce(r_dot_w{i, 1}, 'girard', P.params.pz_interval.zono_order);
-                %     end
-                % end
-                % can get ||w|| <= ||\rho(\Phi)||, and compute the norm using interval arithmetic
-                if P.use_robust_input
-                    for i = 1:jrs_info.n_t
-                        for j = 1:jrs_info.n_q
-                            w_int{i, 1}(j, 1) = interval(w{i, 1}{j, 1});
-                        end
-                        rho_max{i, 1} = norm(max(abs(w_int{i, 1}.inf), abs(w_int{i, 1}.sup)));
-                    end
-
-                    % compute robust input bound tortatotope:
-                    for i = 1:jrs_info.n_t
-                        v_norm{i, 1} = (P.agent_info.LLC_info.alpha_constant*V_diff_int{i, 1}.sup).*(1/P.agent_info.LLC_info.ultimate_bound) + rho_max{i, 1};
-    %                     v_norm{i, 1} = reduce(v_norm{i, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
-                    end
-                else
-                    for i = 1:jrs_info.n_t
-                        v_norm{i, 1} = 0;
-                    end
-                end
-
-                % compute total input tortatotope
-                for i = 1:jrs_info.n_t
-                    for j = 1:jrs_info.n_q
-                        u_ub_tmp = tau_nom{i, 1}{j, 1} + v_norm{i, 1};
-                        u_lb_tmp = tau_nom{i, 1}{j, 1} - v_norm{i, 1};
-                        u_ub_tmp = remove_dependence(u_ub_tmp, jrs_info.k_id(end));
-                        u_lb_tmp = remove_dependence(u_lb_tmp, jrs_info.k_id(end));
-                        u_ub_buff = sum(abs(u_ub_tmp.Grest));
-                        u_lb_buff = -sum(abs(u_lb_tmp.Grest));
-                        u_ub{i, 1}{j, 1} = polyZonotope_ROAHM(u_ub_tmp.c + u_ub_buff, u_ub_tmp.G, [], u_ub_tmp.expMat, u_ub_tmp.id) - P.agent_info.joint_input_limits(2, j);
-                        u_lb{i, 1}{j, 1} = -1*polyZonotope_ROAHM(u_lb_tmp.c + u_lb_buff, u_lb_tmp.G, [], u_lb_tmp.expMat, u_lb_tmp.id) + P.agent_info.joint_input_limits(1, j);
-                    end
-                end
-                
-                % grasp constraints:
-                if P.grasp_constraints_flag
-                    % ASSUMING SURFACE NORMAL IS POSITIVE Z-DIRECTION
-                    % fill this out still
-                end
+                u_ub = new_planner_info.rsInstances{3}.u_ub;
+                u_lb = new_planner_info.rsInstances{3}.u_lb;
             end
 
             %% start making constraints
