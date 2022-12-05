@@ -316,7 +316,7 @@ max_eps_qd
 
 
 %% Extra stuff written for validation
-id = 62;
+id = 2;
 full_q_old = [];
 full_q_new = [];
 full_qd_old = [];
@@ -341,7 +341,7 @@ plot(T, full_q_new.')
 plot(T, full_qd_new.')
 plot(T, full_qd_old.')
 hold off
-
+%%
 k_exists_int = cellfun(@isnan, errored{id}.info.k_opt, 'UniformOutput', false);
 k_exists = cellfun(@sum, k_exists_int);
 T_k = 0:errored{id}.t_plan:T(end);

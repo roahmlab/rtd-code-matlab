@@ -173,8 +173,8 @@ disp("Press enter to continue")
 
 %% Test setup
 %num_workers = 120; % specify 0 to run without parallel pool
-num_trials = 100;
-timeout = 3600;
+num_trials = 500;
+timeout = 36000;
 disp("Proceeding to auto-test")
 
 % delete(gcp('nocreate'))
@@ -276,8 +276,21 @@ if (max_eps_q > 0) || (max_eps_qd > 0)
 end
 end
 
-%% stats
+%% stats new
+% mean median std min max range
+for i=1:num_trials
+    overall_range = zeros(size(summaries{i}.k_opts_stats{1}(:, 6)));
+    for j=1:length(summaries{i}.k_opts_stats)
+        if any(isnan(summaries{i}.k_opts_stats{j}(:, 3)))
+            continue
+        end
+        overall_range = max(overall_range, summaries{i}.k_opts_stats{j}(:, 3));
+    end
+    i, overall_range
+    pause
+end
 
+%% stats old
 % Graph
 oldcumtime = cumsum([0; to_graph.old_time(:)]);
 newcumtime = cumsum([0; to_graph.new_time(:)]);
