@@ -17,118 +17,40 @@ classdef DynamicsComponent < handle
             self.arm_state_component = arm_state_component;
             self.controller_component = controller_component;
         end
-        %% robot_arm_agent
-        %% inverse kinematics
-        function [q,exitflag] = inverse_kinematics(A,J,q0)
-            % q = A.inverse_kinematics(J)
-            % q = A.inverse_kinematics(J,q0)
-            % [q,exitflag] = A.inverse_kinematics(...)
-            %
-            % Given a desired end-effector location, or locations of all
-            % the joints, J, as an A.dimension-by-(1 or A.n_links...)
-            % array, attempt to find a configuration q that reaches that
-            % location. This uses fmincon for nonlinear optimization of the
-            % Euclidean distances squared to each joint location as the
-            % cost function. The second (optional) argument is an initial
-            % guess for the nonlinear solver.
-            
-            if nargin < 3
-                q0 = A.state(A.joint_state_indices,end) ;
-            end
-            
-            if size(J,2) > 1
-                [q,exitflag] = A.inverse_kinematics_joint_locations(J,q0) ;
-            else
-                [q,exitflag] = A.inverse_kinematics_end_effector(J,q0) ;
-            end
-        end
         
-        function [q,exitflag] = inverse_kinematics_joint_locations(A,J,q0)
-            % q = A.inverse_kinematics_joint_locations(J)
-            % q = A.inverse_kinematics_joint_locations(J,q0)
-            %
-            % Given joint locations J as a d-by-n array, return the
-            % static configuration q as an n-by-1 vector where n is the
-            % number of joints of the arm. This uses nonlinear optimization
-            % (fmincon) to find the joint configuration.
-            %
-            % The optional second input is an initial guess for the
-            % nonlinear least squares solver. If it is not returned, the
-            % arm uses its last state (the column vector A.state(:,end)) as
-            % the initial guess.
-            
-            % set up the initial config
-            if nargin < 3
-                q0 = A.state(A.joint_state_indices,end) ;
-            end
-            
-            % create the least-squares function to solve for the config
-            n = A.n_links_and_joints ;
-            d = A.dimension ;
-            opt_fun = @(x) sum(vecnorm(reshape(A.get_joint_locations(x),n*d,1) - J)) ;
-            
-            % create bounds on the solution
-            lb = A.joint_state_limits(1,:)' ;
-            ub = A.joint_state_limits(2,:)' ;
-            
-            % set options
-            options = optimoptions('fmincon') ;
-            if A.verbose < 2
-                options.Display = 'off' ;
-            end
-            
-            % optimize!
-            [q,~,exitflag] = fmincon(opt_fun,q0,[],[],[],[],lb,ub,[],options) ;
-        end
-        
-        function [q,exitflag] = inverse_kinematics_end_effector(A,J,q0)
-            % q = A.inverse_kinematics_end_effector(J,q0)
-            %
-            % Given an end-effector location J \in \R^d where d is the
-            % dimension of the agent (2 or 3), find the configuration q
-            % that gets the arm to that end effector location (or fail
-            % trying! aaaah!)
-            
-            % set up the initial guess
-            if nargin < 3
-                q0 = A.state(A.joint_state_indices,end) ;
-            end
-            
-            % create the function to solve for the config
-            opt_fun = @(x) sum((A.get_end_effector_location(x) - J(:)).^2) ;
-            
-            % create bounds on the solution
-            lb = A.joint_state_limits(1,:)' ;
-            ub = A.joint_state_limits(2,:)' ;
-            
-            % set options
-            options = optimoptions('fmincon') ;
-            if A.verbose < 2
-                options.Display = 'off' ;
-            end
-            
-            % optimize!
-            [q,~,exitflag] = fmincon(opt_fun,q0,[],[],[],[],lb,ub,[],options) ;
-        end
-         %% moving
+        %% move
         function move(A,t_move,T_ref,U_ref,Z_ref)
-            switch A.move_mode
-                case 'integrator'
-                    move@multi_link_agent(A,t_move,T_ref,U_ref,Z_ref)
-                case 'direct'
-                    % don't call the integrator, just assume the agent
-                    % perfectly executes the reference trajectory
-                    
-                    % get the reference trajectory up to time t_move
-                    T = 0:A.integrator_time_discretization:t_move ;
-                    [U,Z] = match_trajectories(T,T_ref,U_ref,T_ref,Z_ref) ;
-                    
-                    % append the reference trajectory to the agent's
-                    % current trajectory
-                    A.commit_move_data(T,Z,T,U) ;
-                otherwise
-                    error('Please set A.move_mode to ''integrator'' or ''direct''!')
+            % method: move(t_move,T_ref,U_ref,Z_ref)
+            %
+            % Moves the agent for the duration t_move using the nominal
+            % inputs U_ref and nominal trajectory Z_ref that are indexed by
+            % the nominal time T_ref.
+            %
+            % This method assumes that the input is zero-order hold, and
+            % the input corresponding to the last time index is zero; this
+            % is why the last old input is discarded when the input is
+            % updated. Similarly, this method assumes that the nominal time
+            % starts at 0.
+            
+            A.vdisp('Moving!',5)
+            
+            % set up default reference trajectory
+            if nargin < 5
+                Z_ref = [] ;
             end
+            
+            % get the time, input, and reference trajectory to use for
+            % moving the agent
+            [T_used,U_used,Z_used] = self.controller.move_setup(t_move,T_ref,U_ref,Z_ref) ;
+            
+            % get the current state
+            zcur = A.state(:,end) ;
+            
+            % call the ode solver to simulate agent
+            [tout,zout] = A.integrator(@(t,z) A.dynamics(t,z,T_ref,U_ref,Z_ref),...
+                                       [0 t_move], zcur) ;
+            
+            A.commit_move_data(tout,zout,T_used,U_used,Z_used) ;
         end
         
         function move_random(A)

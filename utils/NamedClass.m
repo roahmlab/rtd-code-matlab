@@ -1,7 +1,7 @@
 classdef NamedClass < handle
     properties
-        classname
-        verbose_level{mustBeScalarOrEmpty} = 0
+        classname char = ''
+        verbose_level {mustBeScalarOrEmpty} = 0
     end
     methods
         function self = NamedClass()
@@ -14,7 +14,11 @@ classdef NamedClass < handle
                 level = 0 ;
             end
             if self.verbose_level >= level
-                disp([self.classname, ': ', char(output)])
+                name = self.classname;
+                if isprop(self, "name")
+                    name = [char(self.name), '-', self.classname];
+                end
+                disp([name, ': ', char(output)])
             end
         end
     end

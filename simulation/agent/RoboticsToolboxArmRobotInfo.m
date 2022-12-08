@@ -17,17 +17,68 @@ classdef RoboticsToolboxArmRobotInfo < handle
         
         kinematic_chain
         
-        joint_state_limits
-        joint_speed_limits
+        joint_position_limits
+        joint_velocity_limits
         joint_input_limits
         reach_limits
         
         buffer_dist
         params
         link_poly_zonotopes
-        LLC_info
+        %LLC_info -> controller
+        
+        q_index
     end
+    
     methods
+        function self = RoboticsToolboxArmRobotInfo(robot, params, options)
+            arguments
+                robot rigidBodyTree
+                params
+                options.gravity = [0 0 -9.81];
+                options.joint_position_limits = [];
+                options.joint_velocity_limits = [];
+            end
+            % Input/Output format for kinematics and dynamics.
+            robot.DataFormat = 'col';
+            robot.Gravity = options.gravity;
+            self.robot = robot;
+            
+            self.dimension = 3;
+            
+            self.n_links_and_joints = params.nominal.num_joints;
+            q_index = params.nominal.q_index;
+            
+            link_shapes = repmat({'cuboid'}, 1, n_links_and_joints);
+            [link_poly_zonotopes, link_sizes, temp_link_CAD_data] = create_pz_bounding_boxes(robot);
+
+            % these joint locations are taken in link-centered body-fixed frames
+            % imagine a frame at the center of link 1, and at the center of link 2
+            % we want to write the position of joint 2 in link 1's frame, and in link 2's frame.
+            for i = 1:n_links_and_joints
+                if i == 1
+                    joint_locations(:, i) = [params.nominal.T0(1:3, end, i);
+                                             -link_poly_zonotopes{i}.c];
+                else
+                    joint_locations(:, i) = [-link_poly_zonotopes{i-1}.c + params.nominal.T0(1:3, end, i);
+                                             -link_poly_zonotopes{i}.c];
+                end
+            end
+
+            % pull joint position limits from rigidBodyTree
+            % MATLAB doesn't store velocity/input limits, so pass these in externally for now.
+            for i = 1:n_links_and_joints
+                if ~strcmp(robot.Bodies{i}.Joint.Type, 'fixed')
+                    joint_state_limits(1, q_index(i)) = robot.Bodies{i}.Joint.PositionLimits(1);
+                    joint_state_limits(2, q_index(i)) = robot.Bodies{i}.Joint.PositionLimits(2);
+                end
+            end
+       
+            % assuming serial kinematic chain!
+            kinematic_chain = [0:n_links_and_joints-1; 1:n_links_and_joints];
+            self.q_index = q_index
+            
+        end
         %% property check
         function check_and_fix_properties(self)
             % A.check_and_fix_properties()
@@ -56,33 +107,6 @@ classdef RoboticsToolboxArmRobotInfo < handle
                 error(['The arm''s workspace dimension (',num2str(d),...
                     ') is incorrect! Pick 2 or 3.'])
             end
-            
-            %% states and state indices
-            %self.vdisp('Checking states and state indices',5)
-            
-            % by default, the arm's states are (position,speed) of each
-            % joint
-            % MOVED TO StateComponent
-%             if isempty(self.n_states)
-%                 self.n_states = 2*N ;
-%                 self.vdisp(['Setting number of states to ',num2str(self.n_states)],6)
-%             end
-%             
-%             if isempty(self.joint_state_indices)
-%                 self.joint_state_indices = 1:2:self.n_states ;
-%                 self.vdisp('Setting default joint state indices',6)
-%             end
-%             
-%             if isempty(self.joint_speed_indices)
-%                 self.joint_speed_indices = 2:2:self.n_states ;
-%                 self.vdisp('Setting default joint speed indices',6)
-%             end
-            
-            % TODO MOVE TO ControllerComponent
-%             if isempty(self.n_inputs)
-%                 self.n_inputs = N ;
-%                 self.vdisp(['Setting number of inputs to ',num2str(self.n_states)],6)
-%             end
             
             %% links
             %self.vdisp('Checking links',5)
@@ -206,6 +230,15 @@ classdef RoboticsToolboxArmRobotInfo < handle
                 self.kinematic_chain = [0:(N-1) ; 1:N] ;
             end
             
+                        
+            %% states and state indices
+            %self.vdisp('Checking states and state indices',5)
+            
+            % TODO MOVE TO ControllerComponent
+%             if isempty(self.n_inputs)
+%                 self.n_inputs = N ;
+%                 self.vdisp(['Setting number of inputs to ',num2str(self.n_states)],6)
+%             end
             %% physics
             % TODO MOVE TO DYNAMICS
 %             if isempty(self.gravity_direction)
