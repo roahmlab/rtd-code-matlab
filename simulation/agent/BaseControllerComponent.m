@@ -1,9 +1,13 @@
 classdef BaseControllerComponent < handle
-    properties
-        robot_info
-        robot_state
+    % BaseControllerComponent Interface for an Entity Controller Component
+    properties (Abstract)
+        robot_info EntityInfo
+        robot_state EntityState
+        trajectories cell
     end
-    methods
+    methods (Abstract)
+        reset(self)
+        set_trajectory(self, trajectory)
         get_control_inputs(self, varargin)
     end
 end

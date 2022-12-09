@@ -1,14 +1,14 @@
-classdef ArmourDynamics < handle
+classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsComponent
     
     properties
         % General information of the robot arm
-        arm_info RoboticsToolboxArmRobotInfo
+        robot_info ArmourAgentInfo = ArmourAgentInfo.empty()
         
         % The state of the arm
-        arm_state
+        robot_state ArmourAgentState = ArmourAgentState.empty()
         
         % The controller used
-        controller
+        controller ArmourController = ArmourController.empty()
         
         % Other properties
         time_discretization = 0.01
@@ -29,21 +29,49 @@ classdef ArmourDynamics < handle
         measurement_noise = {}
     end
     
+    methods (Static)
+        function options = defaultoptions()
+            options.time_discretization = 0.01;
+            options.measurement_noise_points = 0;
+            options.measurement_noise_pos_sigma = 1e-4;
+            options.measurement_noise_vel_sigma = 1e-4;
+        end
+    end
+    
     methods
-        function self = ArmourDynamics(arm_info, arm_state_component, controller_component, options)
+        function self = ArmourDynamics(arm_info, arm_state_component, controller_component, optionsStruct, options)
             arguments
                 arm_info
                 arm_state_component
                 controller_component
-                options.time_discretization = 0.01;
-                options.measurement_noise_points = 0;
-                options.measurement_noise_pos_sigma = 1e-4;
-                options.measurement_noise_vel_sigma = 1e-4;
+                optionsStruct struct = struct()
+                options.time_discretization
+                options.measurement_noise_points
+                options.measurement_noise_pos_sigma
+                options.measurement_noise_vel_sigma
                 % options.log_controller = false;
             end
-            self.arm_info = arm_info;
-            self.arm_state = arm_state_component;
+            self.mergeoptions(optionsStruct, options);
+            
+            % set base variables
+            self.robot_info = arm_info;
+            self.robot_state = arm_state_component;
             self.controller = controller_component;
+            
+        end
+        
+        function reset(self, optionsStruct, options)
+            arguments
+                self
+                optionsStruct struct = struct()
+                options.use_true_params_for_robust
+                options.use_disturbance_norm
+                options.Kr
+                options.V_max
+                options.alpha_constant
+            end
+            options = self.mergeoptions(optionsStruct, options);
+            
             self.time_discretization = options.time_discretization;
             % self.log_controller = options.log_controller;
             
@@ -51,6 +79,7 @@ classdef ArmourDynamics < handle
             self.measurement_noise.pos_sigma = options.measurement_noise_pos_sigma;
             self.measurement_noise.vel_sigma = options.measurement_noise_vel_sigma;
         end
+            
         
         function move(self, t_move)
             % get the current state
