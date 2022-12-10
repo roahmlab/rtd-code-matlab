@@ -97,6 +97,7 @@ classdef ArmourAgentInfo < EntityInfo & UUIDbase & OptionsClass & handle
             % Fill in our other dependent parameters
             self.robot.Gravity = options.gravity;
             self.n_links_and_joints = self.params.nominal.num_joints;
+            self.num_q = self.params.nominal.num_q;
             self.body_joint_index = self.params.nominal.q_index;
 
             

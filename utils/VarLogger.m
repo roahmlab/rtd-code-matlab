@@ -6,17 +6,17 @@ classdef VarLogger < handle
         log_validateKeys logical
     end
     methods
-        function self = VarLogger(validate_keys, key_names)
-            arguments
-                validate_keys logical = true
-            end
+        function self = VarLogger(key_names, options)
             arguments (Repeating)
-                key_names {mustBeTextScaler}
+                key_names {mustBeTextScalar}
+            end
+            arguments
+                options.validate_keys(1,1) logical = true
             end
             
             % Say whether we should make sure the key exists first or just
             % add dynamically
-            self.log_validateKeys = validate_keys;
+            self.log_validateKeys = options.validate_keys;
             % Use a Map container so keys are hashed
             self.log_entries = containers.Map;
             
@@ -25,7 +25,7 @@ classdef VarLogger < handle
         end
         
         function keys = keys(self)
-            keys = self.log_entries.key(key_names);
+            keys = self.log_entries.keys;
         end
         
         function addKeys(self, key_names)
@@ -33,7 +33,7 @@ classdef VarLogger < handle
                 self
             end
             arguments (Repeating)
-                key_names {mustBeTextScaler}
+                key_names {mustBeTextScalar}
             end
             
             % Determine the new keys, and add them
@@ -48,7 +48,7 @@ classdef VarLogger < handle
                 self
             end
             arguments (Repeating)
-                key_name {mustBeTextScaler}
+                key_name {mustBeTextScalar}
                 value
             end
             
@@ -66,18 +66,20 @@ classdef VarLogger < handle
             
             % now append to the log for each key
             for kv_pair = [key_name; value]
-                self.log_entries(kv_pair{1}) = [self.log_entries(kv_pair{1}), kv_pair{2}];
+                self.log_entries(kv_pair{1}) = [self.log_entries(kv_pair{1}), kv_pair(2)];
             end
         end
         
-        function varargout = get(self, flatten, as_struct, key_name)
+        function varargout = get(self, key_name, options)
             arguments
                 self
-                flatten logical = true
-                as_struct logical = true
             end
             arguments (Repeating)
-                key_name {mustBeTextScaler}
+                key_name {mustBeTextScalar}
+            end
+            arguments
+                options.flatten(1,1) logical = true
+                options.as_struct(1,1) logical = true
             end
             
             % Validate the key names
@@ -97,7 +99,7 @@ classdef VarLogger < handle
             
             % Make sure the output is the same size if there is more than
             % 1, or that it's as_struct is true for a single output
-            if ~(nargout == num_res) && ~(nargout == 1 && as_struct)
+            if ~(nargout == num_res) && ~(nargout <= 1 && options.as_struct)
                 error('Invalid log output option! Can only output as a single struct, or each individual log option requested!')
             end
             
@@ -105,7 +107,7 @@ classdef VarLogger < handle
             values = cell(1, num_res);
             for i=1:num_res
                 entry = self.log_entries(key_name{i});
-                if flatten
+                if options.flatten && ~isempty(entry)
                     values{i} = [entry{:}];
                 else
                     values{i} = entry;
@@ -113,7 +115,7 @@ classdef VarLogger < handle
             end
             
             % Output as requested (We did validation earlier)
-            if as_struct
+            if nargout <= 1 && options.as_struct
                 kv_pairs = [key_name; values];
                 varargout{1} = struct(kv_pairs{:});
             else

@@ -1,18 +1,23 @@
 classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
     
+    % Inherited properties that must be defined
     properties
         % General information of the robot arm
-        robot_info ArmourAgentInfo
+        robot_info = ArmourAgentInfo.empty()
         
         % state space representation
-        n_states uint32 = 0
+        n_states = 0
         state double = []
-        time (1,:) = []
-        
+        time = []
+    end
+    
+    % Extra properties we define
+    properties
         % indexes for state space
         position_indices (1,:) uint32 = []
         velocity_indices (1,:) uint32 = []
     end
+    % Dynamics properties to make life easier
     properties (Dependent)
         position
         velocity
@@ -33,7 +38,7 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct, options);
             % Set up verbose output
             self.name = options.name;
             self.set_vdisplevel(options.verboseLevel);
@@ -49,7 +54,7 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
         end
         
         function reset(self,state,joint_speeds)
-            self.vdisp('Resetting states',3) ;
+            self.vdisp('Resetting states',LogLevel.INFO) ;
             % reset to zero by default
             self.state = zeros(self.n_states,1) ;
             % Add state
@@ -57,24 +62,42 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
                 % changed to be more general
                 if length(state) == self.robot_info.num_q
                     % fill in joint positions if they are provided
-                    self.vdisp('Using provided joint positions',6)
+                    self.vdisp('Using provided joint positions',LogLevel.DEBUG)
                     self.state(self.position_indices) = state ;
                     
                     if nargin > 2
                         % fill in joint speeds if they are provided
-                        self.vdisp('Using provided joint speeds',6)
+                        self.vdisp('Using provided joint speeds',LogLevel.DEBUG)
                         self.state(self.velocity_indices) = joint_speeds ;
                     end
                 elseif length(state) == self.n_states
                     % fill in full position and speed state if provided
-                    self.vdisp('Using provided full state',6)
+                    self.vdisp('Using provided full state',LogLevel.DEBUG)
                     self.state = state ;
                 else
                     error('Input has incorrect number of states!')
                 end
             end
-            self.vdisp('Resetting time and inputs',3)
+            self.vdisp('Resetting time and inputs',LogLevel.INFO)
             self.time = 0 ;
+        end
+        
+        function state = get_state(self, time)
+            arguments
+                self
+                time = -1
+            end
+            state = ArmRobotState();
+            if time < 0
+                state.time = self.time(end);
+                state.q = self.position(end);
+                state.q_dot = self.velocity(end);
+            else
+                state.time = time;
+                temp_state = interp1(self.time, self.state.', time);
+                state.q = temp_state(self.position_indices);
+                state.q_dot = temp_state(self.velocity_indices);
+            end
         end
         
         function commit_state_data(self,T_state,Z_state)

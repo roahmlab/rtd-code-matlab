@@ -8,7 +8,7 @@ classdef BaseControllerComponent < handle
     end
     methods (Abstract)
         reset(self)
-        set_trajectory(self, trajectory)
-        get_control_inputs(self, varargin)
+        setTrajectory(self, trajectory)
+        getControlInputs(self, varargin)
     end
 end

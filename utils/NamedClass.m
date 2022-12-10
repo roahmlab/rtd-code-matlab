@@ -20,7 +20,7 @@ classdef NamedClass < handle
             % https://www.section.io/engineering-education/how-to-choose-levels-of-logging/
             if level >= self.verboseLevel
                 name = self.classname;
-                if length(self.name) > 0
+                if ~isempty(self.name)
                     name = [self.classname, '-', char(self.name)];
                 end
                 name = [name, '-', char(level)];

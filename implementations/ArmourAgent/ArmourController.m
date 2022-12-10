@@ -5,12 +5,17 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
     % arminfo params by extension
     % arminfo M_min_eigenvalue???
     
+    % Inherited properties that must be defined
     properties
-        robot_info ArmourAgentInfo = ArmourAgentInfo.empty()
-        robot_state ArmourAgentState = ArmourAgentState.empty()
-        LLC_wrapped robot_arm_LLC = uarmtd_robust_CBF_LLC.empty()
+        robot_info = ArmourAgentInfo.empty()
+        robot_state = ArmourAgentState.empty()
         
         n_inputs uint32 = 0
+    end
+    
+    % Extra properties we define
+    properties
+        LLC_wrapped robot_arm_LLC = uarmtd_robust_CBF_LLC.empty()
         
         ultimate_bound double
         ultimate_bound_position double
@@ -52,7 +57,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             % Set base variables
             self.robot_info = arm_info;
             self.robot_state = arm_state_component;
-            self.n_inputs = arm_info.n_links_and_joints;
+            self.n_inputs = arm_info.num_q;
             
             % Initialize
             self.reset();
@@ -78,17 +83,18 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             
             % Create the LLC with the options
             self.LLC_wrapped = uarmtd_robust_CBF_LLC( ...
-                'use_true_params_for_robust', self.options.use_true_params_for_robust, ...
-                'use_disturbance_norm', self.options.use_disturbance_norm, ...
-                'Kr', self.options.Kr, ...
-                'V_max', self.options.V_max, ...
+                'use_true_params_for_robust',options.use_true_params_for_robust, ...
+                'use_disturbance_norm', options.use_disturbance_norm, ...
+                'Kr', options.Kr, ...
+                'V_max', options.V_max, ...
                 'alpha_constant', options.alpha_constant);
             
             % Because we want to simplify, recreate the wrapped setup
             % function and merge info out
+            self.n_inputs = self.robot_state.n_states; % Torque based control
             % low_level_controller
             self.LLC_wrapped.n_agent_states = self.robot_state.n_states;
-            self.LLC_wrapped.n_agent_inputs = self.robot_state.n_inputs;
+            self.LLC_wrapped.n_agent_inputs = self.n_inputs;
             % robot_arm_LLC
             self.LLC_wrapped.arm_dimension = self.robot_info.dimension;
             self.LLC_wrapped.arm_n_links_and_joints = self.robot_info.n_links_and_joints;

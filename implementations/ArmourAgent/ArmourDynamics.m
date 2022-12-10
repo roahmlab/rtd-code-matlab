@@ -1,4 +1,4 @@
-classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsComponent
+classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & handle
     
     % Leftover Old Dependencies
     % match_trajectory
@@ -8,15 +8,20 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
     % arminfo params by extension
     % and Controller by extension
     
+    % Inherited properties that must be defined
     properties
         % General information of the robot arm
-        robot_info ArmourAgentInfo = ArmourAgentInfo.empty()
+        robot_info = ArmourAgentInfo.empty()
         
         % The state of the arm
-        robot_state ArmourAgentState = ArmourAgentState.empty()
+        robot_state = ArmourAgentState.empty()
         
         % The controller used
-        controller ArmourController = ArmourController.empty()
+        controller = ArmourController.empty()
+    end
+    
+    % Extra properties we define
+    properties
         
         % Other properties
         time_discretization double = 0.01
@@ -26,7 +31,7 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
 
         % Measurement Noise (This probably should eventually be its own
         % class and type
-        measurement_noise = {}
+        measurement_noise = struct
     end
     
     methods (Static)
@@ -44,9 +49,9 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
     methods
         function self = ArmourDynamics(arm_info, arm_state_component, controller_component, optionsStruct, options)
             arguments
-                arm_info
-                arm_state_component
-                controller_component
+                arm_info ArmourAgentInfo
+                arm_state_component ArmourAgentState
+                controller_component ArmourController
                 optionsStruct struct = struct()
                 options.time_discretization
                 options.measurement_noise_points
@@ -62,6 +67,8 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
             self.robot_info = arm_info;
             self.robot_state = arm_state_component;
             self.controller = controller_component;
+            
+            self.reset()
         end
         
         function reset(self, optionsStruct, options)
@@ -123,7 +130,7 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
                 robust_out = zeros(size(uout));
                 disturbance_out = zeros(size(uout));
                 lyap_out = zeros(size(tout));
-                r_out = zeros(self.robot_info.n_links_and_joints, size(tout, 2));
+                r_out = zeros(self.robot_info.num_q, size(tout, 2));
 
                 % store approximate inputs at each time:
                 for j = 1:length(tout)
@@ -214,12 +221,12 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
             % Position
             self.measurement_noise.pos              ...
                 = self.measurement_noise.pos_sigma  ...
-                * randn(self.robot_info.n_links_and_joints, self.measurement_noise.points);
+                * randn(self.robot_info.num_q, self.measurement_noise.points);
             
             % Velocity
             self.measurement_noise.vel              ...
                 = self.measurement_noise.vel_sigma  ...
-                * randn(self.robot_info.n_links_and_joints, self.measurement_noise.points);
+                * randn(self.robot_info.num_q, self.measurement_noise.points);
         end
     end
 end
