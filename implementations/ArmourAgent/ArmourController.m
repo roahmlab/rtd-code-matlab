@@ -1,9 +1,16 @@
 classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass & handle
     
+    % Leftover Old Dependencies
+    % robot_arm_LLC and uarmtd_robust_CBF_LLC
+    % arminfo params by extension
+    % arminfo M_min_eigenvalue???
+    
     properties
         robot_info ArmourAgentInfo = ArmourAgentInfo.empty()
         robot_state ArmourAgentState = ArmourAgentState.empty()
         LLC_wrapped robot_arm_LLC = uarmtd_robust_CBF_LLC.empty()
+        
+        n_inputs uint32 = 0
         
         ultimate_bound double
         ultimate_bound_position double
@@ -15,11 +22,14 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
     
     methods (Static)
         function options = defaultoptions()
+            % Configurable options for this component
             options.use_true_params_for_robust = false;
             options.use_disturbance_norm = true;
             options.Kr = 10;
             options.V_max = 3.1e-7;
             options.alpha_constant = 1;
+            options.verboseLevel = LogLevel.INFO;
+            options.name = '';
         end
     end
     
@@ -34,12 +44,15 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                 options.Kr
                 options.V_max
                 options.alpha_constant
+                options.verboseLevel
+                options.name
             end
             self.mergeoptions(optionsStruct, options);
             
             % Set base variables
             self.robot_info = arm_info;
             self.robot_state = arm_state_component;
+            self.n_inputs = arm_info.n_links_and_joints;
             
             % Initialize
             self.reset();
@@ -54,8 +67,14 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                 options.Kr
                 options.V_max
                 options.alpha_constant
+                options.verboseLevel
+                options.name
             end
             options = self.mergeoptions(optionsStruct, options);
+            
+            % Set up verbose output
+            self.name = options.name;
+            self.set_vdisplevel(options.verboseLevel);
             
             % Create the LLC with the options
             self.LLC_wrapped = uarmtd_robust_CBF_LLC( ...
@@ -73,14 +92,14 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             % robot_arm_LLC
             self.LLC_wrapped.arm_dimension = self.robot_info.dimension;
             self.LLC_wrapped.arm_n_links_and_joints = self.robot_info.n_links_and_joints;
-            self.LLC_wrapped.arm_joint_state_indices = self.robot_info.position_indices;
-            self.LLC_wrapped.arm_joint_speed_indices = self.robot_info.velocity_indices;
+            self.LLC_wrapped.arm_joint_state_indices = self.robot_state.position_indices;
+            self.LLC_wrapped.arm_joint_speed_indices = self.robot_state.velocity_indices;
             % uarmtd_robust_CBF_LLC
             if isprop(self.robot_info, 'M_min_eigenvalue')
                 self.LLC_wrapped.ultimate_bound = sqrt(2*self.LLC_wrapped.V_max/self.robot_info.M_min_eigenvalue);
                 self.LLC_wrapped.ultimate_bound_position = (1/self.LLC_wrapped.Kr)*self.LLC_wrapped.ultimate_bound;
                 self.LLC_wrapped.ultimate_bound_velocity = 2*self.LLC_wrapped.ultimate_bound;
-                self.vdisp(sprintf('Computed ultimate bound of %.3f', self.LLC_wrapped.ultimate_bound), 8);
+                self.vdisp(sprintf('Computed ultimate bound of %.3f', self.LLC_wrapped.ultimate_bound), LogLevel.GENERAL);
             else
                 warning('No minimum eigenvalue of agent mass matrix specified, can not compute ultimate bound');
             end
@@ -108,8 +127,8 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             
             % Create shims
             planner_info_shim.desired_trajectory = {@(t)unwrap_traj(trajectory.getCommand(startTime + t))};
-            A_shim.joint_state_indices = self.robot_info.position_indices;
-            A_shim.joint_speed_indices = self.robot_info.velocity_indices;
+            A_shim.joint_state_indices = self.robot_state.position_indices;
+            A_shim.joint_speed_indices = self.robot_state.velocity_indices;
             A_shim.params = self.robot_info.params;
             A_shim.n_states = self.robot_state.n_states;
             

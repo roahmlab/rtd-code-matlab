@@ -32,19 +32,19 @@ classdef OptionsClass < handle
             end
             
             for newOptionStruct = newOptions
-                fields = fieldnames(newOptionStruct);
+                fields = fieldnames(newOptionStruct{1}).';
                 for fieldname = fields
-                    self.instanceOptions.(fieldname) ...
-                        = newOptionStruct.(fieldname);
+                    self.instanceOptions.(fieldname{1}) ...
+                        = newOptionStruct{1}.(fieldname{1});
                 end
             end
             if nargout
-                options = copy(self.instanceOptions);
+                options = self.instanceOptions;
             end
         end
         
         function options = getoptions(self)
-            options = copy(self.instanceOptions);
+            options = self.instanceOptions;
         end
     end
 end

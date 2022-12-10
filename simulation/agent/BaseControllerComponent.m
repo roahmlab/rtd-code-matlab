@@ -4,6 +4,7 @@ classdef BaseControllerComponent < handle
         robot_info EntityInfo
         robot_state EntityState
         trajectories cell
+        n_inputs uint32
     end
     methods (Abstract)
         reset(self)

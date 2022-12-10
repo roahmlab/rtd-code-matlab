@@ -1,5 +1,13 @@
 classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsComponent
     
+    % Leftover Old Dependencies
+    % match_trajectory
+    % rnea_mass
+    % rnea_coriolis
+    % rnea_gravity
+    % arminfo params by extension
+    % and Controller by extension
+    
     properties
         % General information of the robot arm
         robot_info ArmourAgentInfo = ArmourAgentInfo.empty()
@@ -11,21 +19,13 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
         controller ArmourController = ArmourController.empty()
         
         % Other properties
-        time_discretization = 0.01
+        time_discretization double = 0.01
         
         % Logging
-        % log_controller = false
-        time = []
-        inputs = []
-        % clean
-        % uout = []
-        % nominal_out = []
-        % robust_out = []
-        % disturbance_out = []
-        % lyp_out = []
-        % r_out = []
+        controller_log VarLogger = VarLogger.empty()
 
-        % Measurement Noise
+        % Measurement Noise (This probably should eventually be its own
+        % class and type
         measurement_noise = {}
     end
     
@@ -35,6 +35,9 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
             options.measurement_noise_points = 0;
             options.measurement_noise_pos_sigma = 1e-4;
             options.measurement_noise_vel_sigma = 1e-4;
+            options.log_controller = false;
+            options.verboseLevel = LogLevel.INFO;
+            options.name = '';
         end
     end
     
@@ -49,7 +52,9 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
                 options.measurement_noise_points
                 options.measurement_noise_pos_sigma
                 options.measurement_noise_vel_sigma
-                % options.log_controller = false;
+                options.log_controller
+                options.verboseLevel
+                options.name
             end
             self.mergeoptions(optionsStruct, options);
             
@@ -57,24 +62,41 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
             self.robot_info = arm_info;
             self.robot_state = arm_state_component;
             self.controller = controller_component;
-            
         end
         
         function reset(self, optionsStruct, options)
             arguments
                 self
                 optionsStruct struct = struct()
-                options.use_true_params_for_robust
-                options.use_disturbance_norm
-                options.Kr
-                options.V_max
-                options.alpha_constant
+                options.time_discretization
+                options.measurement_noise_points
+                options.measurement_noise_pos_sigma
+                options.measurement_noise_vel_sigma
+                options.log_controller
+                options.verboseLevel
+                options.name
             end
             options = self.mergeoptions(optionsStruct, options);
             
-            self.time_discretization = options.time_discretization;
-            % self.log_controller = options.log_controller;
+            % if we're going to log, set it up
+            if options.log_controller
+                self.controller_log = VarLogger('input_time', ...
+                                     'input', ...
+                                     'nominal_input', ...
+                                     'robust_input', ...
+                                     'disturbance', ...
+                                     'lyapunov', ...
+                                     'r');
+            end
             
+            % Set up verbose output
+            self.name = options.name;
+            self.set_vdisplevel(options.verboseLevel);
+            
+            % For integration output
+            self.time_discretization = options.time_discretization;
+            
+            % Measurement noise generation parameters
             self.measurement_noise.points = options.measurement_noise_points;
             self.measurement_noise.pos_sigma = options.measurement_noise_pos_sigma;
             self.measurement_noise.vel_sigma = options.measurement_noise_vel_sigma;
@@ -82,41 +104,45 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
             
         
         function move(self, t_move)
+            self.vdisp('Moving!',LogLevel.INFO)
+            
             % get the current state
-            zcur = self.arm_state.state(:,end);
+            zcur = self.robot_state.state(:,end);
             
             % call the ode solver to simulate agent
             [tout,zout] = self.integrator(@(t,z) self.dynamics(t,z),...
                                        [0 t_move], zcur) ;
 
-            % initialize trajectories to log
-            uout = zeros(self.controller.n_inputs, size(tout, 2));
-            nominal_out = zeros(size(uout));
-            robust_out = zeros(size(uout));
-            disturbance_out = zeros(size(uout));
-            lyap_out = zeros(size(tout));
-            r_out = zeros(self.arm_info.n_links_and_joints, size(tout, 2));
-
-            % store approximate inputs at each time:
-            for j = 1:length(tout)
-                t = tout(j);
-                z_meas = zout(:,j);
-                [uout(:, j), nominal_out(:, j), robust_out(:, j),...
-                 disturbance_out(:, j), lyap_out(:, j), r_out(:, j)] = ...
-                 self.controller.getControlInputs(t, z_meas);
-            end
+            % save the motion data
+            self.robot_state.commit_state_data(tout, zout);
             
-            % Commit it
-            self.arm_state.commit_state_data(tout, zout);
-            self.commit_input_data(tout, uout);
-        end
-        
-        % Convert to a mixin for loggin
-        %function commit_input_data(self, T, uout, nominal_out, robust_out, disturbance_out, lyp_out, r_out)
-        function commit_input_data(self, T, inputs)
-            self.time = [self.time, self.time(end) + T(2:end)];
-            self.inputs = [self.inputs, inputs(:,2:end)];
-            % Add later
+            % If we have an active log, initialize trajectories to log
+            if ~isempty(self.controller_log)
+                uout = zeros(self.controller.n_inputs, size(tout, 2));
+                nominal_out = zeros(size(uout));
+                robust_out = zeros(size(uout));
+                disturbance_out = zeros(size(uout));
+                lyap_out = zeros(size(tout));
+                r_out = zeros(self.robot_info.n_links_and_joints, size(tout, 2));
+
+                % store approximate inputs at each time:
+                for j = 1:length(tout)
+                    t = tout(j);
+                    z_meas = zout(:,j);
+                    [uout(:, j), nominal_out(:, j), robust_out(:, j),...
+                     disturbance_out(:, j), lyap_out(:, j), r_out(:, j)] = ...
+                     self.controller.getControlInputs(t, z_meas);
+                end
+                
+                % Save to the log
+                self.controller_log.add('input_time', tout, ...
+                             'input', uout, ...
+                             'nominal_input', nominal_out, ...
+                             'robust_input', robust_out, ...
+                             'disturbance', disturbance_out, ...
+                             'lyapunov', lyap_out, ...
+                             'r', r_out);
+            end
         end
         
         function [t_out,z_out] = integrator(self, arm_dyn, t_span, z0)
@@ -139,11 +165,11 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
         
         function zd = dynamics(self, t, state)
             % Rename variable for ease
-            q = state(self.arm_state.position_indices);
-            qd = state(self.arm_state.velocity_indices);
+            q = state(self.robot_state.position_indices);
+            qd = state(self.robot_state.velocity_indices);
             
             % True dynamics
-            [M, C, g] = self.calculate_dynamics(q, qd, self.arm_info.params.true);
+            [M, C, g] = self.calculate_dynamics(q, qd, self.robot_info.params.true);
             
             % Add measurement noise if desired
             if self.measurement_noise.points > 0
@@ -156,8 +182,8 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
             end
             
             z_meas = zeros(size(z));
-            z_meas(self.arm_state.position_indices) = q;
-            z_meas(self.arm_state.velocity_indices) = qd;
+            z_meas(self.robot_state.position_indices) = q;
+            z_meas(self.robot_state.velocity_indices) = qd;
             
             u = self.controller.getControlInputs(t, z_meas);
             
@@ -166,8 +192,8 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
 
             % return dynamics
             zd = zeros(size(z));
-            zd(self.arm_state.position_indices) = qd(:);
-            zd(self.arm_state.velocity_indices) = qdd(:);
+            zd(self.robot_state.position_indices) = qd(:);
+            zd(self.robot_state.velocity_indices) = qdd(:);
         end
 
         % Compute dynamic parameters given robot parameters
@@ -178,19 +204,22 @@ classdef ArmourDynamics < handle & NamedClass & OptionsClass & BaseDynamicsCompo
         end
         
         % add measurement noise
-        % make into a mixin?
+        % make into a new class for interpolated process noise
         function generate_measurement_noise(self, t_span)
+            % Time for interpolation
             self.measurement_noise.time ...
                 = linspace(t_span(1), t_span(end), self.measurement_noise.points);
             
             % noise profile should try to match actual joint encoders
+            % Position
             self.measurement_noise.pos              ...
                 = self.measurement_noise.pos_sigma  ...
-                * randn(self.arm_info.n_links_and_joints, self.measurement_noise.points);
+                * randn(self.robot_info.n_links_and_joints, self.measurement_noise.points);
             
+            % Velocity
             self.measurement_noise.vel              ...
                 = self.measurement_noise.vel_sigma  ...
-                * randn(self.arm_info.n_links_and_joints, self.measurement_noise.points);
+                * randn(self.robot_info.n_links_and_joints, self.measurement_noise.points);
         end
     end
 end
