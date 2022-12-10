@@ -117,12 +117,17 @@ classdef ArmourAgentInfo < EntityInfo & UUIDbase & OptionsClass & handle
             
             
             % Flesh out the joints from the robot
+            % these joint locations are taken in link-centered body-fixed frames
+            % imagine a frame at the center of link 1, and at the center of link 2
+            % we want to write the position of joint 2 in link 1's frame, and in link 2's frame.
             joint_locations(1) = {[ self.params.nominal.T0(1:3, end, 1);
                                     -self.links(1).poly_zonotope.c ]};
             for i = 2:self.n_links_and_joints
-                joint_locations(i) = {[-link_poly_zonotopes{i-1}.c + self.params.nominal.T0(1:3, end, i);
+                joint_locations(i) = {[-self.links(i-1).poly_zonotope.c + self.params.nominal.T0(1:3, end, i);
                                          -self.links(i).poly_zonotope.c]};
             end
+            % pull joint position limits from rigidBodyTree
+            % MATLAB doesn't store velocity/input limits, so pass these in externally for now.
             for i = 1:self.n_links_and_joints
                 if ~strcmp(self.robot.Bodies{i}.Joint.Type, 'fixed')
                     joint_position_limits(self.body_joint_index(i)) = {self.robot.Bodies{i}.Joint.PositionLimits(:)};

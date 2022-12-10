@@ -1,6 +1,8 @@
 classdef ArmourAgent < handle & NamedClass & UUIDbase
 % ArmourAgent
 % The Agent with the robust controller for ARMOUR
+% Left to do are the helper safety check functions like check input limits
+% and glueing this together
     properties
         %%%%%%%%%%%%%%%%%%%
         % Data Components %
