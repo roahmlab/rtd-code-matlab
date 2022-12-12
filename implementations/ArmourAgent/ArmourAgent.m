@@ -78,17 +78,19 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             components.visual = 'ArmourPatchVisual';
             options.components = components;
             options.component_options = struct;%get_componentoptions(components);
+            options.component_logLevelOverride = [];
             options.verboseLevel = LogLevel.INFO;
             options.name = '';
         end
         
         function self = from_options(robot, params, options)
             a = ArmourAgentInfo(robot, params, options.component_options.info);
-            self = ArmourAgent(a, [], [], [], [], [], [], options);
+            self = ArmourAgent(a, optionsStruct=options);
         end
     end
     
     methods
+        % WIP
         function self = ArmourAgent(info, components, optionsStruct, options)
             arguments
                 info
@@ -101,6 +103,7 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
                 optionsStruct.optionsStruct struct = struct()
                 options.components
                 options.component_options
+                options.component_logLevelOverride
                 options.verboseLevel
                 options.name
             end
@@ -152,6 +155,7 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
                 self
                 optionsStruct struct = struct()
                 options.component_options
+                options.component_logLevelOverride
                 options.verboseLevel
                 options.name
             end
@@ -167,6 +171,12 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
                         && isfield(options.component_options.(fieldname{1}), 'name') ...
                         && isempty(options.component_options.(fieldname{1}).name)
                     options.component_options.(fieldname{1}).name = options.name;
+                    
+                end
+                % Overwrite the verboseLevel if we have a logleveloverride
+                if ~isempty(options.component_logLevelOverride) ...
+                        && isfield(options.component_options.(fieldname{1}), 'verboseLog')
+                    options.component_options.(fieldname{1}).verboseLog = options.component_logLevelOverride;
                     
                 end
                 self.(fieldname{1}).reset(options.component_options.(fieldname{1}));

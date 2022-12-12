@@ -60,7 +60,7 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
             self.arm_state = arm_state_component;
             self.kinematics = kinematics_component;
             
-            self.reset();
+            %self.reset();
         end
         
         function reset(self, optionsStruct, options)

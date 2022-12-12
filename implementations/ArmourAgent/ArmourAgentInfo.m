@@ -71,7 +71,7 @@ classdef ArmourAgentInfo < EntityInfo & UUIDbase & OptionsClass & handle
             self.params = params;
             
             % initialize
-            % self.reset();
+            self.reset();
         end
         
         % We set this here, but is it really necessary?
