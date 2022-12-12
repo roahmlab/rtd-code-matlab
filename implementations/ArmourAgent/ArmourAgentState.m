@@ -1,5 +1,7 @@
 classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
     
+    % Old functions
+    % rand_range
     % Inherited properties that must be defined
     properties
         % General information of the robot arm
@@ -8,6 +10,7 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
         % state space representation
         n_states = 0
         state double = []
+        step_start_idxs = []
         time = []
     end
     
@@ -25,6 +28,8 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
     
     methods (Static)
         function options = defaultoptions()
+            options.initial_position = [];
+            options.initial_velocity = [];
             options.verboseLevel = LogLevel.INFO;
             options.name = '';
         end
@@ -35,51 +40,109 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             arguments
                 arm_info ArmourAgentInfo
                 optionsStruct struct = struct()
+                options.initial_position
+                options.initial_velocity
+                options.verboseLevel
+                options.name
+            end
+            self.mergeoptions(optionsStruct, options);
+            
+            % Setup
+            self.robot_info = arm_info;
+            
+            % initialize
+            % self.reset();
+        end
+        
+        function reset(self, optionsStruct, options)
+            arguments
+                self
+                optionsStruct struct = struct()
+                options.initial_position
+                options.initial_velocity
                 options.verboseLevel
                 options.name
             end
             options = self.mergeoptions(optionsStruct, options);
-            % Set up verbose output
-            self.name = options.name;
-            self.set_vdisplevel(options.verboseLevel);
             
-            % Setup
-            self.robot_info = arm_info;
+            % Set component dependent properties
             self.n_states = 2 * self.robot_info.num_q;
             self.position_indices = 1:2:self.n_states;
             self.velocity_indices = 2:2:self.n_states;
             
-            % initialize
-            self.reset();
+            % Set up verbose output
+            self.name = options.name;
+            self.set_vdisplevel(options.verboseLevel);
+            
+            % reset the rest
+            self.vdisp('Resetting time and states',LogLevel.INFO);
+            
+            % reset to zero by default
+            self.state = zeros(self.n_states,1);
+            self.time = 0;
+            self.step_start_idxs = 0;
+            
+            % Add position
+            if ~isempty(options.initial_position)
+                self.vdisp('Using provided joint positions',LogLevel.TRACE)
+                self.state(self.position_indices) = options.initial_position;
+            end
+            
+            % Add velocity
+            if ~isempty(options.initial_velocity)
+                self.vdisp('Using provided joint velocities',LogLevel.TRACE)
+                self.state(self.velocity_indices) = options.initial_velocity;
+            end
+            
+            % Take these initials and merge them in again.
+            options.initial_position = self.position;
+            options.initial_velocity = self.velocity;
+            self.mergeoptions(options);
         end
         
-        function reset(self,state,joint_speeds)
-            self.vdisp('Resetting states',LogLevel.INFO) ;
-            % reset to zero by default
-            self.state = zeros(self.n_states,1) ;
-            % Add state
-            if nargin > 1
-                % changed to be more general
-                if length(state) == self.robot_info.num_q
-                    % fill in joint positions if they are provided
-                    self.vdisp('Using provided joint positions',LogLevel.DEBUG)
-                    self.state(self.position_indices) = state ;
-                    
-                    if nargin > 2
-                        % fill in joint speeds if they are provided
-                        self.vdisp('Using provided joint speeds',LogLevel.DEBUG)
-                        self.state(self.velocity_indices) = joint_speeds ;
-                    end
-                elseif length(state) == self.n_states
-                    % fill in full position and speed state if provided
-                    self.vdisp('Using provided full state',LogLevel.DEBUG)
-                    self.state = state ;
-                else
-                    error('Input has incorrect number of states!')
-                end
+        function random_init(self, options)
+            arguments
+                self
+                options.pos_range = []
+                options.vel_range = []
+                options.random_position = true
+                options.random_velocity = false
+                options.save_to_options = false
             end
-            self.vdisp('Resetting time and inputs',LogLevel.INFO)
-            self.time = 0 ;
+            % Just generate the random configurations
+            pos_range = options.pos_range;
+            vel_range = options.vel_range;
+            if isempty(pos_range)
+                pos_range = [self.robot_info.joints(1:self.robot_info.num_q).position_limits];
+            end
+            if isempty(vel_range)
+                vel_range = [self.robot_info.joints(1:self.robot_info.num_q).velocity_limits];
+            end
+            
+            % set any joint limits that are +Inf to pi and -Inf to -pi
+            pos_range_infs = isinf(pos_range) ;
+            pos_range(1,pos_range_infs(1,:)) = -pi ;
+            pos_range(2,pos_range_infs(2,:)) = +pi ;
+            
+            % reset
+            self.state = zeros(self.n_states,1);
+            self.time = 0;
+            self.step_start_idxs = 0;
+            
+            % Make the random configuration
+            if options.random_position
+                self.state(self.position_indices) = rand_range(pos_range(1,:),pos_range(2,:))';
+            end
+            if options.random_velocity
+                self.state(self.velocity_indices) = rand_range(vel_range(1,:),vel_range(2,:))';
+            end
+            
+            % Take these initials and merge them in again.
+            if options.save_to_options
+                merge.initial_position = self.position;
+                merge.initial_velocity = self.velocity;
+                self.mergeoptions(merge);
+            end
         end
         
         function state = get_state(self, time)
@@ -90,13 +153,13 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             state = ArmRobotState();
             if time < 0
                 state.time = self.time(end);
-                state.q = self.position(end);
-                state.q_dot = self.velocity(end);
+                state.q = self.position(:,end);
+                state.q_dot = self.velocity(:,end);
             else
                 state.time = time;
                 temp_state = interp1(self.time, self.state.', time);
-                state.q = temp_state(self.position_indices);
-                state.q_dot = temp_state(self.velocity_indices);
+                state.q = temp_state(:,self.position_indices);
+                state.q_dot = temp_state(:,self.velocity_indices);
             end
         end
         
@@ -108,8 +171,69 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             % state, time, input, and input_time properties.
             
             % update the time and state
+            self.step_start_idxs = [self.time, length(self.time) + 1]; 
             self.time = [self.time, self.time(end) + T_state(2:end)] ;
             self.state = [self.state, Z_state(:,2:end)] ;
+        end
+        
+
+        function out = joint_limit_check(self, t_check_step)
+            % create time vector for checking
+            start_idx = self.step_start_idxs(end);
+            t_check = self.time(start_idx):t_check_step:self.time(end);
+
+            % get agent state trajectories interpolated to time
+            pos_check = interp1(self.time(start_idx:end), self.position(:,start_idx:end), t_check);
+            vel_check = interp1(self.time(start_idx:end), self.velocity(:,start_idx:end), t_check);
+
+            % check bound satisfaction
+            A.vdisp('Running joint limits check!', LogLevel.INFO);
+            
+            % check position & velocity
+            pos_exceeded = false(size(pos_check));
+            vel_exceeded = false(size(vel_check));
+            for idx=1:self.robot_info.num_q
+                % pos
+                lb = pos_check(idx,:) < self.robot_info.joints(idx).position_limits(1);
+                ub = pos_check(idx,:) > self.robot_info.joints(idx).position_limits(2);
+                pos_exceeded(idx,:) = lb + ub;
+                % vel
+                lb = vel_check(idx,:) < self.robot_info.joints(idx).velocity_limits(1);
+                ub = vel_check(idx,:) > self.robot_info.joints(idx).velocity_limits(2);
+                vel_exceeded(idx,:) = lb + ub;
+            end
+            
+            % Get out results
+            out = any(pos_exceeded) || any(vel_exceeded);
+            if out
+                % Position limit exceeded in these positions
+                [joint_idx_list, t_idx_list] = find(pos_exceeded);
+                for idx = 1:length(joint_idx_list)
+                    t_idx = t_idx_list(idx);
+                    joint_idx = joint_idx_list(idx);
+                    % Format error message
+                    msg = sprintf('t=%.2f, %d-position limit exceeded: %.5f vs [%.5f, %.5f]',...
+                        t_check(t_idx), joint_idx, pos_check(joint_idx, t_idx), ...
+                        self.robot_info.joints(joint_idx).position_limits(1), ...
+                        self.robot_info.joints(joint_idx).position_limits(2));
+                    self.vdisp(msg, LogLevel.ERROR);
+                end
+                
+                % Velocity limit exceeded in these positions
+                [joint_idx_list, t_idx_list] = find(vel_exceeded);
+                for idx = 1:length(joint_idx_list)
+                    t_idx = t_idx_list(idx);
+                    joint_idx = joint_idx_list(idx);
+                    % Format error message
+                    msg = sprintf('t=%.2f, %d-velocity limit exceeded: %.5f vs [%.5f, %.5f]',...
+                        t_check(t_idx), joint_idx, vel_check(joint_idx, t_idx), ...
+                        self.robot_info.joints(joint_idx).velocity_limits(1), ...
+                        self.robot_info.joints(joint_idx).velocity_limits(2));
+                    self.vdisp(msg, LogLevel.ERROR);
+                end
+            else
+                A.vdisp('No joint limits exceeded', LogLevel.INFO);
+            end
         end
         
         function position = get.position(self)

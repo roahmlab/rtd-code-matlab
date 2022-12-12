@@ -57,10 +57,9 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             % Set base variables
             self.robot_info = arm_info;
             self.robot_state = arm_state_component;
-            self.n_inputs = arm_info.num_q;
             
             % Initialize
-            self.reset();
+            % self.reset();
         end
         
         function reset(self, optionsStruct, options)
@@ -76,6 +75,9 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                 options.name
             end
             options = self.mergeoptions(optionsStruct, options);
+            
+            % Set component dependent variables
+            self.n_inputs = self.robot_info.num_q;
             
             % Set up verbose output
             self.name = options.name;
@@ -128,7 +130,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
         
         function [u, tau, v, true_disturbance, true_V, r] = getControlInputs(self, t, z_meas)
             % Prepare trajectory
-            trajectory = self.trajectories(end);
+            trajectory = self.trajectories{end};
             startTime = trajectory.robotState.time;
             
             % Create shims
@@ -143,6 +145,69 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                 [u, tau, v, true_disturbance, true_V, r] = self.LLC_wrapped.get_control_inputs(A_shim, t, z_meas, planner_info_shim);
             else
                 [u, tau, v, true_disturbance] = self.LLC_wrapped.get_control_inputs(A_shim, t, z_meas, planner_info_shim);
+            end
+        end
+        
+        % Check the controller against the controller log
+        function out = ultimate_bound_check(self, t_check_step, controller_log)
+            % if no log, skip
+            if isempty(controller_log)
+                self.vdisp('Not logging controller inputs, skipping ultimate bound check!', LogLevel.INFO);
+                return
+            end
+            
+            % retrieve the last log entry
+            entries = self.controller_log.get('input_time', 'input', flatten=false);
+            t_input = entries.input_time{end};
+            input = entries.input{end};
+
+            % interpolate for the t_check_step and get agent input
+            % trajectory interpolated to time
+            t_check = t_input(1):t_check_step:t_input(end);
+            u_check = interp1(t_input, input, t_check);
+            % Get the reference trajectory
+            trajectory = self.trajectories{end};
+            reference_trajectory = arrayfun(@(t)trajectory.getCommand(t), t_check);
+            u_pos_ref = [reference_trajectory.q];
+            u_vel_ref = [reference_trajectory.qd];
+            
+            % check bound satisfaction
+            self.vdisp('Running ultimate bound check!',LogLevel.INFO);
+            
+            % Absolute difference
+            u_pos_diff = abs(u_pos_ref - u_check(self.robot_state.position_indices));
+            u_vel_diff = abs(u_vel_ref - u_check(self.robot_state.position_indices));
+            position_exceeded = u_pos_diff > self.ultimate_bound_position;
+            velocity_exceeded = u_vel_diff > self.ultimate_bound_velocity;
+            
+            % Get out results
+            out = any(position_exceeded) || any(velocity_exceeded);
+            if out
+                % Position ultimate bound exceeded in these positions
+                [joint_idx_list, t_idx_list] = find(position_exceeded);
+                for idx = 1:length(joint_idx_list)
+                    t_idx = t_idx_list(idx);
+                    joint_idx = joint_idx_list(idx);
+                    % Format error message
+                    msg = sprintf('t=%.2f, %d-position bound exceeded: %.5f vs +-%.5f',...
+                        t_check(t_idx), joint_idx, u_pos_diff(joint_idx, t_idx), ...
+                        self.ultimate_bound_position);
+                    self.vdisp(msg, LogLevel.ERROR);
+                end
+                
+                % Velocity ultimate bound exceeded in these positions
+                [joint_idx_list, t_idx_list] = find(velocity_exceeded);
+                for idx = 1:length(joint_idx_list)
+                    t_idx = t_idx_list(idx);
+                    joint_idx = joint_idx_list(idx);
+                    % Format error message
+                    msg = sprintf('t=%.2f, %d-velocity bound exceeded: %.5f vs +-%.5f',...
+                        t_check(t_idx), joint_idx, u_vel_diff(joint_idx, t_idx), ...
+                        self.ultimate_bound_velocity);
+                    self.vdisp(msg, LogLevel.ERROR);
+                end
+            else
+                self.vdisp('No ultimate bound exceeded', LogLevel.INFO);
             end
         end
         

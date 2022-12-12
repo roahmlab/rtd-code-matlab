@@ -35,7 +35,7 @@ classdef OptionsClass < handle
                 fields = fieldnames(newOptionStruct{1}).';
                 for fieldname = fields
                     self.instanceOptions.(fieldname{1}) ...
-                        = newOptionStruct{1}.(fieldname{1});
+                        = merge_or_replace(self.instanceOptions.(fieldname{1}), newOptionStruct{1}.(fieldname{1}));
                 end
             end
             if nargout
@@ -48,4 +48,18 @@ classdef OptionsClass < handle
         end
     end
 end
-    
+
+function into = merge_or_replace(into, from)
+    if isstruct(into) && isstruct(from)
+        fields = fieldnames(from).';
+        for fieldname = fields
+            if isfield(into, fieldname{1})
+                into.(fieldname{1}) = merge_or_replace(into.(fieldname{1}), from.(fieldname{1}));
+            else
+                into.(fieldname{1}) = from.(fieldname{1});
+            end
+        end
+    else
+        into = from;
+    end
+end

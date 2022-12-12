@@ -21,7 +21,7 @@ classdef NamedClass < handle
             if level >= self.verboseLevel
                 name = self.classname;
                 if ~isempty(self.name)
-                    name = [self.classname, '-', char(self.name)];
+                    name = [char(self.name), '-', self.classname];
                 end
                 name = [name, '-', char(level)];
                 disp([name, ': ', char(output)])

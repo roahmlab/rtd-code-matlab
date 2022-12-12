@@ -1,5 +1,6 @@
 classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & handle
     
+    % Torque dynamics with optional measurement noise
     % Leftover Old Dependencies
     % match_trajectory
     % rnea_mass
@@ -227,6 +228,53 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             self.measurement_noise.vel              ...
                 = self.measurement_noise.vel_sigma  ...
                 * randn(self.robot_info.num_q, self.measurement_noise.points);
+        end
+        
+        % Check that the controller wasn't giving bad torques
+        function out = controller_input_check(self, t_check_step)
+            % if not logging, skip
+            if isempty(self.controller_log)
+                self.vdisp('Not logging controller inputs, skipping input torque check!', LogLevel.INFO);
+                return
+            end
+            
+            % retrieve the last log entry
+            entries = self.controller_log.get('input_time', 'input', flatten=false);
+            t_input = entries.input_time{end};
+            input = entries.input{end};
+            
+            % interpolate for the t_check_step and get agent input
+            % trajectory interpolated to time
+            t_check = t_input(1):t_check_step:t_input(end);
+            u_check = interp1(t_input, input, t_check);
+
+            % check torque bounds
+            self.vdisp('Running input torque check!', LogLevel.INFO);
+            u_exceeded = false(size(u_check));
+            for idx=1:self.robot_info.num_q
+                % Lower bound
+                lb = u_check(idx,:) < self.robot_info.joints(idx).torque_limits(1);
+                ub = u_check(idx,:) > self.robot_info.joints(idx).torque_limits(2);
+                u_exceeded(idx,:) = lb + ub;
+            end
+
+            % Get out results
+            out = any(u_exceeded);
+            if out
+                [joint_idx_list, t_idx_list] = find(u_exceeded);
+                for idx = 1:length(joint_idx_list)
+                    t_idx = t_idx_list(idx);
+                    joint_idx = joint_idx_list(idx);
+                    % Format error message
+                    msg = sprintf('t=%.2f, %d-torque exceeded: %.2f vs [%.2f, %.2f]', ...
+                        t_check(t_idx), joint_idx, u_check(joint_idx, t_idx), ...
+                        self.robot_info.joints(joint_idx).torque_limits(1), ...
+                        self.robot_info.joints(joint_idx).torque_limits(2));
+                    self.vdisp(msg, LogLevel.ERROR);
+                end
+            else
+                self.vdisp('No inputs exceeded', LogLevel.INFO);
+            end
         end
     end
 end

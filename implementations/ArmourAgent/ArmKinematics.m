@@ -1,4 +1,4 @@
-classdef ArmKinematics < NamedClass & handle
+classdef ArmKinematics < NamedClass & OptionsClass & handle
     % A collection of useful function for arm robot kinematics
 
     % Leftover Old Dependencies
@@ -14,18 +14,41 @@ classdef ArmKinematics < NamedClass & handle
         arm_state
     end
     
+    methods (Static)
+        function options = defaultoptions()
+            options.verboseLevel = LogLevel.INFO;
+            options.name = '';
+        end
+    end
+    
     methods
-        function self = ArmKinematics(arm_info, arm_state_component, verbose_level, name)
+        function self = ArmKinematics(arm_info, arm_state_component, optionsStruct, options)
             arguments
                 arm_info ArmourAgentInfo
                 arm_state_component ArmourAgentState
-                verbose_level = LogLevel.INFO
-                name = ''
+                optionsStruct struct = struct()
+                options.verbose_level
+                options.name
             end
+            self.mergeoptions(optionsStruct, options);
+            
             self.arm_info = arm_info;
             self.arm_state = arm_state_component;
-            self.set_vdisplevel(verbose_level);
-            self.name = name;
+            
+            % self.reset()
+        end
+        
+        function reset(self, optionsStruct, options)
+            arguments
+                self
+                optionsStruct struct = struct()
+                options.verboseLevel
+                options.name
+            end
+            options = self.mergeoptions(optionsStruct, options);
+            
+            self.set_vdisplevel(options.verboseLevel);
+            self.name = options.name;
         end
         
         function [R,T,J] = get_link_rotations_and_translations(self, time_or_config, cad_flag)
