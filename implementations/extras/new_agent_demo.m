@@ -55,3 +55,15 @@ axis equal
 % Demo the ability to copy paste
 opts = A.getoptions
 A_2 = ArmourAgent.from_options(robot, params, opts)
+
+% Change out the visual for the third copy paste
+opts.components.visual = 'ArmourCadPatchVisual';
+opts.component_options.visual = ArmourCadPatchVisual.defaultoptions();
+% Also name it
+opts.name = 'CAD'
+
+% Demo
+A_3 = ArmourAgent.from_options(robot, params, opts)
+figure; view(3); grid on
+plot(A_3.visual)
+axis equal; camlight

@@ -79,6 +79,10 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
             end
             options = self.mergeoptions(optionsStruct, options);
             
+            % Set up verbose output
+            self.name = options.name;
+            self.set_vdisplevel(options.verboseLevel);
+            
             self.patch_style.FaceColor = options.face_color;
             self.patch_style.FaceAlpha = options.face_opacity;
             self.patch_style.EdgeColor = options.edge_color;
