@@ -1,4 +1,4 @@
-classdef EntityInfo < handle
+classdef EntityInfo < UUIDbase & handle
     % EntityInfo This might go later
     properties (Abstract)
         dimension double {mustBeMember(dimension,[2, 3])}

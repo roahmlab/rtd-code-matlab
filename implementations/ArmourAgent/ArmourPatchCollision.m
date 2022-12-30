@@ -1,4 +1,4 @@
-classdef ArmourPatchCollision < NamedClass & handle
+classdef ArmourPatchCollision < Patch3dDynamicObject & NamedClass & handle
     
     
     % Leftover Old Dependencies
@@ -85,10 +85,11 @@ classdef ArmourPatchCollision < NamedClass & handle
         end
         
         % get collision check volume
-        function out = get_collision_check_volume(self,q)
+        function out = get_patch3dObject(self,options)
             arguments
                 self
-                q = self.arm_state.position(:,end)
+                options.q = self.arm_state.position(:,end)
+                options.time = []
             end
             % out_volume = A.get_collision_check_volume(q)
             %
@@ -101,23 +102,35 @@ classdef ArmourPatchCollision < NamedClass & handle
             % patch structure with two fields (faces and vertices) that can
             % be used with SurfaceIntersection for collision checking.
             
+            % get position given or the time to query.
+            q = options.q;
+            if ~isempty(options.time)
+                state = self.arm_state.get_state(options.time);
+                q = state.q;
+            end
+            
             [R,T] = self.kinematics.get_link_rotations_and_translations(q) ;
             
             F_cell = self.collision_patch_data.faces ;
             V_cell = self.collision_patch_data.vertices ;
             
+            % Create the Patch3dObject object
+            out = Patch3dObject;
+            out.parent_uuid = self.arm_info.uuid;
+
             switch self.arm_info.dimension
-                case 2
-                    V = [] ;
-                    for idx = 1:length(F_cell)
-                        V_idx = R{idx}*V_cell{idx}' + T{idx} ;
-                        V = [V, nan(2,1), V_idx(:,F_cell{idx})] ;
-                    end
+                % case 2
+                %     V = [] ;
+                %     for idx = 1:length(F_cell)
+                %         V_idx = R{idx}*V_cell{idx}' + T{idx} ;
+                %         V = [V, nan(2,1), V_idx(:,F_cell{idx})] ;
+                %     end
                     
-                    out = V(:,2:end) ;
+                %     out = V(:,2:end) ;
                 case 3
                     F = [] ;
                     V = [] ;
+                    group_ends = [];
                     
                     N_verts = 0 ;
                     
@@ -129,10 +142,12 @@ classdef ArmourPatchCollision < NamedClass & handle
                         V = [V ; V_idx] ;
                         
                         N_verts = size(V,1) ;
+                        group_ends = [group_ends; N_verts];
                     end
                     
                     out.faces = F ;
                     out.vertices = V ;
+                    out.group_ends = group_ends;
             end
         end
     end

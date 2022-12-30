@@ -1,21 +1,22 @@
-classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
+classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & handle
     
     % Old functions
     % rand_range
     % Inherited properties that must be defined
     properties
         % General information of the robot arm
-        robot_info = ArmourAgentInfo.empty()
+        entity_info = ArmourAgentInfo.empty()
         
         % state space representation
         n_states = 0
         state double = []
-        step_start_idxs = []
         time = []
     end
     
     % Extra properties we define
     properties
+        % Indexes for our checking of each step.
+        step_start_idxs = []
         % indexes for state space
         position_indices (1,:) uint32 = []
         velocity_indices (1,:) uint32 = []
@@ -48,7 +49,7 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             self.mergeoptions(optionsStruct, options);
             
             % Setup
-            self.robot_info = arm_info;
+            self.entity_info = arm_info;
             
             % initialize
             % self.reset();
@@ -66,7 +67,7 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             options = self.mergeoptions(optionsStruct, options);
             
             % Set component dependent properties
-            self.n_states = 2 * self.robot_info.num_q;
+            self.n_states = 2 * self.entity_info.num_q;
             self.position_indices = 1:2:self.n_states;
             self.velocity_indices = 2:2:self.n_states;
             
@@ -113,10 +114,10 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             pos_range = options.pos_range;
             vel_range = options.vel_range;
             if isempty(pos_range)
-                pos_range = [self.robot_info.joints(1:self.robot_info.num_q).position_limits];
+                pos_range = [self.entity_info.joints(1:self.entity_info.num_q).position_limits];
             end
             if isempty(vel_range)
-                vel_range = [self.robot_info.joints(1:self.robot_info.num_q).velocity_limits];
+                vel_range = [self.entity_info.joints(1:self.entity_info.num_q).velocity_limits];
             end
             
             % set any joint limits that are +Inf to pi and -Inf to -pi
@@ -148,20 +149,37 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
         function state = get_state(self, time)
             arguments
                 self
-                time = -1
+                time = self.time(end);
             end
             state = ArmRobotState();
-            if time < 0
-                state.time = self.time(end);
-                state.q = self.position(:,end);
-                state.q_dot = self.velocity(:,end);
-            else
-                state.time = time;
+            
+            % Default to the last time and state
+            state.time = time;
+            state.q = self.position(:,end);
+            state.q_dot = self.velocity(:,end);
+            
+            % If we can and need to interpolate the state, do it
+            if ~(length(self.time) == 1 || time > self.time(end))
                 temp_state = interp1(self.time, self.state.', time);
                 state.q = temp_state(:,self.position_indices);
                 state.q_dot = temp_state(:,self.velocity_indices);
             end
         end
+        
+        % function state = get_step_states(self, step)
+        %     arguments
+        %         self
+        %         step = length(self.step_start_idxs)
+        %     end
+        %     start_idx = self.step_start_idxs(step);
+        %     end_idx = length(self.time);
+            
+        %     if step ~= length(self.step_start_idxs)
+        %         end_idx = self.step_start_idxs(step+1);
+        %     end
+            
+        %     % TODO hash out
+        % end
         
         function commit_state_data(self,T_state,Z_state)
             % method: commit_move_data(T_state,Z_state)
@@ -174,8 +192,8 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             self.step_start_idxs = [self.time, length(self.time) + 1]; 
             self.time = [self.time, self.time(end) + T_state(2:end)] ;
             self.state = [self.state, Z_state(:,2:end)] ;
+            % TODO, remove magic number 2
         end
-        
 
         function out = joint_limit_check(self, t_check_step)
             % create time vector for checking
@@ -192,14 +210,14 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
             % check position & velocity
             pos_exceeded = false(size(pos_check));
             vel_exceeded = false(size(vel_check));
-            for idx=1:self.robot_info.num_q
+            for idx=1:self.entity_info.num_q
                 % pos
-                lb = pos_check(idx,:) < self.robot_info.joints(idx).position_limits(1);
-                ub = pos_check(idx,:) > self.robot_info.joints(idx).position_limits(2);
+                lb = pos_check(idx,:) < self.entity_info.joints(idx).position_limits(1);
+                ub = pos_check(idx,:) > self.entity_info.joints(idx).position_limits(2);
                 pos_exceeded(idx,:) = lb + ub;
                 % vel
-                lb = vel_check(idx,:) < self.robot_info.joints(idx).velocity_limits(1);
-                ub = vel_check(idx,:) > self.robot_info.joints(idx).velocity_limits(2);
+                lb = vel_check(idx,:) < self.entity_info.joints(idx).velocity_limits(1);
+                ub = vel_check(idx,:) > self.entity_info.joints(idx).velocity_limits(2);
                 vel_exceeded(idx,:) = lb + ub;
             end
             
@@ -214,8 +232,8 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
                     % Format error message
                     msg = sprintf('t=%.2f, %d-position limit exceeded: %.5f vs [%.5f, %.5f]',...
                         t_check(t_idx), joint_idx, pos_check(joint_idx, t_idx), ...
-                        self.robot_info.joints(joint_idx).position_limits(1), ...
-                        self.robot_info.joints(joint_idx).position_limits(2));
+                        self.entity_info.joints(joint_idx).position_limits(1), ...
+                        self.entity_info.joints(joint_idx).position_limits(2));
                     self.vdisp(msg, LogLevel.ERROR);
                 end
                 
@@ -227,8 +245,8 @@ classdef ArmourAgentState < EntityState & NamedClass & OptionsClass & handle
                     % Format error message
                     msg = sprintf('t=%.2f, %d-velocity limit exceeded: %.5f vs [%.5f, %.5f]',...
                         t_check(t_idx), joint_idx, vel_check(joint_idx, t_idx), ...
-                        self.robot_info.joints(joint_idx).velocity_limits(1), ...
-                        self.robot_info.joints(joint_idx).velocity_limits(2));
+                        self.entity_info.joints(joint_idx).velocity_limits(1), ...
+                        self.entity_info.joints(joint_idx).velocity_limits(2));
                     self.vdisp(msg, LogLevel.ERROR);
                 end
             else

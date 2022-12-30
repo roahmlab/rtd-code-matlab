@@ -52,7 +52,7 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
                 options.set_view_when_animating
                 options.animation_view
                 options.verboseLevel
-                options.nam
+                options.name
             end
             self.mergeoptions(optionsStruct, options);
             
@@ -75,7 +75,7 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
                 options.set_view_when_animating
                 options.animation_view
                 options.verboseLevel
-                options.nam
+                options.name
             end
             options = self.mergeoptions(optionsStruct, options);
             
@@ -94,6 +94,8 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
             self.create_baselink_plot_patch_data();
             self.create_link_plot_patch_data();
             
+            self.plot_data.baselink = [];
+            self.plot_data.links = [];
         end
     end
     

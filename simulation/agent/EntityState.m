@@ -1,16 +1,10 @@
-classdef EntityState < handle
-    % EntityState Interface for some Entity state
-    properties (Abstract)
-        robot_info EntityInfo
-        % state space representation
-        n_states(1,1) uint32
-        state double
-        % this might not remain here
-        time(1,:) double
-    end
-    methods (Abstract)
-        reset(self)
-        state = get_state(self, time)
-        commit_state_data(self, times, states)
+classdef EntityState < UUIDbase & handle
+    % RobotState
+    % The state of a generic robot at a point in time, which is saved.
+    % Each hard instance of this (unique object, not seperate handles to
+    % the same underlying object) will have a unique uuid.
+    properties
+        time
+        % An relevant robot properties that evolve over time
     end
 end
