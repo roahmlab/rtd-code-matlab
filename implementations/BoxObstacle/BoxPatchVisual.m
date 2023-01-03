@@ -1,4 +1,4 @@
-classdef BoxPatchVisual < NamedClass & OptionsClass & handle
+classdef BoxPatchVisual < PatchVisualObject & NamedClass & OptionsClass & handle
     
     
     % Leftover Old Dependencies
@@ -112,14 +112,14 @@ classdef BoxPatchVisual < NamedClass & OptionsClass & handle
     
     % Plotting
     methods
-        function plot(self, time)
+        function plot(self, options)
             arguments
                 self BoxPatchVisual
-                time(1,1) double = self.box_state.time(end)
+                options.time(1,1) double = self.box_state.time(end)
             end
             
             % Get the position
-            state = self.box_state.get_state(time);
+            state = self.box_state.get_state(options.time);
             
             % Shift the patch points
             V = self.plot_patch_data.vertices + state.state.';
@@ -139,7 +139,7 @@ classdef BoxPatchVisual < NamedClass & OptionsClass & handle
         
         % Compat
         function plot_at_time(self,t)
-            self.plot(t) ;
+            self.plot(time=t) ;
         end
     end
 end

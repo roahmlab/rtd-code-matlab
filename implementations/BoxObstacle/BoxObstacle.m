@@ -55,6 +55,18 @@ classdef BoxObstacle < OptionsClass & NamedClass & handle
             options.verboseLevel = LogLevel.INFO;
             options.name = '';
         end
+        
+        function box = makeBox(center, side_lengths, optionsStruct)
+            arguments
+                center
+                side_lengths
+                optionsStruct struct = struct()
+            end
+            component_options.info.side_lengths = side_lengths;
+            component_options.state.initial_state = center;
+            box = BoxObstacle(optionsStruct=optionsStruct, ...
+                              component_options=component_options);
+        end
     end
     
     methods

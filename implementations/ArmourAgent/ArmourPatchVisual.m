@@ -1,4 +1,4 @@
-classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
+classdef ArmourPatchVisual < PatchVisualObject & NamedClass & OptionsClass & handle
     
     
     % Leftover Old Dependencies
@@ -20,7 +20,7 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
         set_view_when_animating(1,1) logical
         animation_view(1,1) int8
         
-        plot_data
+        plot_data = struct
     end
     
     methods (Static)
@@ -164,19 +164,18 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
     
     % Plotting
     methods
-        function plot(self,~)
-            self.plot_at_time(self.arm_state.time(end)) ;
+        function plot_at_time(self,t)
+            self.plot(time=t) ;
         end
         
-        function plot_at_time(self,t,~)
+        function plot(self,options)
             arguments
                 self
-                t = 0
-                ~
+                options.time(1,1) double = self.arm_state.time(end)
             end
             
             self.plot_baselink() ;
-            self.plot_links(t) ;
+            self.plot_links(options.time) ;
         end
         
         function plot_baselink(self)
@@ -194,8 +193,10 @@ classdef ArmourPatchVisual < NamedClass & OptionsClass & handle
         end
         
         function plot_links(self,time_or_config)
+            % TEMP FIX FOR CADPATCHVISUAL
+            cad_flag = strcmp(self.classname, 'ArmourCadPatchVisual');
             % get the rotations and translations at the current time
-            [R,T] = self.kinematics.get_link_rotations_and_translations(time_or_config) ;
+            [R,T] = self.kinematics.get_link_rotations_and_translations(time_or_config, cad_flag);
             
             % generate plot data for each link
             % cellfun is easier to see the math from

@@ -22,24 +22,24 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
     end
     
     methods
-        function self = Patch3dCollisionSystem(static_objects, dynamic_objects, optionsStruct, options)
+        function self = Patch3dCollisionSystem(objects, optionsStruct, options)
             arguments
-                static_objects (1,:) Patch3dObject = Patch3dObject.empty()
-                dynamic_objects (1,:) Patch3dDynamicObject = Patch3dDynamicObject.empty()
-                optionsStruct struct = struct()
+                objects.static_objects (1,:) Patch3dObject = Patch3dObject.empty()
+                objects.dynamic_objects (1,:) Patch3dDynamicObject = Patch3dDynamicObject.empty()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.log_collisions
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Reset first
             self.reset()
             
             % add static or dynamic objects if provided
-            self.add_staticObjects(static_objects);
-            self.add_dynamicObjects(dynamic_objects);
+            self.add_staticObjects(objects.static_objects);
+            self.add_dynamicObjects(objects.dynamic_objects);
             
         end
             
@@ -237,7 +237,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             
             % Resolve the object volumes for each of the dynamic entities
             get_vol = @(entity)entity.get_patch3dObject();
-            resolved_dyn_objs = cellfunc(get_vol, self.dynamic_entities);
+            resolved_dyn_objs = arrayfun(get_vol, self.dynamic_objects);
             
             % Iterate through the dynamic objects
             collision = false;

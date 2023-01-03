@@ -25,8 +25,8 @@ classdef BoxObstacleInfo < EntityInfo & OptionsClass & handle
     methods (Static)
         function options = defaultoptions()
             % Configurable options for this component
-            options.dimension = 2; % arbitrary value
-            options.side_lengths = [1, 1];
+            options.dimension = [];
+            options.side_lengths = [1, 1]; % arbitrary value
             options.creation_buffer = 0;
             options.is_base_obstacle = false;
         end
@@ -60,6 +60,9 @@ classdef BoxObstacleInfo < EntityInfo & OptionsClass & handle
             options = self.mergeoptions(optionsStruct, options);
             
             % Validate
+            if isempty(options.dimension)
+                options.dimension = length(options.side_lengths);
+            end
             if options.dimension ~= length(options.side_lengths)
                 error("Box dimension must match side lengths!");
             end

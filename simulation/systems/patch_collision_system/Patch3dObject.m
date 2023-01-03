@@ -29,6 +29,12 @@ classdef Patch3dObject < UUIDbase
                 self Patch3dObject
                 other Patch3dObject
             end
+            % Don't check collision if they share the same parent_uuid
+            if strcmp(self.parent_uuid, other.parent_uuid)
+                collision = false;
+                pair = [];
+                return
+            end
             % Create struct for compat
             surf1 = struct('faces', self.faces, 'vertices', self.vertices);
             surf2 = struct('faces', other.faces, 'vertices', other.vertices);

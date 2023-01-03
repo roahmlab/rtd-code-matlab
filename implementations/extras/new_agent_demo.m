@@ -67,3 +67,70 @@ A_3 = ArmourAgent.from_options(robot, params, opts)
 figure; view(3); grid on
 plot(A_3.visual)
 axis equal; camlight
+disp("press enter to continue")
+pause
+
+%% Initialize the visual and collision systems
+visual = PatchVisualSystem(dynamic_objects=A_3.visual);
+collision = Patch3dCollisionSystem(dynamic_objects=A_3.collision);
+
+% Create the base obstacles
+base_creation_buffer = 0.025;
+face_color = [0.5 0.5 0.5];
+edge_color = [0 0 0];
+
+base_options.info.is_base_obstacle = true;
+base_options.info.creation_buffer = base_creation_buffer;
+base_options.visual.face_color = face_color;
+base_options.visual.edge_color = edge_color;
+optionsStruct.component_options = base_options;
+base = BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
+                            2*[0.2794, 0.2794, 0.1778], ...
+                            optionsStruct);
+tower = BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
+                            2*[0.1016, 0.1651, 0.3312], ...
+                            optionsStruct);
+head = BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
+                            2*[0.1651, 0.1397, 0.0635], ...
+                            optionsStruct);
+% Floor
+floor_color = [0.9, 0.9, 0.9];
+optionsStruct.component_options.visual.face_color = face_color;
+floor = BoxObstacle.makeBox([-0.0331;0;0.005], ...
+                            2*[1.3598, 1.3598, 0.0025], ...
+                            optionsStruct);
+
+% Add them to the collision
+collision.add_staticObjects(base.collision.get_patch3dObject, ...
+                            tower.collision.get_patch3dObject, ...
+                            head.collision.get_patch3dObject, ...
+                            floor.collision.get_patch3dObject)
+
+visual.addObjects(static_objects = [base.visual, ...
+                  tower.visual, ...
+                  head.visual, ...
+                  floor.visual])
+
+% Create a random start (assuming no obstacles)
+randomizing = true;
+while randomizing
+    A_3.state.random_init();
+    proposal_obj = A_3.collision.get_patch3dObject();
+
+    % test it in the collision system
+    [randomizing, pairs] = collision.checkCollisionObject(proposal_obj);
+end
+% This is captured by the goal generator if we don't set anything as the
+% start.
+
+creation_buffer = 0.05;
+for 
+
+% Create and add the goal
+goal = RandomArmConfigurationGoal(collision, A_3);
+goal.reset();
+goal.createGoal();
+visual.addObjects(static_objects=goal);
+
+% redraw
+visual.redraw();

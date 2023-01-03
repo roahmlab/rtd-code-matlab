@@ -2,7 +2,7 @@ classdef BaseDynamicsComponent < handle
     % BaseDynamicsComponent
     properties (Abstract)
         robot_info EntityInfo
-        robot_state EntityState
+        robot_state EntityStateComponent
         controller BaseControllerComponent
     end
     methods (Abstract)

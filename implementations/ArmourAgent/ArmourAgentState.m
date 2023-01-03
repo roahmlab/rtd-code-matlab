@@ -86,13 +86,13 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             % Add position
             if ~isempty(options.initial_position)
                 self.vdisp('Using provided joint positions',LogLevel.TRACE)
-                self.state(self.position_indices) = options.initial_position;
+                self.state(self.position_indices) = options.initial_position(:);
             end
             
             % Add velocity
             if ~isempty(options.initial_velocity)
                 self.vdisp('Using provided joint velocities',LogLevel.TRACE)
-                self.state(self.velocity_indices) = options.initial_velocity;
+                self.state(self.velocity_indices) = options.initial_velocity(:);
             end
             
             % Take these initials and merge them in again.
@@ -101,6 +101,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             self.mergeoptions(options);
         end
         
+        % TODO: split into random_state, set_state
         function random_init(self, options)
             arguments
                 self
