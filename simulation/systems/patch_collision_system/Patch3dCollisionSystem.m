@@ -71,30 +71,15 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             self.dynamic_objects = Patch3dDynamicObject.empty();
         end
         
-        function add_staticObjects(self, static_objects)
+        function add_staticObjects(self, objects)
             arguments
                 self Patch3dCollisionSystem
+                objects.static (1,:) Patch3dObject
+                objects.dynamic (1,:) Patch3dDynamicObject
             end
-            arguments (Repeating)
-                static_objects (1,:) Patch3dObject
-            end
-            % Merge the static objects in
-            for objs = static_objects
-                self.static_objects = [self.static_objects, objs{1}];
-            end
-        end
-        
-        function add_dynamicObjects(self, dynamic_objects)
-            arguments
-                self Patch3dCollisionSystem
-            end
-            arguments (Repeating)
-                dynamic_objects (1,:) Patch3dDynamicObject
-            end
-            % Merge the static objects in
-            for objs = dynamic_objects
-                self.dynamic_objects = [self.dynamic_objects, objs{1}];
-            end
+            % TODO fix assumptions
+            self.static_objects = [self.static_objects, objects.static];
+            self.dynamic_objects = [self.dynamic_objects, objects.dynamic];
         end
         
         function remove(self, object)
@@ -187,7 +172,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             contactPairs.pairs = [];
             
             % Resolve the object volumes for each of the dynamic entities
-            get_vol = @(obj) obj.get_patch3dObject(time=time);
+            get_vol = @(obj) obj.getCollisionObject(time=time);
             resolved_dyn_objs = arrayfun(get_vol, self.dynamic_objects);
             
             % Iterate through the dynamic objects
@@ -236,7 +221,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             contactPairs.pairs = [];
             
             % Resolve the object volumes for each of the dynamic entities
-            get_vol = @(entity)entity.get_patch3dObject();
+            get_vol = @(entity)entity.getCollisionObject();
             resolved_dyn_objs = arrayfun(get_vol, self.dynamic_objects);
             
             % Iterate through the dynamic objects

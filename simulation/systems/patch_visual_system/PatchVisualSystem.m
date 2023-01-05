@@ -76,12 +76,12 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
         function addObjects(self, objects)
             arguments
                 self PatchVisualSystem
-                objects.static_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
-                objects.dynamic_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
+                objects.static (1,:) PatchVisualObject = PatchVisualObject.empty()
+                objects.dynamic (1,:) PatchVisualObject = PatchVisualObject.empty()
             end
             % Merge the objects in
-            self.static_objects = [self.static_objects, objects.static_objects];
-            self.dynamic_objects = [self.dynamic_objects, objects.dynamic_objects];
+            self.static_objects = [self.static_objects, objects.static];
+            self.dynamic_objects = [self.dynamic_objects, objects.dynamic];
         end
         
         function remove(self, object)

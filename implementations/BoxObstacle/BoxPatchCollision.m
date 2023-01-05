@@ -63,7 +63,7 @@ classdef BoxPatchCollision < Patch3dDynamicObject & NamedClass & handle
         end
         
         % get collision check volume
-        function out = get_patch3dObject(self,options)
+        function out = getCollisionObject(self,options)
             arguments
                 self
                 options.buffered = false

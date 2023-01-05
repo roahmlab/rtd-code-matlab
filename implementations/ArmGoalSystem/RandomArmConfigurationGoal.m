@@ -182,7 +182,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
                 % TODO: consider isolating random state from random init
                 % Propose a position for the arm & get the collision object
                 self.arm_agent.state.random_init();
-                proposal_obj = self.arm_agent.collision.get_patch3dObject();
+                proposal_obj = self.arm_agent.collision.getCollisionObject();
 
                 % test it in the collision system
                 [collision, pairs] = self.collision_system.checkCollisionObject(proposal_obj);

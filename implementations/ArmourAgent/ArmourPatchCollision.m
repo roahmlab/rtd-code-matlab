@@ -85,7 +85,7 @@ classdef ArmourPatchCollision < Patch3dDynamicObject & NamedClass & handle
         end
         
         % get collision check volume
-        function out = get_patch3dObject(self,options)
+        function out = getCollisionObject(self,options)
             arguments
                 self
                 options.q = self.arm_state.position(:,end)
