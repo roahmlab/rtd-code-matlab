@@ -123,8 +123,38 @@ end
 % This is captured by the goal generator if we don't set anything as the
 % start.
 
+% Create the random obstacles
+n_obstacles = 10;
+obstacle_size_range = [0.01 0.5] ; % [min, max] side length
 creation_buffer = 0.05;
-for 
+world_bounds = [A_3.info.reach_limits(1:2:6); A_3.info.reach_limits(2:2:6)];
+obstacles = [];
+for obs_num = 1:n_obstacles
+    randomizing = true;
+    while randomizing
+        % create center, side lengths
+        center = rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
+                             world_bounds(2,:) - obstacle_size_range(2)/2 );
+        side_lengths = rand_range(obstacle_size_range(1),...
+                                  obstacle_size_range(2),...
+                                  [],[],...
+                                  1, 3); % 3 is the dim of the world in this case
+        % Create obstacle
+        optionsStruct = struct;
+        optionsStruct.component_options.info.creation_buffer = base_creation_buffer;
+        prop_obs = BoxObstacle.makeBox(center, side_lengths, optionsStruct);
+
+        % test it
+        proposal_obj = prop_obs.collision.get_patch3dObject();
+
+        % test it in the collision system
+        [randomizing, pairs] = collision.checkCollisionObject(proposal_obj);
+    end
+    % if it's good, we save the proposal_obj
+    collision.add_staticObjects(proposal_obj);
+    visual.addObjects(static_objects=prop_obs.visual);
+    obstacles = [obstacles; prop_obs];
+end
 
 % Create and add the goal
 goal = RandomArmConfigurationGoal(collision, A_3);
