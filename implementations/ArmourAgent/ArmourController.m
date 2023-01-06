@@ -119,7 +119,8 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             self.alpha_constant = self.LLC_wrapped.alpha_constant;
             
             % Create the initial trajectory
-            self.trajectories = {ZeroHoldTrajectory(self.robot_state.get_state)};
+            a = ZeroHoldTrajectory(self.robot_state.get_state);
+            self.trajectories = {a};
         end
             
         

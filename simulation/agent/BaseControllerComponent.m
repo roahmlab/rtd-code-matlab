@@ -3,7 +3,7 @@ classdef BaseControllerComponent < handle
     properties (Abstract)
         robot_info EntityInfo
         robot_state EntityStateComponent
-        trajectories cell
+        trajectories
         n_inputs uint32
     end
     methods (Abstract)

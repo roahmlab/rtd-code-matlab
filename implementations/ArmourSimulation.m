@@ -89,7 +89,7 @@ classdef ArmourSimulation < Simulation & handle
             self.agent = agent;
             % Initialize the visual and collision systems
             self.visual_system = PatchVisualSystem;
-            self.collision_system = Patch3dCollisionSystem;
+            self.collision_system = Patch3dCollisionSystem(time_discretization=0.01);
             %self.systems = {self.visual_system, self.collision_system};
             
             % add the agent
@@ -191,8 +191,11 @@ classdef ArmourSimulation < Simulation & handle
             self.goal_system.createGoal();
             self.visual_system.addObjects(static=self.goal_system);
 
+            % reset the agent
+            self.agent.reset
+
             % redraw
-            clf;view(3);axis equal;grid on;camlight
+            clf;view(3);axis equal;grid on%;camlight
             self.visual_system.redraw();
             
             self.simulation_state = SimulationState.READY;
