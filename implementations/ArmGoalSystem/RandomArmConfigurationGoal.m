@@ -151,7 +151,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
             goal = false;
             get_pos = @(t)self.arm_agent.state.get_state(t).q;
             for t_check = t_vec
-                goal = goal || all(abs(get_pos(t_check) - self.goal_position) <= self.goal_radius);
+                goal = goal || all(abs(get_pos(t_check) - self.goal_position) <= self.goal_radius, 'all');
             end
             
             % Save the time change

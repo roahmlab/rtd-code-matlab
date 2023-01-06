@@ -226,10 +226,10 @@ classdef ArmourSimulation < Simulation & handle
         end
         function summary(self, options)
         end
-        function execute(self, options)
+        function run(self, options)
             arguments
                 self ArmourSimulation
-                options.max_steps = int(1e8)
+                options.max_steps = 1e8
                 options.max_time = Inf
             end
             steps = 0;
@@ -239,6 +239,8 @@ classdef ArmourSimulation < Simulation & handle
                 self.pre_step();
                 self.step();
                 self.post_step();
+                steps = steps + 1;
+                t_cur = toc(start_tic);
             end
         end
     end

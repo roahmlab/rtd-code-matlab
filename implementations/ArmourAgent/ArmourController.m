@@ -117,6 +117,9 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             self.ultimate_bound_position = self.LLC_wrapped.ultimate_bound_position;
             self.ultimate_bound_velocity = self.LLC_wrapped.ultimate_bound_velocity;
             self.alpha_constant = self.LLC_wrapped.alpha_constant;
+            
+            % Create the initial trajectory
+            self.trajectories = {ZeroHoldTrajectory(self.robot_state.get_state)};
         end
             
         
@@ -153,6 +156,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             % if no log, skip
             if isempty(controller_log)
                 self.vdisp('Not logging controller inputs, skipping ultimate bound check!', LogLevel.INFO);
+                out = false;
                 return
             end
             

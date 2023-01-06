@@ -199,7 +199,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             qdd = M\(u-C*qd-g);
 
             % return dynamics
-            zd = zeros(size(z));
+            zd = zeros(size(state));
             zd(self.robot_state.position_indices) = qd(:);
             zd(self.robot_state.velocity_indices) = qdd(:);
         end
@@ -235,6 +235,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             % if not logging, skip
             if isempty(self.controller_log)
                 self.vdisp('Not logging controller inputs, skipping input torque check!', LogLevel.INFO);
+                out = false;
                 return
             end
             

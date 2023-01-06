@@ -23,7 +23,7 @@ classdef Simulation < NamedClass & handle
         
         % Run the lifecycle
         % Max iterations or max length is embedded in this.
-        execute(self, options)
+        run(self, options)
         
         % Exports the world_def struct to a
         %export_world(self, filename)

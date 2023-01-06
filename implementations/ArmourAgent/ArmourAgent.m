@@ -164,7 +164,9 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             options = self.mergeoptions(optionsStruct, options);
             
             % Iterate through all we have options for
+            order = fieldnames(options.components).';
             fields = fieldnames(options.component_options).';
+            fields = intersect(order, fields, 'stable');
             for fieldname = fields
                 % Overwrite their names if we have a name for our class
                 if ~isempty(options.name) ...
@@ -215,6 +217,7 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             self.dynamics.move(t_move);
             results.success = true; %hardcoded for now
             % Then run post-movement checks
+            t_check_step = 0.01;
             results.checks.joint_limits = self.state.joint_limit_check(t_check_step);
             results.checks.control_inputs = self.dynamics.controller_input_check(t_check_step);
             results.checks.ultimate_bound = self.controller.ultimate_bound_check(t_check_step, self.dynamics.controller_log);

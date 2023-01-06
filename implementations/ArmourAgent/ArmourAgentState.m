@@ -202,11 +202,11 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             t_check = self.time(start_idx):t_check_step:self.time(end);
 
             % get agent state trajectories interpolated to time
-            pos_check = interp1(self.time(start_idx:end), self.position(:,start_idx:end), t_check);
-            vel_check = interp1(self.time(start_idx:end), self.velocity(:,start_idx:end), t_check);
+            pos_check = interp1(self.time(start_idx:end), self.position(:,start_idx:end).', t_check);
+            vel_check = interp1(self.time(start_idx:end), self.velocity(:,start_idx:end).', t_check);
 
             % check bound satisfaction
-            A.vdisp('Running joint limits check!', LogLevel.INFO);
+            self.vdisp('Running joint limits check!', LogLevel.INFO);
             
             % check position & velocity
             pos_exceeded = false(size(pos_check));
@@ -223,7 +223,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             end
             
             % Get out results
-            out = any(pos_exceeded) || any(vel_exceeded);
+            out = any(pos_exceeded, 'all') || any(vel_exceeded, 'all');
             if out
                 % Position limit exceeded in these positions
                 [joint_idx_list, t_idx_list] = find(pos_exceeded);
