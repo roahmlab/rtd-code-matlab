@@ -189,7 +189,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
                 qd = qd + noise_vel;
             end
             
-            z_meas = zeros(size(z));
+            z_meas = zeros(size(state));
             z_meas(self.robot_state.position_indices) = q;
             z_meas(self.robot_state.velocity_indices) = qd;
             

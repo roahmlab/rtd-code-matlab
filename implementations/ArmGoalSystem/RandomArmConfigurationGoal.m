@@ -33,6 +33,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
             options.edge_opacity = 0.3;
             options.edge_style = '--';
             options.start_position = [];
+            options.goal_position = [];
             options.min_dist_start_to_goal = [];
             options.goal_creation_timeout = 10;
             options.goal_radius = pi/30;
@@ -53,6 +54,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
                 options.edge_opacity
                 options.edge_width
                 options.start_position
+                options.goal_position
                 options.min_dist_start_to_goal
                 options.goal_creation_timeout
                 options.goal_radius
@@ -78,6 +80,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
                 options.edge_opacity
                 options.edge_width
                 options.start_position
+                options.goal_position
                 options.min_dist_start_to_goal
                 options.goal_creation_timeout
                 options.goal_radius
@@ -115,6 +118,11 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
                 % Get the range and use that to compute the min_dist
                 joint_ranges = diff(pos_limits,[],1);
                 self.min_dist_start_to_goal = norm(0.25*joint_ranges);
+            end
+            
+            % set the goal if provided
+            if ~isempty(options.goal_position)
+                self.createGoal(options.goal_position)
             end
             
             self.plot_data.links = [];

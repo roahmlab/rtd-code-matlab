@@ -101,12 +101,12 @@ floor = BoxObstacle.makeBox([-0.0331;0;0.005], ...
                             optionsStruct);
 
 % Add them to the collision
-collision.add_staticObjects(base.collision.getCollisionObject, ...
-                            tower.collision.getCollisionObject, ...
-                            head.collision.getCollisionObject, ...
-                            floor.collision.getCollisionObject)
+collision.addObjects(static=[base.collision.getCollisionObject, ...
+                             tower.collision.getCollisionObject, ...
+                             head.collision.getCollisionObject, ...
+                             floor.collision.getCollisionObject])
 
-visual.addObjects(static_objects = [base.visual, ...
+visual.addObjects(static = [base.visual, ...
                   tower.visual, ...
                   head.visual, ...
                   floor.visual])
@@ -151,8 +151,8 @@ for obs_num = 1:n_obstacles
         [randomizing, pairs] = collision.checkCollisionObject(proposal_obj);
     end
     % if it's good, we save the proposal_obj
-    collision.add_staticObjects(proposal_obj);
-    visual.addObjects(static_objects=prop_obs.visual);
+    collision.addObjects(static=proposal_obj);
+    visual.addObjects(static=prop_obs.visual);
     obstacles = [obstacles; prop_obs];
 end
 
@@ -160,7 +160,8 @@ end
 goal = RandomArmConfigurationGoal(collision, A_3);
 goal.reset();
 goal.createGoal();
-visual.addObjects(static_objects=goal);
+visual.addObjects(static=goal);
 
 % redraw
+clf;view(3);axis equal;grid on;camlight
 visual.redraw();

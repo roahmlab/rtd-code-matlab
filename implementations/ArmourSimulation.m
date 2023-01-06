@@ -1,0 +1,245 @@
+classdef ArmourSimulation < Simulation & handle
+    properties
+        simulation_timestep = 0.5
+        world = struct
+        entities
+        %systems
+        simulation_state SimulationState = SimulationState.INVALID
+    end
+    properties
+        agent
+        collision_system
+        visual_system
+        goal_system
+    end
+    methods
+        % Important stuff to get started
+        function self = ArmourSimulation(optionsStruct, options)
+            arguments
+                optionsStruct struct = struct()
+                options.simulation_timestep
+            end
+            self.simulation_state = SimulationState.CONSTRUCTED;
+        end
+        
+        % Add object
+        function add_object(self, object, options)
+            arguments
+                self ArmourSimulation
+                object
+                options.isentity = false
+                options.collision = []
+                options.visual = []
+            end
+            
+            % Add the object to the world
+            % Create a name for the object based on its classname if it
+            % doesn't have a given name.
+            name = object.name;
+            if isempty(name)
+                % Base classname
+                name = object.classname;
+                % Get number to append by summing a regexp. It returns the
+                % index of the occurance in each string, but since it's
+                % limited to the first word anyway, it'll be 1 or empty.
+                search_string = ['^', char(name), '\d+$'];
+                all_names = fieldnames(self.world);
+                id = sum(cell2mat(regexp(all_names, search_string)));
+                name = [char(name), num2str(id)];
+            end
+            object.name = name;
+            self.world.(name) = object;
+            
+            % Add to the entity list if it's an entity
+            if options.isentity
+                self.entities = [self.entities, {object}];
+                % Add the collision component provided to the collision system
+                if ~isempty(options.collision)
+                    self.collision_system.addObjects(dynamic=options.collision);
+                end
+                % Add the visualization component provided to the visual
+                % system
+                if ~isempty(options.visual)
+                    self.visual_system.addObjects(dynamic=options.visual);
+                end
+            % if it's not, check for and add to collision or visual
+            else
+                if ~isempty(options.collision)
+                    self.collision_system.addObjects(static=options.collision);
+                end
+                % Add the visualization component provided to the visual
+                % system
+                if ~isempty(options.visual)
+                    self.visual_system.addObjects(static=options.visual);
+                end
+            end
+        end
+        
+        function setup(self, agent)
+            arguments
+                self ArmourSimulation
+                agent ArmourAgent
+            end
+            if self.simulation_state > SimulationState.SETTING_UP
+                self.world = struct;
+                self.entities = [];
+            end
+            self.simulation_state = SimulationState.SETTING_UP;
+            
+            self.agent = agent;
+            % Initialize the visual and collision systems
+            self.visual_system = PatchVisualSystem;
+            self.collision_system = Patch3dCollisionSystem;
+            %self.systems = {self.visual_system, self.collision_system};
+            
+            % add the agent
+            self.add_object(agent, isentity=true, collision=agent.collision, visual=agent.visual);
+
+            % Create the base obstacles
+            base_creation_buffer = 0.025;
+            face_color = [0.5 0.5 0.5];
+            edge_color = [0 0 0];
+
+            base_options.info.is_base_obstacle = true;
+            base_options.info.creation_buffer = base_creation_buffer;
+            base_options.visual.face_color = face_color;
+            base_options.visual.edge_color = edge_color;
+            optionsStruct.component_options = base_options;
+            base = BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
+                                        2*[0.2794, 0.2794, 0.1778], ...
+                                        optionsStruct);
+            tower = BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
+                                        2*[0.1016, 0.1651, 0.3312], ...
+                                        optionsStruct);
+            head = BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
+                                        2*[0.1651, 0.1397, 0.0635], ...
+                                        optionsStruct);
+            % Floor
+            floor_color = [0.9, 0.9, 0.9];
+            optionsStruct.component_options.visual.face_color = floor_color;
+            floor = BoxObstacle.makeBox([-0.0331;0;0.005], ...
+                                        2*[1.3598, 1.3598, 0.0025], ...
+                                        optionsStruct);
+
+            % Add them to the world
+            for obs = [base, tower, head, floor]
+                self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
+            end
+            
+            self.simulation_state = SimulationState.SETUP_READY;
+        end
+        
+        function initialize(self)
+            if self.simulation_state > SimulationState.INITIALIZING
+                error("This simulation currently does not support reinitialization without resetup");
+            end
+            self.simulation_state = SimulationState.INITIALIZING;
+
+            % A lot of temporaries
+            timeout = 10;
+            % Create a random start (assuming no obstacles)
+            randomizing = true;
+            start_tic = tic;
+            t_cur = toc(start_tic);
+            while randomizing && t_cur <= timeout
+                self.agent.state.random_init();
+                proposal_obj = self.agent.collision.getCollisionObject();
+
+                % test it in the collision system
+                [randomizing, pairs] = self.collision_system.checkCollisionObject(proposal_obj);
+                t_cur = toc(start_tic);
+            end
+            % This is captured by the goal generator if we don't set anything as the
+            % start.
+
+            % Create the random obstacles
+            n_obstacles = 10;
+            obstacle_size_range = [0.01 0.5] ; % [min, max] side length
+            creation_buffer = 0.05;
+            world_bounds = [self.agent.info.reach_limits(1:2:6); self.agent.info.reach_limits(2:2:6)];
+            for obs_num = 1:n_obstacles
+                randomizing = true;
+                start_tic = tic;
+                t_cur = toc(start_tic);
+                while randomizing && t_cur <= timeout
+                    % create center, side lengths
+                    center = rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
+                                         world_bounds(2,:) - obstacle_size_range(2)/2 );
+                    side_lengths = rand_range(obstacle_size_range(1),...
+                                              obstacle_size_range(2),...
+                                              [],[],...
+                                              1, 3); % 3 is the dim of the world in this case
+                    % Create obstacle
+                    optionsStruct = struct;
+                    optionsStruct.component_options.info.creation_buffer = creation_buffer;
+                    prop_obs = BoxObstacle.makeBox(center, side_lengths, optionsStruct);
+
+                    % test it
+                    proposal_obj = prop_obs.collision.getCollisionObject(buffered=true);
+
+                    % test it in the collision system
+                    [randomizing, pairs] = self.collision_system.checkCollisionObject(proposal_obj);
+                    t_cur = toc(start_tic);
+                end
+                % if it's good, we save the proposal_obj
+                self.add_object(prop_obs, collision=prop_obs.collision.getCollisionObject, visual=prop_obs.visual);
+            end
+
+            % Create and add the goal
+            self.goal_system = RandomArmConfigurationGoal(self.collision_system, self.agent);
+            self.goal_system.reset();
+            self.goal_system.createGoal();
+            self.visual_system.addObjects(static=self.goal_system);
+
+            % redraw
+            clf;view(3);axis equal;grid on;camlight
+            self.visual_system.redraw();
+            
+            self.simulation_state = SimulationState.READY;
+        end
+        function pre_step(self)
+            self.simulation_state = SimulationState.PRE_STEP;
+            
+            % CALL PLANNER
+        end
+        function step(self)
+            self.simulation_state = SimulationState.STEP;
+            
+            % Update entities
+            agent_results = self.agent.update(self.simulation_timestep);
+            
+            % Update systems
+            [collision, contactPairs] = self.collision_system.updateCollision(self.simulation_timestep);
+            
+            agent_results
+            if collision
+                disp("Collision Detected, Breakpoint!")
+                pause
+                disp("Continuing")
+            end
+        end
+        function post_step(self)
+            self.simulation_state = SimulationState.POST_STEP;
+            % Check if goal was achieved
+            goal = self.goal_system.updateGoal(self.simulation_timestep);
+            self.visual_system.updateVisual(self.simulation_timestep);
+        end
+        function summary(self, options)
+        end
+        function execute(self, options)
+            arguments
+                self ArmourSimulation
+                options.max_steps = int(1e8)
+                options.max_time = Inf
+            end
+            steps = 0;
+            start_tic = tic;
+            t_cur = toc(start_tic);
+            while steps < options.max_steps && t_cur < options.max_time
+                self.pre_step();
+                self.step();
+                self.post_step();
+            end
+        end
+    end
+end

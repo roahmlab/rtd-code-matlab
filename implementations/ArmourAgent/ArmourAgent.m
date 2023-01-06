@@ -208,31 +208,16 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             options.component_options = get_componentoptions(components);
             options = self.mergeoptions(options);
         end
-%         
-%         % Pass the trajectory to the controller
-%         % TODO Decide on relevance
-%         function setTrajectory(self, trajectory)
-%             self.controller.setTrajectory(trajectory);
-%         end
-        
-        % Lifecycle
-        function check = pre_checks(self)
-            % This would run before the update in each world step.
-        end
         
         % Update this agent's state by t_move
-        function update(self, t_move)
+        function results = update(self, t_move)
+            % First move
             self.dynamics.move(t_move);
-        end
-        
-        % Safety checks
-        function check = post_checks(self)
-            % TODO make this addable, and check across? Maybe not (reasons
-            % not are obfuscation)
-            % true means an issue happened!
-            check.joint_limits = self.state.joint_limit_check(t_check_step);
-            check.control_inputs = self.dynamics.controller_input_check(t_check_step);
-            check.ultimate_bound = self.controller.ultimate_bound_check(t_check_step, self.dynamics.controller_log);
+            results.success = true; %hardcoded for now
+            % Then run post-movement checks
+            results.checks.joint_limits = self.state.joint_limit_check(t_check_step);
+            results.checks.control_inputs = self.dynamics.controller_input_check(t_check_step);
+            results.checks.ultimate_bound = self.controller.ultimate_bound_check(t_check_step, self.dynamics.controller_log);
         end
         
         function uuid = get.uuid(self)

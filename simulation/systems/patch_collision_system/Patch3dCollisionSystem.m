@@ -38,8 +38,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             self.reset()
             
             % add static or dynamic objects if provided
-            self.add_staticObjects(objects.static_objects);
-            self.add_dynamicObjects(objects.dynamic_objects);
+            self.addObjects(static=objects.static_objects, dynamic=objects.dynamic_objects);
             
         end
             
@@ -71,11 +70,11 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             self.dynamic_objects = Patch3dDynamicObject.empty();
         end
         
-        function add_staticObjects(self, objects)
+        function addObjects(self, objects)
             arguments
                 self Patch3dCollisionSystem
-                objects.static (1,:) Patch3dObject
-                objects.dynamic (1,:) Patch3dDynamicObject
+                objects.static (1,:) Patch3dObject = Patch3dObject.empty()
+                objects.dynamic (1,:) Patch3dDynamicObject = Patch3dDynamicObject.empty()
             end
             % TODO fix assumptions
             self.static_objects = [self.static_objects, objects.static];

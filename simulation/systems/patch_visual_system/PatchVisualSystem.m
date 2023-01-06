@@ -41,8 +41,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
             self.reset()
             
             % add static or dynamic objects if provided
-            args = namedargs2cell(objects);
-            self.addObjects(args{:});
+            self.addObjects(static=objects.static_objects, dynamic=objects.dynamic_objects);
         end
             
         function reset(self, optionsStruct, options)
