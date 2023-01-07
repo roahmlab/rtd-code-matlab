@@ -3,7 +3,7 @@ classdef ZeroHoldTrajectory < Trajectory
     % The original ArmTD trajectory with peicewise accelerations
     properties (Constant)
         % Size of the trajectoryParams, we want this set for all use
-        param_shape = 0; % This already needs a change!
+        param_shape = 7; % This already needs a change!
         % TODO - update to add dynamic parameter as an option
     end
     properties

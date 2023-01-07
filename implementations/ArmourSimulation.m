@@ -8,6 +8,7 @@ classdef ArmourSimulation < Simulation & handle
     end
     properties
         agent
+        obstacles
         collision_system
         visual_system
         goal_system
@@ -64,6 +65,7 @@ classdef ArmourSimulation < Simulation & handle
                 end
             % if it's not, check for and add to collision or visual
             else
+                self.obstacles = [self.obstacles, box_obstacle_zonotope('center', object.state.state, 'side_lengths', object.info.side_lengths)];
                 if ~isempty(options.collision)
                     self.collision_system.addObjects(static=options.collision);
                 end
