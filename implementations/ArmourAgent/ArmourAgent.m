@@ -1,8 +1,8 @@
-classdef ArmourAgent < OptionsClass & NamedClass & handle
-% ArmourAgent
+classdef ArmourAgent < WorldEntity & handle
 % The Agent with the robust controller for ARMOUR
 % Left to do are the helper safety check functions like check input limits
 % and glueing this together
+    % Required Abstract Properties
     properties
         %%%%%%%%%%%%%%%%%%%
         % Data Components %
@@ -10,13 +10,15 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
         
         % Core data to describe the agent.
         % Should be mostly invariant.
-        info ArmourAgentInfo
+        info = ArmourAgentInfo.empty()
         
         % The changing values and their history that fully describe the
         % state of the agent at any given (valid) point in time
-        state
-        
-        
+        state = ArmourAgentState.empty()
+    end
+
+    % Specific for this entity
+    properties
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % Prerequisite Utility Components %
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,12 +65,11 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
         % None
         
     end
-    properties (Dependent)
-        uuid
-    end
     
     methods (Static)
         function options = defaultoptions()
+            options = WorldEntity.baseoptions();
+            
             components.info = 'ArmourAgentInfo';
             components.state = 'ArmourAgentState';
             components.kinematics = 'ArmKinematics';
@@ -77,10 +78,6 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             components.collision = 'ArmourPatchCollision';
             components.visual = 'ArmourPatchVisual';
             options.components = components;
-            options.component_options = struct;%get_componentoptions(components);
-            options.component_logLevelOverride = [];
-            options.verboseLevel = LogLevel.INFO;
-            options.name = '';
         end
         
         function self = from_options(robot, params, options)
@@ -94,12 +91,12 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
         function self = ArmourAgent(info, components, optionsStruct, options)
             arguments
                 info
-                components.state_component = []
-                components.kinematics_component = []
-                components.controller_component = []
-                components.dynamics_component = []
-                components.collision_component = []
-                components.visual_component = []
+                components.state = []
+                components.kinematics = []
+                components.controller = []
+                components.dynamics = []
+                components.collision = []
+                components.visual = []
                 optionsStruct.optionsStruct struct = struct()
                 options.components
                 options.component_options
@@ -107,43 +104,22 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
                 options.verboseLevel
                 options.name
             end
-            % mark each of our preconstructed components and save them
-            names = {'info', 'state', 'kinematics', 'controller', 'dynamics', 'collision', 'visual'};
-            components = {info, components.state_component, ...
-                components.kinematics_component, components.controller_component, ...
-                components.dynamics_component, components.collision_component, ...
-                components.visual_component};
-            
-            % Boolean mask for provided components
-            provided_components_mask = ~cellfun(@isempty, components);
-            provided_components = components(provided_components_mask);
-            
-            % Preprocess and save the names
-            provided_component_classnames = cellfun(@class, provided_components, 'UniformOutput', false);
-            provided_component_names = names(provided_components_mask);
-            override_options.components = [provided_component_names; provided_component_classnames];
-            override_options.components = struct(override_options.components{:});
-            
-            % Preprocess the instances for options
-            component_handles = [provided_component_names; provided_components];
-            override_options.component_options = get_componentoptions(struct(component_handles{:}));
-            
-            % Build option structs for the preconstructed components and
-            % save them to this agent.
-            for i=1:length(provided_component_names)
-                self.(provided_component_names{i}) = provided_components{i};
-            end
-            
+            % Get override options based on provided components
+            components.info = info;
+            override_options = WorldEntity.get_componentOverrideOptions(components);
+
             % Merge all options
-            options = self.mergeoptions(optionsStruct.optionsStruct, options, override_options);
+            self.mergeoptions(optionsStruct.optionsStruct, options, override_options);
             
-            % (Re)construct all components for consistency
-            self.state = construct_component(options, 'state', self.info);
-            self.kinematics = construct_component(options, 'kinematics', self.info, self.state);
-            self.controller = construct_component(options, 'controller', self.info, self.state);
-            self.dynamics = construct_component(options, 'dynamics', self.info, self.state, self.controller);
-            self.collision = construct_component(options, 'collision', self.info, self.state, self.kinematics);
-            self.visual = construct_component(options, 'visual', self.info, self.state, self.kinematics);
+            % Set components and (Re)construct dependent components for
+            % consistency
+            self.info = info;
+            self.construct_component('state', self.info);
+            self.construct_component('kinematics', self.info, self.state);
+            self.construct_component('controller', self.info, self.state);
+            self.construct_component('dynamics', self.info, self.state, self.controller);
+            self.construct_component('collision', self.info, self.state, self.kinematics);
+            self.construct_component('visual', self.info, self.state, self.kinematics);
             
             % Reset
             self.reset()
@@ -163,52 +139,12 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             self.getoptions();
             options = self.mergeoptions(optionsStruct, options);
             
-            % Iterate through all we have options for
-            order = fieldnames(options.components).';
-            fields = fieldnames(options.component_options).';
-            fields = intersect(order, fields, 'stable');
-            for fieldname = fields
-                % Overwrite their names if we have a name for our class
-                if ~isempty(options.name) ...
-                        && isfield(options.component_options.(fieldname{1}), 'name') ...
-                        && isempty(options.component_options.(fieldname{1}).name)
-                    options.component_options.(fieldname{1}).name = options.name;
-                    
-                end
-                % Overwrite the verboseLevel if we have a logleveloverride
-                if ~isempty(options.component_logLevelOverride) ...
-                        && isfield(options.component_options.(fieldname{1}), 'verboseLog')
-                    options.component_options.(fieldname{1}).verboseLog = options.component_logLevelOverride;
-                    
-                end
-                self.(fieldname{1}).reset(options.component_options.(fieldname{1}));
-            end
-            
-            % Make sure to reset those that don't have options but still
-            % need reset
-            names = {'info', 'state', 'kinematics', 'controller', 'dynamics', 'collision', 'visual'};
-            remaining = setdiff(names, fields);
-            for name = remaining
-                self.(name{1}).reset();
-            end
+            % reset all components
+            self.reset_components()
             
             % Set up verbose output
             self.name = options.name;
             self.set_vdisplevel(options.verboseLevel);
-        end
-        
-        % Get all the options used for initialization of the robot
-        function options = getoptions(self)
-            % Update all the component options before returning.
-            components.info = self.info;
-            components.state = self.state;
-            components.kinematics = self.kinematics;
-            components.controller = self.controller;
-            components.dynamics = self.dynamics;
-            components.collision = self.collision;
-            components.visual = self.visual;
-            options.component_options = get_componentoptions(components);
-            options = self.mergeoptions(options);
         end
         
         % Update this agent's state by t_move
@@ -222,35 +158,5 @@ classdef ArmourAgent < OptionsClass & NamedClass & handle
             results.checks.control_inputs = self.dynamics.controller_input_check(t_check_step);
             results.checks.ultimate_bound = self.controller.ultimate_bound_check(t_check_step, self.dynamics.controller_log);
         end
-        
-        function uuid = get.uuid(self)
-            uuid = self.info.uuid;
-        end
-            
-    end
-end
-
-function component_options = get_componentoptions(components)
-    % Generate an entry for each field which is of type OptionsClass
-    fields = fieldnames(components).';
-    for fieldname = fields
-        if ismember('OptionsClass', superclasses(components.(fieldname{1})))
-            try
-                component_options.(fieldname{1}) ...
-                    = components.(fieldname{1}).getoptions();
-            catch
-                component_options.(fieldname{1}) ...
-                    = eval([components.(fieldname{1}) '.defaultoptions()']);
-            end
-        end
-    end
-end
-
-function component = construct_component(option_struct, name, varargin)
-    if isfield(option_struct, 'component_options') ...
-            && isfield(option_struct.component_options, name)
-        component = feval(option_struct.components.(name), varargin{:}, option_struct.component_options.(name));
-    else
-        component = feval(option_struct.components.(name), varargin{:});
     end
 end

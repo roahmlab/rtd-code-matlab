@@ -81,7 +81,7 @@ classdef ArmKinematics < NamedClass & OptionsClass & handle
                 end
                 
                 % interpolate the state for the corresponding time
-                j_vals = match_trajectories(t,self.arm_state.time,self.arm_state.position);
+                j_vals = self.arm_state.get_state(t).q;% match_trajectories(t,self.arm_state.time,self.arm_state.position);
             else
                 % assume a configuration was put in
                 q = time_or_config;

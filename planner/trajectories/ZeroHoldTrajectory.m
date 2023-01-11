@@ -55,9 +55,14 @@ classdef ZeroHoldTrajectory < Trajectory
                 throw(ME)
             end
             
-            command.q_des = self.robotState.q;
-            command.q_dot_des = self.robotState.q*0;
-            command.q_ddot_des = self.robotState.q*0;
+            q_des = self.robotState.q;
+            q_dot_des = self.robotState.q*0;
+            q_ddot_des = self.robotState.q*0;
+
+            n_q = length(q_des);
+            command = ArmRobotTrajectoryState(1:n_q, n_q+1:n_q*2, n_q*2+1:n_q*3);
+            command.time = t;
+            command.state = [q_des; q_dot_des; q_ddot_des];
         end
     end
 end

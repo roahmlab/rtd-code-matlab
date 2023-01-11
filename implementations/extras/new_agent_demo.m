@@ -89,18 +89,6 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 0.5;
 
-robotInfo = ArmRobotInfo;
-robotInfo.params = sim.agent.info.params;
-robotInfo.link_poly_zonotopes = {sim.agent.info.links.poly_zonotope}.';
-robotInfo.LLC_info = {};
-robotInfo.LLC_info.ultimate_bound = sim.agent.controller.ultimate_bound;
-robotInfo.LLC_info.ultimate_bound_position = sim.agent.controller.ultimate_bound_position;
-robotInfo.LLC_info.ultimate_bound_velocity = sim.agent.controller.ultimate_bound_velocity;
-robotInfo.LLC_info.alpha_constant = sim.agent.controller.alpha_constant;
-robotInfo.joint_input_limits = [sim.agent.info.joints.torque_limits];
-
-worldInfo = WorldInfo;
-
 input_constraints_flag = false;
 use_robust_input = false;
 smooth_obs = false;
@@ -133,7 +121,7 @@ HLP.make_new_graph_every_iteration_flag = 1;
 HLP.sampling_timeout = 0.5;
 
 planner = ArmourPlanner( ...
-        trajOptProps, robotInfo, worldInfo, ...
+        trajOptProps, sim.agent, ...
         input_constraints_flag, use_robust_input, smooth_obs, 'orig' ...
     );
 
@@ -144,16 +132,26 @@ worldState.obstacles = num2cell(sim.obstacles);
 lookahead = 1;
 iter = 0;
 pausing = false;
-while true
-    if pausing
-        pause
-    end
-    iter = iter + 1;
+% while true
+%     if pausing
+%         pause
+%     end
+%     iter = iter + 1;
+%     sim.run(max_steps=1);
+%     pause(0.1)
+% end
+
+cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP, worldState);
+sim.run(max_steps=20, pre_step_callback={cb});
+
+function info = planner_callback(sim, planner, agent_info, world_info, lookahead, HLP, worldState)
+    world = struct2array(sim.world);
+    mask = ~strcmp({world.uuid}, sim.agent.uuid);
+    representations = [world(mask).representation];
+    obstacles = arrayfun(@(x)x.get_zonotope,representations);
+
     time = sim.agent.state.time(end);
-    traj = sim.agent.controller.trajectories{end}.getCommand(time);
-    q_0 = traj.q_des;
-    q_dot_0 = traj.q_dot_des;
-    q_ddot_0 = traj.q_ddot_des;
+    ref_state = sim.agent.controller.trajectories{end}.getCommand(time);
     agent_info.state = sim.agent.state.state(:,end);
     
     q_des = HLP.get_waypoint(agent_info,world_info,lookahead) ;
@@ -161,17 +159,8 @@ while true
         disp('Waypoint creation failed! Using global goal instead.')
         q_des = HLP.goal ;
     end
-    
 
-    robotState = ArmRobotState;
-    robotState.time = time;
-    robotState.q = q_0;
-    robotState.q_dot = q_dot_0;
-    robotState.q_ddot = q_ddot_0;
-
-    waypoint = q_des;
-
-    [trajectory, plan_info] = planner.planTrajectory(robotState, worldState, waypoint);
+    [trajectory, plan_info] = planner.planTrajectory(ref_state, worldState, q_des);
     FO = plan_info.rsInstances{2}.FO;
     jrsinfo = plan_info.rsInstances{1}.jrs_info;
     
@@ -188,6 +177,6 @@ while true
         k_opt = nan;
         trajopt_failed = true;
     end
-    sim.run(max_steps=1);
-    pause(0.1)
+
+    info = struct;
 end

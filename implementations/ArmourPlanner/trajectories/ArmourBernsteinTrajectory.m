@@ -36,8 +36,8 @@ classdef ArmourBernsteinTrajectory < Trajectory
             
             % Check for each of the args and update.
             if exist('robotState','var')
-                if ~isa(robotState, 'ArmRobotState')
-                    error('Robot must inherit an ArmRobotState to use ArmTdTrajectory');
+                if ~isa(robotState, 'ArmRobotTrajectoryState')
+                    error('Robot must inherit an ArmRobotTrajectoryState to use ArmTdTrajectory');
                 end
                 self.robotState = robotState;
             end
@@ -181,21 +181,21 @@ classdef ArmourBernsteinTrajectory < Trajectory
             % Valid time of trajectory
             elseif t < self.trajOptProps.horizonTime
                 % Original implementation adapted
-                command.q_des = zeros(self.n_q, 1);
-                command.q_dot_des = zeros(self.n_q, 1);
-                command.q_ddot_des = zeros(self.n_q, 1);
+                q_des = zeros(self.n_q, 1);
+                q_dot_des = zeros(self.n_q, 1);
+                q_ddot_des = zeros(self.n_q, 1);
                 % TODO: Figure out how to adapt this!!!
             
                 for j = 1:self.n_q
                     for coeff_idx = 0:5
-                        command.q_des(j) = command.q_des(j) + ...
+                        q_des(j) = q_des(j) + ...
                             self.alpha(j,coeff_idx+1) * t^coeff_idx;
                         if coeff_idx > 0
-                            command.q_dot_des(j) = command.q_dot_des(j) + ...
+                            q_dot_des(j) = q_dot_des(j) + ...
                                 coeff_idx * self.alpha(j,coeff_idx+1) * t^(coeff_idx-1);
                         end
                         if coeff_idx > 1
-                            command.q_ddot_des(j) = command.q_ddot_des(j) + ...
+                            q_ddot_des(j) = q_ddot_des(j) + ...
                                 (coeff_idx) * (coeff_idx-1) * self.alpha(j,coeff_idx+1) * t^(coeff_idx-2);
                         end
                     end
@@ -209,10 +209,14 @@ classdef ArmourBernsteinTrajectory < Trajectory
 
             % The trajectory has reached a stop
             else
-                command.q_des = self.q_end;
-                command.q_dot_des = zeros(self.n_q, 1);
-                command.q_ddot_des = zeros(self.n_q, 1);
+                q_des = self.q_end;
+                q_dot_des = zeros(self.n_q, 1);
+                q_ddot_des = zeros(self.n_q, 1);
             end
+            
+            command = ArmRobotTrajectoryState(1:self.n_q, self.n_q+1:self.n_q*2, self.n_q*2+1:self.n_q*3);
+            command.time = t;
+            command.state = [q_des; q_dot_des; q_ddot_des];
         end
     end
 end

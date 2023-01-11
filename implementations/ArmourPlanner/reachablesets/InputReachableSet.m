@@ -9,9 +9,9 @@ classdef InputReachableSet < ReachableSets & NamedClass
     end
     methods
         function self = InputReachableSet( ...
-                    robotInfo, jrsHandle, use_robust_input ...
+                    robot, jrsHandle, use_robust_input ...
                 )
-            self.robotInfo = robotInfo;
+            self.robot = robot;
             self.jrsHandle = jrsHandle;
             self.use_robust_input = use_robust_input;
             self.verbose_level = -1;
@@ -31,7 +31,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
             self.vdisp("Set up zeros for overapproximation")
             for j = 1:jrsInstance.n_q
                 zero_cell{j, 1} = polyZonotope_ROAHM(0); 
-                r{j, 1} = polyZonotope_ROAHM(0, [], self.robotInfo.LLC_info.ultimate_bound);
+                r{j, 1} = polyZonotope_ROAHM(0, [], self.robot.controller.ultimate_bound);
             end
             
             self.vdisp("start RNEA")
@@ -44,7 +44,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
                         jrsInstance.dq_a{i}, ...
                         jrsInstance.ddq_a{i}, ...
                         true, ...
-                        self.robotInfo.params.pz_nominal);
+                        self.robot.info.params.pz_nominal);
                 if self.use_robust_input
                     self.vdisp("RNEA interval for robust input")
                     [tau_int{i, 1}, f_int{i, 1}, n_int{i, 1}] = ...
@@ -55,12 +55,12 @@ classdef InputReachableSet < ReachableSets & NamedClass
                             jrsInstance.dq_a{i}, ...
                             jrsInstance.ddq_a{i}, ...
                             true, ...
-                            self.robotInfo.params.pz_interval);
+                            self.robot.info.params.pz_interval);
                     
                     self.vdisp("calculate w from robust controller")
                     for j = 1:jrsInstance.n_q
                         w{i, 1}{j, 1} = tau_int{i, 1}{j, 1} - tau_nom{i, 1}{j, 1};
-                        w{i, 1}{j, 1} = reduce(w{i, 1}{j, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+                        w{i, 1}{j, 1} = reduce(w{i, 1}{j, 1}, 'girard', self.robot.info.params.pz_interval.zono_order);
                     end
                     
                     self.vdisp("calculate v_cell")
@@ -71,14 +71,14 @@ classdef InputReachableSet < ReachableSets & NamedClass
                         zero_cell, ...
                         r, ...
                         false, ...
-                        self.robotInfo.params.pz_interval);
+                        self.robot.info.params.pz_interval);
                     V{i, 1} = 0;
                     for j = 1:jrsInstance.n_q
                         V{i, 1} = V{i, 1} + 0.5.*r{j, 1}.*V_cell{j, 1};
-                        V{i, 1} = reduce(V{i, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+                        V{i, 1} = reduce(V{i, 1}, 'girard', self.robot.info.params.pz_interval.zono_order);
                     end
                     V_diff{i, 1} = V{i, 1} - V{i, 1};
-                    V_diff{i, 1} = reduce(V_diff{i, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+                    V_diff{i, 1} = reduce(V_diff{i, 1}, 'girard', self.robot.info.params.pz_interval.zono_order);
                     V_diff_int{i, 1} = interval(V_diff{i, 1});
                 end
             end
@@ -105,7 +105,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
                 self.vdisp("robust input bound tortatotope")
                 % compute robust input bound tortatotope:
                 for i = 1:jrsInstance.n_t
-                    v_norm{i, 1} = (self.robotInfo.LLC_info.alpha_constant*V_diff_int{i, 1}.sup).*(1/self.robotInfo.LLC_info.ultimate_bound) + rho_max{i, 1};
+                    v_norm{i, 1} = (self.robot.controller.alpha_constant*V_diff_int{i, 1}.sup).*(1/self.robot.controller.ultimate_bound) + rho_max{i, 1};
 %                     v_norm{i, 1} = reduce(v_norm{i, 1}, 'girard', P.agent_info.params.pz_interval.zono_order);
                 end
             else
@@ -124,8 +124,8 @@ classdef InputReachableSet < ReachableSets & NamedClass
                     u_lb_tmp = remove_dependence(u_lb_tmp, jrsInstance.k_id(end));
                     u_ub_buff = sum(abs(u_ub_tmp.Grest));
                     u_lb_buff = -sum(abs(u_lb_tmp.Grest));
-                    u_ub{i, 1}{j, 1} = polyZonotope_ROAHM(u_ub_tmp.c + u_ub_buff, u_ub_tmp.G, [], u_ub_tmp.expMat, u_ub_tmp.id) - self.robotInfo.joint_input_limits(2, j);
-                    u_lb{i, 1}{j, 1} = -1*polyZonotope_ROAHM(u_lb_tmp.c + u_lb_buff, u_lb_tmp.G, [], u_lb_tmp.expMat, u_lb_tmp.id) + self.robotInfo.joint_input_limits(1, j);
+                    u_ub{i, 1}{j, 1} = polyZonotope_ROAHM(u_ub_tmp.c + u_ub_buff, u_ub_tmp.G, [], u_ub_tmp.expMat, u_ub_tmp.id) - self.robot.info.joints(j).torque_limits(2);
+                    u_lb{i, 1}{j, 1} = -1*polyZonotope_ROAHM(u_lb_tmp.c + u_lb_buff, u_lb_tmp.G, [], u_lb_tmp.expMat, u_lb_tmp.id) + self.robot.info.joints(j).torque_limits(1);
                 end
             end
             

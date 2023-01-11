@@ -6,5 +6,6 @@ classdef EntityState < UUIDbase & handle
     properties
         time
         % An relevant robot properties that evolve over time
+        state
     end
 end

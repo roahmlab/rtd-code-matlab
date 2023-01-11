@@ -12,6 +12,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
     properties
         static_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
         dynamic_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
+        draw_time = 0.01
     end
     
     % Default Options
@@ -134,6 +135,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
                 for obj = self.dynamic_objects
                     obj.plot(time=t_plot)
                 end
+                pause(self.draw_time)
             end
             
             % Save the time change
@@ -152,6 +154,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
             for obj = self.dynamic_objects
                 obj.plot(time=time)
             end
+            pause(self.draw_time)
         end
         
         function animate(self, t_span)

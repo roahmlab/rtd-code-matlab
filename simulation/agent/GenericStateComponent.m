@@ -106,7 +106,7 @@ classdef GenericStateComponent < EntityStateComponent & NamedClass & OptionsClas
                 self GenericStateComponent
                 time = self.time(end)
             end
-            state = GenericState();
+            state = EntityState();
             
             % Default to the last time and state
             state.time = time;

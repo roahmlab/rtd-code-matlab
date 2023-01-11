@@ -9,9 +9,9 @@ classdef ForwardOccupancy < ReachableSets
     end
     methods
         function self = ForwardOccupancy( ...
-                    robotInfo, jrsHandle, smooth_obs ...
+                    robot, jrsHandle, smooth_obs ...
                 )
-            self.robotInfo = robotInfo;
+            self.robot = robot;
             self.jrsHandle = jrsHandle;
             self.smooth_obs = smooth_obs;
         end
@@ -28,15 +28,15 @@ classdef ForwardOccupancy < ReachableSets
             
             % get forward kinematics and forward occupancy
             for i = 1:jrsInstance.n_t
-               [R_w{i, 1}, p_w{i, 1}] = pzfk(jrsInstance.R{i, 1}, self.robotInfo.params.pz_nominal); 
-               for j = 1:self.robotInfo.params.pz_nominal.num_bodies
-                  FO{i, 1}{j, 1} = R_w{i, 1}{j, 1}*self.robotInfo.link_poly_zonotopes{j, 1} + p_w{i, 1}{j, 1}; 
-                  FO{i, 1}{j, 1} = reduce(FO{i, 1}{j, 1}, 'girard', self.robotInfo.params.pz_interval.zono_order);
+               [R_w{i, 1}, p_w{i, 1}] = pzfk(jrsInstance.R{i, 1}, self.robot.info.params.pz_nominal); 
+               for j = 1:self.robot.info.params.pz_nominal.num_bodies
+                  FO{i, 1}{j, 1} = R_w{i, 1}{j, 1}*self.robot.info.links(j).poly_zonotope + p_w{i, 1}{j, 1}; 
+                  FO{i, 1}{j, 1} = reduce(FO{i, 1}{j, 1}, 'girard', self.robot.info.params.pz_interval.zono_order);
                   FO{i, 1}{j, 1} = remove_dependence(FO{i, 1}{j, 1}, jrsInstance.k_id(end));
                end
             end
             
-            reachableSet = FOInstance(self.robotInfo, R_w, p_w, FO, jrsInstance, self.smooth_obs);
+            reachableSet = FOInstance(self.robot.info, R_w, p_w, FO, jrsInstance, self.smooth_obs);
         end
     end
 end

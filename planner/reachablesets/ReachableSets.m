@@ -9,7 +9,7 @@ classdef ReachableSets < handle
     end
     properties
         cache_size = 0
-        robotInfo
+        robot
     end
     properties (Abstract)
         cache_max_size
@@ -17,7 +17,7 @@ classdef ReachableSets < handle
     methods (Abstract)
         % An example constructor, but can take anything needed
         %self = ReachableSets( ...
-        %            robotInfo ...
+        %            robot ...
         %        )
         
         % Obtains the relevant reachable set for the robotstate provided

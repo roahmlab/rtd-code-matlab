@@ -152,18 +152,16 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
                 self
                 time = self.time(end);
             end
-            state = ArmRobotState();
+            state = ArmRobotState(self.position_indices, self.velocity_indices);
             
             % Default to the last time and state
             state.time = time;
-            state.q = self.position(:,end);
-            state.q_dot = self.velocity(:,end);
+            state.state = repmat(self.state(:,end),1,length(time));
             
             % If we can and need to interpolate the state, do it
-            if ~(length(self.time) == 1 || time > self.time(end))
-                temp_state = interp1(self.time, self.state.', time);
-                state.q = temp_state(:,self.position_indices);
-                state.q_dot = temp_state(:,self.velocity_indices);
+            mask = time <= self.time(end);
+            if length(self.time) > 1 && any(mask)
+                state.state(:,mask) = interp1(self.time, self.state.', time(mask));
             end
         end
         

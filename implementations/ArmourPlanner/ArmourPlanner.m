@@ -1,7 +1,7 @@
 classdef ArmourPlanner < RTD_Planner
     properties
         %trajOptProps
-        %robotInfo
+        %robot
         %worldInfo
         jrsHandle
         foHandle
@@ -25,7 +25,7 @@ classdef ArmourPlanner < RTD_Planner
         % - Create RTD_TrajOpt for each trajectory type
         % - Create initial trajectories for each trajectory type
         function self = ArmourPlanner( ...
-                    trajOptProps, robotInfo, worldInfo, ...
+                    trajOptProps, robot, ...
                     input_constraints_flag, use_robust_input, smooth_obs, traj_type ...
                 )
             
@@ -37,7 +37,7 @@ classdef ArmourPlanner < RTD_Planner
             %trajOptProps.horizon = 1.0;
             %timeForCost = 0.5;
             
-            %robotInfo = ArmRobotInfo;
+            %robot = ArmRobotInfo;
             %worldInfo = WorldInfo;
             
             %input_constraints_flag = false;
@@ -45,11 +45,11 @@ classdef ArmourPlanner < RTD_Planner
             %smooth_obs = false;
             
             % Create our reachable sets
-            self.jrsHandle = JointReachableSetsOnline(robotInfo, "traj_type", traj_type);
-            self.foHandle = ForwardOccupancy(robotInfo, self.jrsHandle, smooth_obs);
+            self.jrsHandle = JointReachableSetsOnline(robot, "traj_type", traj_type);
+            self.foHandle = ForwardOccupancy(robot, self.jrsHandle, smooth_obs);
             self.reachableSets = {self.jrsHandle, self.foHandle};
             if input_constraints_flag
-                self.irsHandle = InputReachableSet(robotInfo, self.jrsHandle, use_robust_input);
+                self.irsHandle = InputReachableSet(robot, self.jrsHandle, use_robust_input);
                 self.reachableSets = [self.reachableSets, {self.irsHandle}];
             end
             
@@ -77,8 +77,7 @@ classdef ArmourPlanner < RTD_Planner
             % Create the trajopt object.
             self.trajopt = {RTD_TrajOpt( ...
                 trajOptProps,           ...
-                robotInfo,              ...
-                worldInfo,              ...
+                robot,              ...
                 self.reachableSets,          ...
                 self.objective,              ...
                 self.optimizationEngine,     ...

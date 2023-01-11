@@ -29,6 +29,7 @@ classdef ArmourSimulation < Simulation & handle
                 self ArmourSimulation
                 object
                 options.isentity = false
+                options.update_name = false
                 options.collision = []
                 options.visual = []
             end
@@ -48,7 +49,9 @@ classdef ArmourSimulation < Simulation & handle
                 id = sum(cell2mat(regexp(all_names, search_string)));
                 name = [char(name), num2str(id)];
             end
-            object.name = name;
+            if options.update_name
+                object.update_name(name);
+            end
             self.world.(name) = object;
             
             % Add to the entity list if it's an entity
@@ -202,12 +205,13 @@ classdef ArmourSimulation < Simulation & handle
             
             self.simulation_state = SimulationState.READY;
         end
-        function pre_step(self)
+        function info = pre_step(self)
             self.simulation_state = SimulationState.PRE_STEP;
             
             % CALL PLANNER
+            info = struct;
         end
-        function step(self)
+        function info = step(self)
             self.simulation_state = SimulationState.STEP;
             
             % Update entities
@@ -216,18 +220,21 @@ classdef ArmourSimulation < Simulation & handle
             % Update systems
             [collision, contactPairs] = self.collision_system.updateCollision(self.simulation_timestep);
             
-            agent_results
             if collision
                 disp("Collision Detected, Breakpoint!")
                 pause
                 disp("Continuing")
             end
+            info.agent_results = agent_results;
+            info.collision = collision;
+            info.contactPairs = contactPairs;
         end
-        function post_step(self)
+        function info = post_step(self)
             self.simulation_state = SimulationState.POST_STEP;
             % Check if goal was achieved
             goal = self.goal_system.updateGoal(self.simulation_timestep);
             self.visual_system.updateVisual(self.simulation_timestep);
+            info.goal = goal;
         end
         function summary(self, options)
         end
@@ -236,14 +243,35 @@ classdef ArmourSimulation < Simulation & handle
                 self ArmourSimulation
                 options.max_steps = 1e8
                 options.max_time = Inf
+                options.pre_step_callback cell = {}
+                options.step_callback cell = {}
+                options.post_step_callback cell = {}
+                options.stop_on_goal = true
             end
+            
+            % Build the execution order
+            execution_queue = [ {@(self)self.pre_step()},   ...
+                                options.pre_step_callback,  ...
+                                {@(self)self.step()},       ...
+                                options.step_callback,      ...
+                                {@(self)self.post_step()},  ...
+                                options.post_step_callback ];
+
             steps = 0;
             start_tic = tic;
             t_cur = toc(start_tic);
-            while steps < options.max_steps && t_cur < options.max_time
-                self.pre_step();
-                self.step();
-                self.post_step();
+            stop = false;
+            while steps < options.max_steps && t_cur < options.max_time && ~stop
+                % Iterate through all functions in the execution queue
+                for fcn = execution_queue
+                    info = fcn{1}(self);
+                    % Automate logging here if wanted
+                    stop = stop || (isfield(info, 'stop') && info.stop);
+                    if options.stop_on_goal && isfield(info, 'goal') && info.goal
+                        stop = true;
+                        disp("Goal acheived!")
+                    end
+                end
                 steps = steps + 1;
                 t_cur = toc(start_tic);
             end

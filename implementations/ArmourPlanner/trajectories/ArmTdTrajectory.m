@@ -42,8 +42,8 @@ classdef ArmTdTrajectory < Trajectory
             
             % Check for each of the args and update.
             if exist('robotState','var')
-                if ~isa(robotState, 'ArmRobotState')
-                    error('Robot must inherit an ArmRobotState to use ArmTdTrajectory');
+                if ~isa(robotState, 'ArmRobotTrajectoryState')
+                    error('Robot must inherit an ArmRobotTrajectoryState to use ArmTdTrajectory');
                 end
                 self.robotState = robotState;
             end
@@ -182,31 +182,36 @@ classdef ArmTdTrajectory < Trajectory
                 
             % First half of the trajectory
             elseif t < self.trajOptProps.planTime
-                command.q_des = self.q_0 + ...
+                q_des = self.q_0 + ...
                     self.q_dot_0 * t + ...
                     (1/2) * k_scaled * t^2;
-                command.q_dot_des = self.q_dot_0 + ...
+                q_dot_des = self.q_dot_0 + ...
                     k_scaled * t;
-                command.q_ddot_des = k_scaled;
+                q_ddot_des = k_scaled;
             
             % Second half of the trajectory
             elseif t < self.trajOptProps.horizonTime
                 % Shift time for ease
                 t = t - self.trajOptProps.planTime;
                 
-                command.q_des = self.q_peak + ...
+                q_des = self.q_peak + ...
                     self.q_dot_peak * t + ...
                     (1/2) * self.q_ddot_to_stop * t^2;
-                command.q_dot_des = self.q_dot_peak + ...
+                q_dot_des = self.q_dot_peak + ...
                     self.q_ddot_to_stop * t;
-                command.q_ddot_des = self.q_ddot_to_stop;
+                q_ddot_des = self.q_ddot_to_stop;
             
             % The trajectory has reached a stop
             else
-                command.q_des = self.q_end;
-                command.q_dot_des = zeros(size(self.q_dot_0));
-                command.q_ddot_des = zeros(size(self.q_ddot_0));
+                q_des = self.q_end;
+                q_dot_des = zeros(size(self.q_dot_0));
+                q_ddot_des = zeros(size(self.q_ddot_0));
             end
+
+            n_q = length(q_des);
+            command = ArmRobotTrajectoryState(1:n_q, n_q+1:n_q*2, n_q*2+1:n_q*3);
+            command.time = t;
+            command.state = [q_des; q_dot_des; q_ddot_des];
         end
     end
 end

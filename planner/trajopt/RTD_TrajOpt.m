@@ -8,7 +8,6 @@ classdef RTD_TrajOpt < handle & NamedClass
     % Make protected later (Debate).
     properties%(Access = 'protected')
         robotInfo
-        worldInfo
         reachableSets
         objective
         optimizationEngine
@@ -22,7 +21,6 @@ classdef RTD_TrajOpt < handle & NamedClass
         function self = RTD_TrajOpt(    ...
                     trajOptProps,       ...
                     robotInfo,          ...
-                    worldInfo,          ...
                     reachableSets,      ...
                     objective,          ...
                     optimizationEngine, ...
@@ -30,7 +28,6 @@ classdef RTD_TrajOpt < handle & NamedClass
                 )
             self.trajOptProps = trajOptProps;
             self.robotInfo = robotInfo; % there's a chance these two info
-            self.worldInfo = worldInfo; % structures won't be needed
             self.reachableSets = reachableSets;
             self.objective = objective;
             self.optimizationEngine = optimizationEngine;
