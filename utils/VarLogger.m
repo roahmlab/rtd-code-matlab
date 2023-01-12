@@ -110,7 +110,7 @@ classdef VarLogger < handle
                 if options.flatten && ~isempty(entry)
                     values{i} = [entry{:}];
                 else
-                    values{i} = entry;
+                    values{i} = {entry};
                 end
             end
             

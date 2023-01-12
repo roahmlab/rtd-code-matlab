@@ -22,11 +22,11 @@ classdef ArmRobotState < EntityState
             
 
         function position = get.position(self)
-            position = self.state(self.position_indices);
+            position = self.state(self.position_indices,:);
         end
 
         function velocity = get.velocity(self)
-            velocity = self.state(self.velocity_indices);
+            velocity = self.state(self.velocity_indices,:);
         end
 
         % Compat

@@ -61,7 +61,7 @@ classdef ZeroHoldTrajectory < Trajectory
 
             n_q = length(q_des);
             command = ArmRobotTrajectoryState(1:n_q, n_q+1:n_q*2, n_q*2+1:n_q*3);
-            command.time = t;
+            command.time = time;
             command.state = [q_des; q_dot_des; q_ddot_des];
         end
     end

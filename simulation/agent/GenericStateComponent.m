@@ -114,7 +114,7 @@ classdef GenericStateComponent < EntityStateComponent & NamedClass & OptionsClas
             
             % If we can and need to interpolate the state, do it
             if ~(length(self.time) == 1 || time > self.time(end))
-                state.state = interp1(self.time, self.state.', time);
+                state.state = interp1(self.time, self.state.', time).';
             end
         end
         

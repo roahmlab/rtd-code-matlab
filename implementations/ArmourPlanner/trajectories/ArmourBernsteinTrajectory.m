@@ -215,7 +215,7 @@ classdef ArmourBernsteinTrajectory < Trajectory
             end
             
             command = ArmRobotTrajectoryState(1:self.n_q, self.n_q+1:self.n_q*2, self.n_q*2+1:self.n_q*3);
-            command.time = t;
+            command.time = time;
             command.state = [q_des; q_dot_des; q_ddot_des];
         end
     end

@@ -15,7 +15,8 @@ uncertain_mass_range = [0.97, 1.03];
 visualize_cad = false;
 
 % Add noise to the dynamics
-component_options.dynamics.measurement_noise_points = 11;
+%component_options.dynamics.measurement_noise_points = 11;
+component_options.dynamics.log_controller = true;
 component_options.controller.use_true_params_for_robust = true;
 
 %% Setup the info
@@ -69,11 +70,14 @@ plot(A_3.visual)
 axis equal; camlight
 disp("press enter to continue")
 pause
+close all
 
 %% Create the simulation
 sim = ArmourSimulation
-sim.setup(A_2)
+sim.setup(A_3)
 sim.initialize()
+sim.visual_system.enable_camlight = true;
+sim.visual_system.redraw();
 %sim.run(max_steps=1);
 
 disp("press enter to continue")
@@ -93,6 +97,12 @@ input_constraints_flag = false;
 use_robust_input = false;
 smooth_obs = false;
 
+planner = ArmourPlanner( ...
+        trajOptProps, sim.agent, ...
+        input_constraints_flag, use_robust_input, smooth_obs, 'orig' ...
+    );
+
+%% HLP stuff to migrate
 HLP = robot_arm_straight_line_HLP();
 world_info.goal = sim.goal_system.goal_position;
 agent_info = struct;
@@ -120,14 +130,6 @@ HLP.setup(agent_info,world_info);
 HLP.make_new_graph_every_iteration_flag = 1;
 HLP.sampling_timeout = 0.5;
 
-planner = ArmourPlanner( ...
-        trajOptProps, sim.agent, ...
-        input_constraints_flag, use_robust_input, smooth_obs, 'orig' ...
-    );
-
-worldState = WorldState;
-worldState.obstacles = num2cell(sim.obstacles);
-
 %% Run planning step by step
 lookahead = 1;
 iter = 0;
@@ -141,25 +143,23 @@ pausing = false;
 %     pause(0.1)
 % end
 
-cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP, worldState);
-sim.run(max_steps=20, pre_step_callback={cb});
+cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
+sim.run(max_steps=100, pre_step_callback={cb});
 
-function info = planner_callback(sim, planner, agent_info, world_info, lookahead, HLP, worldState)
-    world = struct2array(sim.world);
-    mask = ~strcmp({world.uuid}, sim.agent.uuid);
-    representations = [world(mask).representation];
-    obstacles = arrayfun(@(x)x.get_zonotope,representations);
-
+function info = planner_callback(sim, planner, agent_info, world_info, lookahead, HLP)
+    % Get the end state
     time = sim.agent.state.time(end);
     ref_state = sim.agent.controller.trajectories{end}.getCommand(time);
     agent_info.state = sim.agent.state.state(:,end);
-    
+
     q_des = HLP.get_waypoint(agent_info,world_info,lookahead) ;
     if isempty(q_des)
         disp('Waypoint creation failed! Using global goal instead.')
         q_des = HLP.goal ;
     end
 
+    % get the sensor readings at the time
+    worldState.obstacles = sensors.zonotope_sensor(sim.world, sim.agent, time);
     [trajectory, plan_info] = planner.planTrajectory(ref_state, worldState, q_des);
     FO = plan_info.rsInstances{2}.FO;
     jrsinfo = plan_info.rsInstances{1}.jrs_info;

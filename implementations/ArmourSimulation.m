@@ -200,7 +200,6 @@ classdef ArmourSimulation < Simulation & handle
             self.agent.reset
 
             % redraw
-            clf;view(3);axis equal;grid on%;camlight
             self.visual_system.redraw();
             
             self.simulation_state = SimulationState.READY;
@@ -233,8 +232,9 @@ classdef ArmourSimulation < Simulation & handle
             self.simulation_state = SimulationState.POST_STEP;
             % Check if goal was achieved
             goal = self.goal_system.updateGoal(self.simulation_timestep);
-            self.visual_system.updateVisual(self.simulation_timestep);
+            pause_requested = self.visual_system.updateVisual(self.simulation_timestep);
             info.goal = goal;
+            info.pause_requested = pause_requested;
         end
         function summary(self, options)
         end
@@ -260,6 +260,7 @@ classdef ArmourSimulation < Simulation & handle
             steps = 0;
             start_tic = tic;
             t_cur = toc(start_tic);
+            pause_time = 0;
             stop = false;
             while steps < options.max_steps && t_cur < options.max_time && ~stop
                 % Iterate through all functions in the execution queue
@@ -271,9 +272,15 @@ classdef ArmourSimulation < Simulation & handle
                         stop = true;
                         disp("Goal acheived!")
                     end
+                    % Pause if requested
+                    if isfield(info, 'pause_requested') && info.pause_requested
+                        start_pause = tic;
+                        keyboard
+                        pause_time = pause_time + toc(start_pause);
+                    end
                 end
                 steps = steps + 1;
-                t_cur = toc(start_tic);
+                t_cur = toc(start_tic) - pause_time;
             end
         end
     end

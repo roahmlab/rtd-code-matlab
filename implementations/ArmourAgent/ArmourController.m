@@ -93,7 +93,6 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             
             % Because we want to simplify, recreate the wrapped setup
             % function and merge info out
-            self.n_inputs = self.robot_state.n_states; % Torque based control
             % low_level_controller
             self.LLC_wrapped.n_agent_states = self.robot_state.n_states;
             self.LLC_wrapped.n_agent_inputs = self.n_inputs;
@@ -135,7 +134,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
         function [u, tau, v, true_disturbance, true_V, r] = getControlInputs(self, t, z_meas)
             % Prepare trajectory
             trajectory = self.trajectories{end};
-            startTime = trajectory.robotState.time;
+            startTime = self.robot_state.get_state().time;
             
             % Create shims
             planner_info_shim.desired_trajectory = {@(t)unwrap_traj(trajectory.getCommand(startTime + t))};
@@ -162,31 +161,31 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             end
             
             % retrieve the last log entry
-            entries = self.controller_log.get('input_time', 'input', flatten=false);
+            entries = controller_log.get('input_time', 'input', flatten=false);
             t_input = entries.input_time{end};
             input = entries.input{end};
 
             % interpolate for the t_check_step and get agent input
             % trajectory interpolated to time
             t_check = t_input(1):t_check_step:t_input(end);
-            u_check = interp1(t_input, input, t_check);
+            u_check = self.robot_state.get_state(t_check);
             % Get the reference trajectory
             trajectory = self.trajectories{end};
             reference_trajectory = arrayfun(@(t)trajectory.getCommand(t), t_check);
             u_pos_ref = [reference_trajectory.q];
-            u_vel_ref = [reference_trajectory.qd];
+            u_vel_ref = [reference_trajectory.q_dot];
             
             % check bound satisfaction
             self.vdisp('Running ultimate bound check!',LogLevel.INFO);
             
             % Absolute difference
-            u_pos_diff = abs(u_pos_ref - u_check(self.robot_state.position_indices));
-            u_vel_diff = abs(u_vel_ref - u_check(self.robot_state.position_indices));
+            u_pos_diff = abs(u_pos_ref - u_check.q);
+            u_vel_diff = abs(u_vel_ref - u_check.q_dot);
             position_exceeded = u_pos_diff > self.ultimate_bound_position;
             velocity_exceeded = u_vel_diff > self.ultimate_bound_velocity;
             
             % Get out results
-            out = any(position_exceeded) || any(velocity_exceeded);
+            out = any(position_exceeded, 'all') || any(velocity_exceeded, 'all');
             if out
                 % Position ultimate bound exceeded in these positions
                 [joint_idx_list, t_idx_list] = find(position_exceeded);

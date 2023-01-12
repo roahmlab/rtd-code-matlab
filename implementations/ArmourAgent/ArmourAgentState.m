@@ -161,7 +161,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             % If we can and need to interpolate the state, do it
             mask = time <= self.time(end);
             if length(self.time) > 1 && any(mask)
-                state.state(:,mask) = interp1(self.time, self.state.', time(mask));
+                state.state(:,mask) = interp1(self.time, self.state.', time(mask)).';
             end
         end
         

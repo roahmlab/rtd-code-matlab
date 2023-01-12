@@ -57,7 +57,7 @@ classdef FOInstance < ReachableSetInstance
                     for o = 1:length(worldState.obstacles) % for each obstacle
                         
                         % first, check if constraint is necessary
-                        O_buf = [worldState.obstacles{o}.Z, self.FO{i, 1}{j, 1}.G, self.FO{i, 1}{j, 1}.Grest];
+                        O_buf = [worldState.obstacles(o).Z, self.FO{i, 1}{j, 1}.G, self.FO{i, 1}{j, 1}.Grest];
                         [A_obs, b_obs] =  polytope_PH(O_buf, self.obs_frs_combs); % get polytope form
                         if ~(all(A_obs*self.FO{i, 1}{j, 1}.c - b_obs <= 0, 1))
                             continue;
@@ -69,7 +69,7 @@ classdef FOInstance < ReachableSetInstance
                         
                         % now create constraint
                         FO_buf = self.FO{i, 1}{j, 1}.Grest; % will buffer by non-sliceable gens
-                        O_buf = [worldState.obstacles{o}.Z, FO_buf]; % describes buffered obstacle zonotope
+                        O_buf = [worldState.obstacles(o).Z, FO_buf]; % describes buffered obstacle zonotope
                         [A_obs, b_obs] = polytope_PH(O_buf, self.obs_frs_combs); % get polytope form
 
                         % constraint PZ:

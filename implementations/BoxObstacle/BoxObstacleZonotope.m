@@ -34,7 +34,7 @@ classdef BoxObstacleZonotope < NamedClass & handle
             end
             state = options.state;
             if ~isempty(options.time)
-                state = self.arm_state.get_state(options.time);
+                state = self.box_state.get_state(options.time);
             end
             
             zono = self.base_zonotope + state.state;

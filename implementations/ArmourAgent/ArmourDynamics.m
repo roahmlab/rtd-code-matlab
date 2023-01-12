@@ -115,7 +115,8 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             self.vdisp('Moving!',LogLevel.INFO)
             
             % get the current state
-            zcur = self.robot_state.state(:,end);
+            state = self.robot_state.get_state;
+            zcur = state.state;
             
             % call the ode solver to simulate agent
             [tout,zout] = self.integrator(@(t,z) self.dynamics(t,z),...
@@ -143,7 +144,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
                 end
                 
                 % Save to the log
-                self.controller_log.add('input_time', tout, ...
+                self.controller_log.add('input_time', state.time + tout, ...
                              'input', uout, ...
                              'nominal_input', nominal_out, ...
                              'robust_input', robust_out, ...
@@ -247,7 +248,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             % interpolate for the t_check_step and get agent input
             % trajectory interpolated to time
             t_check = t_input(1):t_check_step:t_input(end);
-            u_check = interp1(t_input, input, t_check);
+            u_check = interp1(t_input, input.', t_check).';
 
             % check torque bounds
             self.vdisp('Running input torque check!', LogLevel.INFO);
@@ -260,7 +261,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             end
 
             % Get out results
-            out = any(u_exceeded);
+            out = any(u_exceeded, "all");
             if out
                 [joint_idx_list, t_idx_list] = find(u_exceeded);
                 for idx = 1:length(joint_idx_list)

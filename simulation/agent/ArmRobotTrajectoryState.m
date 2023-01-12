@@ -29,15 +29,15 @@ classdef ArmRobotTrajectoryState < EntityState
             
 
         function position = get.position(self)
-            position = self.state(self.position_indices);
+            position = self.state(self.position_indices,:);
         end
 
         function velocity = get.velocity(self)
-            velocity = self.state(self.velocity_indices);
+            velocity = self.state(self.velocity_indices,:);
         end
 
         function acceleration = get.acceleration(self)
-            acceleration = self.state(self.acceleration_indices);
+            acceleration = self.state(self.acceleration_indices,:);
         end
 
         % Compat
