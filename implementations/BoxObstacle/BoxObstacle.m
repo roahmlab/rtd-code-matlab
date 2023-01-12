@@ -46,6 +46,7 @@ classdef BoxObstacle < WorldEntity & handle
         function options = defaultoptions()
             options = WorldEntity.baseoptions();
             
+            % These are the names for the default components
             components.info = 'BoxObstacleInfo';
             components.state = 'GenericStateComponent';
             components.collision = 'BoxPatchCollision';

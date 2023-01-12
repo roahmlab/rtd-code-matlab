@@ -128,7 +128,10 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                 self
                 trajectory Trajectory
             end
-            self.trajectories = [self.trajectories, {trajectory}];
+            % Add the trajectory if it is valid
+            if trajectory.validate()
+                self.trajectories = [self.trajectories, {trajectory}];
+            end
         end
         
         function [u, tau, v, true_disturbance, true_V, r] = getControlInputs(self, t, z_meas)

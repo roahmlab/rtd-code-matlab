@@ -35,6 +35,17 @@ classdef Patch3dObject < UUIDbase
                 pair = [];
                 return
             end
+            % Create and check AABB for quick check
+            [min1, max1] = bounds(self.vertices);
+            [min2, max2] = bounds(other.vertices);
+            
+            % If they don't intersect, skip
+            if any(min1 > max2) || any(min2 > max1)
+                collision = false;
+                pair = [];
+                return
+            end
+                
             % Create struct for compat
             surf1 = struct('faces', self.faces, 'vertices', self.vertices);
             surf2 = struct('faces', other.faces, 'vertices', other.vertices);

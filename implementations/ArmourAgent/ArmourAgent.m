@@ -70,6 +70,7 @@ classdef ArmourAgent < WorldEntity & handle
         function options = defaultoptions()
             options = WorldEntity.baseoptions();
             
+            % These are the names for the default components
             components.info = 'ArmourAgentInfo';
             components.state = 'ArmourAgentState';
             components.kinematics = 'ArmKinematics';

@@ -136,7 +136,7 @@ classdef ArmourSimulation < Simulation & handle
         
         function initialize(self)
             if self.simulation_state > SimulationState.INITIALIZING
-                error("This simulation currently does not support reinitialization without resetup");
+                %error("This simulation currently does not support reinitialization without resetup");
             end
             self.simulation_state = SimulationState.INITIALIZING;
 
@@ -218,7 +218,7 @@ classdef ArmourSimulation < Simulation & handle
             
             % Update systems
             [collision, contactPairs] = self.collision_system.updateCollision(self.simulation_timestep);
-            
+
             if collision
                 disp("Collision Detected, Breakpoint!")
                 pause

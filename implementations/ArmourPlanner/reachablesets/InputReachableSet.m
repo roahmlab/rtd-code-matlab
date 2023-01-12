@@ -14,7 +14,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
             self.robot = robot;
             self.jrsHandle = jrsHandle;
             self.use_robust_input = use_robust_input;
-            self.verbose_level = -1;
+            self.set_vdisplevel(LogLevel.OFF);
         end
         
         % Obtains the relevant reachable set for the robotstate provided
