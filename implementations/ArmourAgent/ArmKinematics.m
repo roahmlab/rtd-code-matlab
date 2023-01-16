@@ -284,6 +284,7 @@ classdef ArmKinematics < NamedClass & OptionsClass & handle
             %
             % Given a time or configuration, return the link rotation
             % and translation arrays R and T, and the joint locations J.
+            % Zach is watching me creepily
             
             [R,T,J] = self.get_link_rotations_and_translations(time_or_config) ;
         end
