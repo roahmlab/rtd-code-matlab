@@ -2,9 +2,11 @@ classdef ArmourSimulation < Simulation & handle
     properties
         simulation_timestep = 0.5
         world = struct
+        world_by_uuid = struct
         entities
         %systems
         simulation_state SimulationState = SimulationState.INVALID
+        simulation_log VarLogger = VarLogger.empty()
     end
     properties
         agent
@@ -12,6 +14,12 @@ classdef ArmourSimulation < Simulation & handle
         collision_system
         visual_system
         goal_system
+    end
+    events
+        PreStep
+        Step
+        PostStep
+        NewObjectAdded
     end
     methods
         % Important stuff to get started
@@ -78,6 +86,9 @@ classdef ArmourSimulation < Simulation & handle
                     self.visual_system.addObjects(static=options.visual);
                 end
             end
+
+            % TODO setup custom event data to return the object added
+            notify(self, 'NewObjectAdded')
         end
         
         function setup(self, agent)
@@ -131,6 +142,12 @@ classdef ArmourSimulation < Simulation & handle
                 self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
             end
             
+            % reset the log
+            % For other simulations, you might want to validate keys and
+            % manually add them to ensure the summary section works as
+            % expected.
+            self.simulation_log = VarLogger(validate_keys=false);
+
             self.simulation_state = SimulationState.SETUP_READY;
         end
         
@@ -209,6 +226,9 @@ classdef ArmourSimulation < Simulation & handle
             
             % CALL PLANNER
             info = struct;
+
+            % TODO setup custom event data to return the sim
+            notify(self, 'PreStep')
         end
         function info = step(self)
             self.simulation_state = SimulationState.STEP;
@@ -227,6 +247,9 @@ classdef ArmourSimulation < Simulation & handle
             info.agent_results = agent_results;
             info.collision = collision;
             info.contactPairs = contactPairs;
+
+            % TODO setup custom event data to return the sim
+            notify(self, 'Step')
         end
         function info = post_step(self)
             self.simulation_state = SimulationState.POST_STEP;
@@ -235,6 +258,9 @@ classdef ArmourSimulation < Simulation & handle
             pause_requested = self.visual_system.updateVisual(self.simulation_timestep);
             info.goal = goal;
             info.pause_requested = pause_requested;
+
+            % TODO setup custom event data to return the sim
+            notify(self, 'PostStep')
         end
         function summary(self, options)
         end

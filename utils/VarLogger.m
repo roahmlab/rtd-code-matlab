@@ -69,6 +69,15 @@ classdef VarLogger < handle
                 self.log_entries(kv_pair{1}) = [self.log_entries(kv_pair{1}), kv_pair(2)];
             end
         end
+
+        function addStruct(self, struct_data)
+            arguments
+                self VarLogger
+                struct_data struct
+            end
+            args = namedargs2cell(struct_data);
+            self.add(args{:});
+        end
         
         function varargout = get(self, key_name, options)
             arguments
@@ -119,7 +128,7 @@ classdef VarLogger < handle
                 kv_pairs = [key_name; values];
                 varargout{1} = struct(kv_pairs{:});
             else
-                [varargout{1:nargout}] = values{:};
+                varargout = cellfun(@(x)x(:), values);
             end
         end
     end
