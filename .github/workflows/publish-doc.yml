@@ -1,0 +1,31 @@
+# action.yml
+name: 'Build Docs'
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_docs:
+    permissions:
+      contents: write
+      pages: write
+    runs-on: ubuntu-latest
+    name: 'Build Sphinx Documentation and publish to github pages'
+    steps:
+      - name: 'Checkout the repo'
+        uses: actions/checkout@v2
+
+      - name: 'Run the buildscript'
+        # Workaround to keep tty working
+        # https://github.com/gfx/example-github-actions-with-tty
+        shell: 'script -q -e -c "bash {0}"'
+        run: ./build-docs.sh html
+
+      - name: 'Deploy to gh-pages'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
+          publish_branch: gh-pages

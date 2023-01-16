@@ -10,6 +10,7 @@ Welcome to RTD-code's documentation!
    :maxdepth: 3
    :caption: Contents:
    
+   introduction
    planner/planner
    simulation/simulation
    utils
