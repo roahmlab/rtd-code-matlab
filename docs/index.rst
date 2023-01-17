@@ -13,7 +13,7 @@ Welcome to RTD-code's documentation!
    introduction
    planner/planner
    simulation/simulation
-   utils
+   utilities/utilities
 
 This project aims to restructure the existing RTD codebase into a set of easier to understand
 and use modules for individual project development as well as better cross-language compatibility.
