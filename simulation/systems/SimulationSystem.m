@@ -1,4 +1,4 @@
-classdef SimulationSystem < UUIDbase & handle
+classdef SimulationSystem < mixins.UUIDbase & handle
     properties (Abstract)
         time (1,:) double
         time_discretization (1,1) double

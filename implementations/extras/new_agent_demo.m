@@ -12,7 +12,7 @@ links_with_uncertainty = {'dumbbell_link'}; % if add_uncertainty_to = 'link', sp
 uncertain_mass_range = [0.97, 1.03];
 
 % If this flag is true, we use the ArmourCadPatchVisual component instead
-visualize_cad = false;
+visualize_cad = true;
 
 % Add noise to the dynamics
 component_options.dynamics.measurement_noise_points = 11;

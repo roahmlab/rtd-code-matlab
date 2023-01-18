@@ -20,7 +20,7 @@ generation.
    :members:
    :undoc-members:
 
-.. mat:autoclass:: utils.UUIDbase
+.. mat:autoclass:: utils.+mixins.UUIDbase
    :show-inheritance:
    :members:
    :undoc-members:

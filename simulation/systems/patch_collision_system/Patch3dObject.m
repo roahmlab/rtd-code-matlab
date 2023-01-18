@@ -1,4 +1,4 @@
-classdef Patch3dObject < UUIDbase
+classdef Patch3dObject < mixins.UUIDbase
     properties
         parent_uuid
         faces(:,:) uint32
