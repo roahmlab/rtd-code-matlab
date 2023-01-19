@@ -1,4 +1,4 @@
-classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass & handle
+classdef ArmourController < BaseControllerComponent & mixins.NamedClass & mixins.Options & handle
     
     % Leftover Old Dependencies
     % robot_arm_LLC and uarmtd_robust_CBF_LLC
@@ -33,7 +33,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             options.Kr = 10;
             options.V_max = 3.1e-7;
             options.alpha_constant = 1;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -106,7 +106,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                 self.LLC_wrapped.ultimate_bound = sqrt(2*self.LLC_wrapped.V_max/self.robot_info.M_min_eigenvalue);
                 self.LLC_wrapped.ultimate_bound_position = (1/self.LLC_wrapped.Kr)*self.LLC_wrapped.ultimate_bound;
                 self.LLC_wrapped.ultimate_bound_velocity = 2*self.LLC_wrapped.ultimate_bound;
-                self.vdisp(sprintf('Computed ultimate bound of %.3f', self.LLC_wrapped.ultimate_bound), LogLevel.GENERAL);
+                self.vdisp(sprintf('Computed ultimate bound of %.3f', self.LLC_wrapped.ultimate_bound), 'GENERAL');
             else
                 warning('No minimum eigenvalue of agent mass matrix specified, can not compute ultimate bound');
             end
@@ -158,7 +158,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
         function out = ultimate_bound_check(self, t_check_step, controller_log)
             % if no log, skip
             if isempty(controller_log)
-                self.vdisp('Not logging controller inputs, skipping ultimate bound check!', LogLevel.INFO);
+                self.vdisp('Not logging controller inputs, skipping ultimate bound check!', 'INFO');
                 out = false;
                 return
             end
@@ -179,7 +179,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
             u_vel_ref = [reference_trajectory.q_dot];
             
             % check bound satisfaction
-            self.vdisp('Running ultimate bound check!',LogLevel.INFO);
+            self.vdisp('Running ultimate bound check!', 'INFO');
             
             % Absolute difference
             u_pos_diff = abs(u_pos_ref - u_check.q);
@@ -199,7 +199,7 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                     msg = sprintf('t=%.2f, %d-position bound exceeded: %.5f vs +-%.5f',...
                         t_check(t_idx), joint_idx, u_pos_diff(joint_idx, t_idx), ...
                         self.ultimate_bound_position);
-                    self.vdisp(msg, LogLevel.ERROR);
+                    self.vdisp(msg, 'ERROR');
                 end
                 
                 % Velocity ultimate bound exceeded in these positions
@@ -211,10 +211,10 @@ classdef ArmourController < BaseControllerComponent & NamedClass & OptionsClass 
                     msg = sprintf('t=%.2f, %d-velocity bound exceeded: %.5f vs +-%.5f',...
                         t_check(t_idx), joint_idx, u_vel_diff(joint_idx, t_idx), ...
                         self.ultimate_bound_velocity);
-                    self.vdisp(msg, LogLevel.ERROR);
+                    self.vdisp(msg, 'ERROR');
                 end
             else
-                self.vdisp('No ultimate bound exceeded', LogLevel.INFO);
+                self.vdisp('No ultimate bound exceeded', 'INFO');
             end
         end
         

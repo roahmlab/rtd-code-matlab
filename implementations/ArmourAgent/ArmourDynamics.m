@@ -1,4 +1,4 @@
-classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & handle
+classdef ArmourDynamics < BaseDynamicsComponent & mixins.NamedClass & mixins.Options & handle
     
     % Torque dynamics with optional measurement noise
     % Leftover Old Dependencies
@@ -28,7 +28,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
         time_discretization double = 0.01
         
         % Logging
-        controller_log VarLogger = VarLogger.empty()
+        controller_log containers.VarLogger = containers.VarLogger.empty()
 
         % Measurement Noise (This probably should eventually be its own
         % class and type
@@ -42,7 +42,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             options.measurement_noise_pos_sigma = 1e-4;
             options.measurement_noise_vel_sigma = 1e-4;
             options.log_controller = false;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -88,7 +88,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             
             % if we're going to log, set it up
             if options.log_controller
-                self.controller_log = VarLogger('input_time', ...
+                self.controller_log = containers.VarLogger('input_time', ...
                                      'input', ...
                                      'nominal_input', ...
                                      'robust_input', ...
@@ -112,7 +112,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             
         
         function move(self, t_move)
-            self.vdisp('Moving!',LogLevel.INFO)
+            self.vdisp('Moving!', 'INFO')
             
             % get the current state
             state = self.robot_state.get_state;
@@ -235,7 +235,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
         function out = controller_input_check(self, t_check_step)
             % if not logging, skip
             if isempty(self.controller_log)
-                self.vdisp('Not logging controller inputs, skipping input torque check!', LogLevel.INFO);
+                self.vdisp('Not logging controller inputs, skipping input torque check!', 'INFO');
                 out = false;
                 return
             end
@@ -251,7 +251,7 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
             u_check = interp1(t_input, input.', t_check).';
 
             % check torque bounds
-            self.vdisp('Running input torque check!', LogLevel.INFO);
+            self.vdisp('Running input torque check!', 'INFO');
             u_exceeded = false(size(u_check));
             for idx=1:self.robot_info.num_q
                 % Lower bound
@@ -272,10 +272,10 @@ classdef ArmourDynamics < BaseDynamicsComponent & NamedClass & OptionsClass & ha
                         t_check(t_idx), joint_idx, u_check(joint_idx, t_idx), ...
                         self.robot_info.joints(joint_idx).torque_limits(1), ...
                         self.robot_info.joints(joint_idx).torque_limits(2));
-                    self.vdisp(msg, LogLevel.ERROR);
+                    self.vdisp(msg, 'ERROR');
                 end
             else
-                self.vdisp('No inputs exceeded', LogLevel.INFO);
+                self.vdisp('No inputs exceeded', 'INFO');
             end
         end
     end

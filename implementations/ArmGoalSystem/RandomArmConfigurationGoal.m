@@ -1,9 +1,9 @@
-classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & NamedClass & OptionsClass & handle
+classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & mixins.NamedClass & mixins.Options & handle
     % Required properties from SimulationSystem
     properties
         time = 0
         time_discretization = 0.1
-        system_log = VarLogger.empty()
+        system_log = containers.VarLogger.empty()
     end
     % Required properties from PatchVisualObject
     properties
@@ -37,7 +37,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
             options.min_dist_start_to_goal = [];
             options.goal_creation_timeout = 10;
             options.goal_radius = pi/30;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -145,7 +145,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
             end_time = self.time(end)+t_update;
             t_vec = start_time:self.time_discretization:end_time;
             
-            self.vdisp('Running goal check!', LogLevel.DEBUG);
+            self.vdisp('Running goal check!', 'DEBUG');
             
             % Accumulate the return
             goal = false;
@@ -204,7 +204,7 @@ classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & Nam
                 proposed_goal_dist = norm(self.start_position - proposed_goal);
             end
             if isempty(proposed_goal)
-                self.vdisp('Failed to find collision free goal! Using random goal', LogLevel.GENERAL);
+                self.vdisp('Failed to find collision free goal! Using random goal', 'GENERAL');
                 % Position is already randomized
                 proposed_goal = self.arm_agent.state.get_state().q;
             end

@@ -1,4 +1,4 @@
-classdef BoxPatchVisual < PatchVisualObject & NamedClass & OptionsClass & handle
+classdef BoxPatchVisual < PatchVisualObject & mixins.NamedClass & mixins.Options & handle
     
     
     % Leftover Old Dependencies
@@ -28,7 +28,7 @@ classdef BoxPatchVisual < PatchVisualObject & NamedClass & OptionsClass & handle
             options.edge_width = 1;
             options.set_view_when_animating = false;
             options.animation_view = 3;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end

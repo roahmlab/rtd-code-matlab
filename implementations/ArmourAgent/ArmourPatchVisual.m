@@ -1,4 +1,4 @@
-classdef ArmourPatchVisual < PatchVisualObject & NamedClass & OptionsClass & handle
+classdef ArmourPatchVisual < PatchVisualObject & mixins.NamedClass & mixins.Options & handle
     
     
     % Leftover Old Dependencies
@@ -32,7 +32,7 @@ classdef ArmourPatchVisual < PatchVisualObject & NamedClass & OptionsClass & han
             options.edge_width = 1.25;
             options.set_view_when_animating = true;
             options.animation_view = 3;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end

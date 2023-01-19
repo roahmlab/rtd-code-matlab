@@ -1,4 +1,4 @@
-classdef InputReachableSet < ReachableSets & NamedClass
+classdef InputReachableSet < ReachableSets & mixins.NamedClass
     % InputReachableSet
     % This generates the upper and lower bound reachable sets on the input,
     % and creates an IRSInstance object.
@@ -14,7 +14,7 @@ classdef InputReachableSet < ReachableSets & NamedClass
             self.robot = robot;
             self.jrsHandle = jrsHandle;
             self.use_robust_input = use_robust_input;
-            self.set_vdisplevel(LogLevel.OFF);
+            self.set_vdisplevel('OFF');
         end
         
         % Obtains the relevant reachable set for the robotstate provided

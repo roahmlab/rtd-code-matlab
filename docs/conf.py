@@ -14,10 +14,19 @@ release = 'release'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinxcontrib.matlab', 'sphinx.ext.autodoc', 'sphinx.ext.duration', 'sphinx.ext.napoleon']
+extensions = [  'sphinxcontrib.matlab', 
+                'sphinx.ext.autodoc',
+                'sphinx.ext.duration',
+                'sphinx.ext.napoleon',
+                'sphinx.ext.viewcode']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
+# -- Napoleon Docstrings Configuration --------------------------------------
+
+napoleon_use_param = False
+napoleon_use_keyword = False
 
 # -- Additional options for sphinxcontrib.matlab ----------------------------
 # https://pypi.org/project/sphinxcontrib-matlabdomain/
@@ -27,6 +36,7 @@ pwd = os.path.dirname(os.path.abspath(__file__))
 matlab_src_dir = os.path.abspath(os.path.join(pwd, '..'))
 matlab_keep_package_prefix = False
 #primary_domain='mat'
+autodoc_member_order='groupwise'
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

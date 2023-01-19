@@ -1,12 +1,39 @@
 classdef VarLogger < handle
-    % NOT A MIXIN
-    
+% VarLogger is a modified Map which helps with logging step-wise data.
+%
+% It uses `containers.Map` as its underlying datatype, and can perform key
+% validation and return flattened or stepwise data for analysis later or
+% for summarizing.
+%
+% Warning:
+%     The current documentation engine is unable to document the `get`
+%     method of this class. Please check the source for how to use it!
+%     https://github.com/sphinx-contrib/matlabdomain/issues/151
+%
+
     properties
-        log_entries containers.Map
-        log_validateKeys logical
+        % The Map which holds the data we have logged.
+        log_entries containers.Map %
+        
+        % Whether or not to throw an error if a new key was used to add
+        % more data.
+        log_validateKeys logical %
     end
+    
     methods
         function self = VarLogger(key_names, options)
+            % Constructs the VarLogger container
+            %
+            % Keys can be added in the constructor, and an Name-Value
+            % option to disable the validation of keys is present.
+            %
+            % Arguments:
+            %     key_names (String - Repeating): Keys for values to log
+            %     options: Keyword arguments. See Below.
+            % 
+            % Keyword Arguments:
+            %     validate_keys (logical): Whether or not to throw an error when adding a new key to the log without explicitly using `addKey`.
+            %
             arguments (Repeating)
                 key_names {mustBeTextScalar}
             end
@@ -25,12 +52,22 @@ classdef VarLogger < handle
         end
         
         function keys = keys(self)
+            % Get the keys of the values that are logged
+            %
+            % Returns:
+            %     cell(String): Cell array of strings for the keys.
+            %
             keys = self.log_entries.keys;
         end
         
         function addKeys(self, key_names)
+            % Adds keys to the current log.
+            %
+            % Arguments:
+            %     key_names (String - Repeating): Keys for values to log
+            %
             arguments
-                self
+                self containers.VarLogger
             end
             arguments (Repeating)
                 key_names {mustBeTextScalar}
@@ -44,8 +81,14 @@ classdef VarLogger < handle
         end
         
         function add(self, key_name, value)
+            % Adds entries to the log by repeating pairs of keys and values
+            %
+            % Arguments:
+            %     key_name (String - Repeating): Key used to log the following value
+            %     value (String - Repeating): Data to log
+            %
             arguments
-                self
+                self containers.VarLogger
             end
             arguments (Repeating)
                 key_name {mustBeTextScalar}
@@ -71,8 +114,13 @@ classdef VarLogger < handle
         end
 
         function addStruct(self, struct_data)
+            % Adds entries to the log based on a struct
+            %
+            % Arguments:
+            %     struct_data (struct): Data to log as a struct
+            %
             arguments
-                self VarLogger
+                self containers.VarLogger
                 struct_data struct
             end
             args = namedargs2cell(struct_data);
@@ -80,8 +128,21 @@ classdef VarLogger < handle
         end
         
         function varargout = get(self, key_name, options)
+            % Gets the log entries requested as either a struct or as multiple outputs
+            %
+            % Arguments:
+            %     key_name (String - Repeating): Keys to retrieve log data for
+            %     options: Keyword arguments. See Below.
+            %
+            % Keyword Arguments:
+            %     flatten (logical): Whether or not the resulting output should be flattened or provided as logged cells
+            %     as_struct (logical): Whether or not the resulting output should be in struct form
+            %
+            % Returns:
+            %     struct or any: Struct holding the logged data or multiple output arguments with the requested log data.
+            %
             arguments
-                self
+                self containers.VarLogger
             end
             arguments (Repeating)
                 key_name {mustBeTextScalar}

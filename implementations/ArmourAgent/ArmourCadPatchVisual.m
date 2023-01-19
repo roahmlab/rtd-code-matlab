@@ -16,7 +16,7 @@ classdef ArmourCadPatchVisual < ArmourPatchVisual
     % Geometry Generation
     methods
         function create_link_plot_patch_data(self)
-            self.vdisp('Loading CAD files for arm plotting!',LogLevel.INFO)
+            self.vdisp('Loading CAD files for arm plotting!', 'INFO')
             for i = 1:self.arm_info.robot.NumBodies
                 stl_file = self.arm_info.robot.Bodies{i}.Visuals{1};
                 stl_file = extractAfter(stl_file, 'Mesh:');
@@ -37,7 +37,7 @@ classdef ArmourCadPatchVisual < ArmourPatchVisual
             end
             
             if triangulated_flag
-                self.vdisp('STL read returned a triangulated data format, but we fixed it :)',LogLevel.WARN)
+                self.vdisp('STL read returned a triangulated data format, but we fixed it :)', 'WARN')
             end
             
             % Flatten to a compatible format with the prior plot routine

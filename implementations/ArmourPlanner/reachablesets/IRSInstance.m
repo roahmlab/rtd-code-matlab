@@ -1,4 +1,4 @@
-classdef IRSInstance < ReachableSetInstance & NamedClass
+classdef IRSInstance < ReachableSetInstance & mixins.NamedClass
     % IRSInstance
     % This is just an individual instance of input reachable set from
     % armour.

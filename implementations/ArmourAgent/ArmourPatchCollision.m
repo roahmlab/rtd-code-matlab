@@ -1,4 +1,4 @@
-classdef ArmourPatchCollision < Patch3dDynamicObject & NamedClass & handle
+classdef ArmourPatchCollision < Patch3dDynamicObject & mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies
@@ -23,7 +23,7 @@ classdef ArmourPatchCollision < Patch3dDynamicObject & NamedClass & handle
                 arm_info ArmourAgentInfo
                 arm_state_component ArmourAgentState
                 kinematics_component ArmKinematics
-                verbose_level = LogLevel.INFO
+                verbose_level = 'INFO'
                 name = ''
             end
             self.arm_info = arm_info;

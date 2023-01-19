@@ -2,7 +2,7 @@
 clear ; clc; close all;
 
 %% Agent parameters
-verbosity = LogLevel.DEBUG;
+verbosity = 'DEBUG';
 
 %%% for agent
 agent_urdf = 'fetch_arm_new_dumbbell.urdf';
@@ -132,7 +132,7 @@ HLP.make_new_graph_every_iteration_flag = 1;
 HLP.sampling_timeout = 0.5;
 
 %% Run planning step by step
-lookahead = 1;
+lookahead = 0.4;
 iter = 0;
 pausing = false;
 % while true

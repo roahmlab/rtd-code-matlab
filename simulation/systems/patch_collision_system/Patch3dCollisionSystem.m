@@ -1,9 +1,9 @@
-classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass & handle
+classdef Patch3dCollisionSystem < SimulationSystem & mixins.NamedClass & mixins.Options & handle
     % Required inherited properties
     properties
         time = 0
         time_discretization = 0.1
-        system_log = VarLogger.empty()
+        system_log = containers.VarLogger.empty()
     end
     % Additional properties we add
     properties
@@ -16,7 +16,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
         function options = defaultoptions()
             options.time_discretization = 0.1;
             options.log_collisions = false;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -55,7 +55,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             
             % if we're going to log, set it up
             if options.log_collisions
-                self.system_log = VarLogger('contactPairs');
+                self.system_log = containers.VarLogger('contactPairs');
             end
             
             % Set up verbose output
@@ -140,7 +140,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             end_time = self.time(end)+t_update;
             t_vec = start_time:self.time_discretization:end_time;
             
-            self.vdisp('Running collision check!', LogLevel.DEBUG);
+            self.vdisp('Running collision check!', 'DEBUG');
             
             % Accumulate the return
             collision = false;
@@ -195,15 +195,15 @@ classdef Patch3dCollisionSystem < SimulationSystem & NamedClass & OptionsClass &
             if collision
                 contactPairs.num_pairs = size(contactPairs.pairs,1);
                 msg = sprintf("Collision at t=%.2f detected!", time);
-                self.vdisp(msg, LogLevel.ERROR);
+                self.vdisp(msg, 'ERROR');
                 % Debug all collision pairs
-                if LogLevel.DEBUG > self.verboseLevel
-                    self.vdisp("Collision pairs are as follows", LogLevel.DEBUG);
+                if types.LogLevel.DEBUG > self.verboseLevel
+                    self.vdisp("Collision pairs are as follows", 'DEBUG');
                     for idx = 1:contactPairs.num_pairs
                         msg = sprintf("Collision detected between %s and %s", ...
                                         contactPairs.pairs{idx,1}, ...
                                         contactPairs.pairs{idx,2});
-                        self.vdisp(msg, LogLevel.DEBUG);
+                        self.vdisp(msg, 'DEBUG');
                     end
                 end
             end

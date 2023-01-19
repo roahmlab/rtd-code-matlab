@@ -6,7 +6,7 @@ classdef ArmourSimulation < Simulation & handle
         entities
         %systems
         simulation_state SimulationState = SimulationState.INVALID
-        simulation_log VarLogger = VarLogger.empty()
+        simulation_log containers.VarLogger = containers.VarLogger.empty()
     end
     properties
         agent
@@ -146,7 +146,7 @@ classdef ArmourSimulation < Simulation & handle
             % For other simulations, you might want to validate keys and
             % manually add them to ensure the summary section works as
             % expected.
-            self.simulation_log = VarLogger(validate_keys=false);
+            self.simulation_log = containers.VarLogger(validate_keys=false);
 
             self.simulation_state = SimulationState.SETUP_READY;
         end

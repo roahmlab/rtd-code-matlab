@@ -1,4 +1,4 @@
-classdef ArmourAgentInfo < EntityInfo & OptionsClass & handle
+classdef ArmourAgentInfo < EntityInfo & mixins.Options & handle
     
     % Leftover Old Dependencies
     % load_robot_params by extension -> make it a class

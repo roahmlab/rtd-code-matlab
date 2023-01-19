@@ -1,4 +1,4 @@
-classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & handle
+classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Options & handle
     % TODO incorporate axes so that it's actually plotting everything
     % without deleting stuff or requiring hold on
     
@@ -6,13 +6,13 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
     properties
         time = 0
         time_discretization = 0.1
-        system_log = VarLogger.empty()
+        system_log = containers.VarLogger.empty()
     end
     % Additional properties we add
     properties
         static_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
         dynamic_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
-        draw_time = 0.01
+        draw_time = 0.05
         figure_handle
         pause_requested = false;
         enable_camlight
@@ -24,7 +24,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
             options.time_discretization = 0.1;
             %options.log_collisions = false;
             options.enable_camlight = false;
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -62,7 +62,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
             
             % if we're going to log, set it up
             %if options.log_collisions
-            %    self.system_log = VarLogger('contactPairs');
+            %    self.system_log = containers.VarLogger('contactPairs');
             %end
             
             % Set up verbose output
@@ -147,7 +147,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
             end_time = self.time(end)+t_update;
             t_vec = start_time:self.time_discretization:end_time;
             
-            self.vdisp('Running visualization!', LogLevel.DEBUG);
+            self.vdisp('Running visualization!', 'DEBUG');
             
             % set the active figure
             set(0, 'CurrentFigure', self.figure_handle)
@@ -202,26 +202,38 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
             arguments
                 self
                 options.t_span = [0, self.time(end)]
-                options.pause_time = self.time_discretization
+                options.time_discretization = self.time_discretization
+                options.pause_time = []
+            end
+            
+            if isempty(options.pause_time)
+                options.pause_time = options.time_discretization;
             end
             
             start_time = options.t_span(1);
             end_time = options.t_span(2);
-            t_vec = start_time:self.time_discretization:end_time;
+            t_vec = start_time:options.time_discretization:end_time;
+            proc_time_start = tic;
             
             % Redraw everything
             self.redraw(0);
             
             % Animate the dynamic stuff
             for t_plot = t_vec
-                pause(options.pause_time)
+                proc_time = toc(proc_time_start);
+                pause_time = options.pause_time - proc_time;
+                proc_time_start = tic;
+                if pause_time < 0
+                    self.vdisp(['Warning, animation lagging by ', num2str(-pause_time), 's!'], 'WARN');
+                end
+                pause(max(pause_time, 1e-8));
                 for obj = self.dynamic_objects
                     obj.plot(time=t_plot)
                 end
                 if self.pause_requested
-                    self.vdisp("Pausing", LogLevel.INFO);
+                    self.vdisp("Pausing", 'INFO');
                     keyboard
-                    self.vdisp("Resuming", LogLevel.INFO);
+                    self.vdisp("Resuming", 'INFO');
                     self.pause_requested = false;
                 end
             end
@@ -229,7 +241,7 @@ classdef PatchVisualSystem < SimulationSystem & NamedClass & OptionsClass & hand
 
         function set_pause(self, src, event)
             if event.Character == "p" && ~self.pause_requested
-                self.vdisp("Pause requested", LogLevel.INFO);
+                self.vdisp("Pause requested", 'INFO');
                 self.pause_requested = true;
             end
         end

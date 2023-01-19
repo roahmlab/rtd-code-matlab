@@ -1,4 +1,4 @@
-classdef GenericStateComponent < EntityStateComponent & NamedClass & OptionsClass & handle
+classdef GenericStateComponent < EntityStateComponent & mixins.NamedClass & mixins.Options & handle
     
     % Old functions
     % rand_range
@@ -18,7 +18,7 @@ classdef GenericStateComponent < EntityStateComponent & NamedClass & OptionsClas
         function options = defaultoptions()
             options.initial_state = [];
             options.n_states = [];
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end

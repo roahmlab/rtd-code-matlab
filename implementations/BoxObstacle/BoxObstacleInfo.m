@@ -1,4 +1,4 @@
-classdef BoxObstacleInfo < EntityInfo & OptionsClass & handle
+classdef BoxObstacleInfo < EntityInfo & mixins.Options & handle
     % Leftover Old Dependencies
     % load_robot_params by extension -> make it a class
     % create_pz_bounding_boxes

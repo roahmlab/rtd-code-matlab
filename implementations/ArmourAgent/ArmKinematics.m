@@ -1,4 +1,4 @@
-classdef ArmKinematics < NamedClass & OptionsClass & handle
+classdef ArmKinematics < mixins.NamedClass & mixins.Options & handle
     % A collection of useful function for arm robot kinematics
 
     % Leftover Old Dependencies
@@ -16,7 +16,7 @@ classdef ArmKinematics < NamedClass & OptionsClass & handle
     
     methods (Static)
         function options = defaultoptions()
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -77,7 +77,7 @@ classdef ArmKinematics < NamedClass & OptionsClass & handle
                 if t > self.arm_state.time(end)
                     t = self.arm_state.time(end);
                     self.vdisp(['Invalid time entered! Using agent''s final ',...
-                        'time t = ',num2str(t),' instead.'], LogLevel.WARN);
+                        'time t = ',num2str(t),' instead.'], 'WARN');
                 end
                 
                 % interpolate the state for the corresponding time

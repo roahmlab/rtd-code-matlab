@@ -1,4 +1,4 @@
-classdef BoxPatchCollision < Patch3dDynamicObject & NamedClass & handle
+classdef BoxPatchCollision < Patch3dDynamicObject & mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies
@@ -19,7 +19,7 @@ classdef BoxPatchCollision < Patch3dDynamicObject & NamedClass & handle
             arguments
                 box_info BoxObstacleInfo
                 box_state_component GenericStateComponent
-                verbose_level = LogLevel.INFO
+                verbose_level = 'INFO'
                 name = ''
             end
             self.box_info = box_info;

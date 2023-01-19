@@ -1,4 +1,4 @@
-classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & handle
+classdef ArmourAgentState < EntityStateComponent & mixins.NamedClass & mixins.Options & handle
     
     % Old functions
     % rand_range
@@ -31,7 +31,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
         function options = defaultoptions()
             options.initial_position = [];
             options.initial_velocity = [];
-            options.verboseLevel = LogLevel.INFO;
+            options.verboseLevel = 'INFO';
             options.name = '';
         end
     end
@@ -76,7 +76,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             self.set_vdisplevel(options.verboseLevel);
             
             % reset the rest
-            self.vdisp('Resetting time and states',LogLevel.INFO);
+            self.vdisp('Resetting time and states', 'INFO');
             
             % reset to zero by default
             self.state = zeros(self.n_states,1);
@@ -85,13 +85,13 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             
             % Add position
             if ~isempty(options.initial_position)
-                self.vdisp('Using provided joint positions',LogLevel.TRACE)
+                self.vdisp('Using provided joint positions', 'TRACE')
                 self.state(self.position_indices) = options.initial_position(:);
             end
             
             % Add velocity
             if ~isempty(options.initial_velocity)
-                self.vdisp('Using provided joint velocities',LogLevel.TRACE)
+                self.vdisp('Using provided joint velocities', 'TRACE')
                 self.state(self.velocity_indices) = options.initial_velocity(:);
             end
             
@@ -204,7 +204,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
             vel_check = interp1(self.time(start_idx:end), self.velocity(:,start_idx:end).', t_check).';
 
             % check bound satisfaction
-            self.vdisp('Running joint limits check!', LogLevel.INFO);
+            self.vdisp('Running joint limits check!', 'INFO');
             
             % check position & velocity
             pos_exceeded = false(size(pos_check));
@@ -233,7 +233,7 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
                         t_check(t_idx), joint_idx, pos_check(joint_idx, t_idx), ...
                         self.entity_info.joints(joint_idx).position_limits(1), ...
                         self.entity_info.joints(joint_idx).position_limits(2));
-                    self.vdisp(msg, LogLevel.ERROR);
+                    self.vdisp(msg, 'ERROR');
                 end
                 
                 % Velocity limit exceeded in these positions
@@ -246,10 +246,10 @@ classdef ArmourAgentState < EntityStateComponent & NamedClass & OptionsClass & h
                         t_check(t_idx), joint_idx, vel_check(joint_idx, t_idx), ...
                         self.entity_info.joints(joint_idx).velocity_limits(1), ...
                         self.entity_info.joints(joint_idx).velocity_limits(2));
-                    self.vdisp(msg, LogLevel.ERROR);
+                    self.vdisp(msg, 'ERROR');
                 end
             else
-                self.vdisp('No joint limits exceeded', LogLevel.INFO);
+                self.vdisp('No joint limits exceeded', 'INFO');
             end
         end
         

@@ -8,7 +8,7 @@ Each subpackage is like a themed interface:
 - reachablesets: contains the interfaces for each of the reachable set generators and the instances which then generate their nonlinear constraints - ReachableSets and ReachableSetsInstance.
 - trajectories: contains the interfaces for components directly affect by trajectory definition - Trajectory.
 - trajopt: contains components and interfaces for the core optimization problem, including what is being optimized for - Waypoint, Objective, OptimizationEngine, RTD_TrajOpt, and TrajOptProps.
-- utils: contains some utility classes that can also be subclassed for some quick useful functionality - NamedClass and UUIDbase.
+- utils: contains some utility classes that can also be subclassed for some quick useful functionality - mixins.NamedClass and mixins.UUID.
 - world: contains interfaces for how the planner interacts with the rest of world - RobotModel, RobotState, RobotInfo, WorldModel, WorldState, and WorldInfo
 
 Within the main package, we have the main RTD_Planner object.

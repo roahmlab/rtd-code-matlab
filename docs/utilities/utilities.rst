@@ -7,6 +7,7 @@ RTD Code Utilities Reference
    
    mixins
    containers
+   types
 
 * :ref:`genindex`
 * :ref:`mat-modindex`

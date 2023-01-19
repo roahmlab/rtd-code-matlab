@@ -54,5 +54,5 @@ Again, if you find any part of this changing during runtime, it should be a part
 
 State of a generic robot at a given moment in time.
 Time is always relevant, so it is included in the base object.
-For utility, this extends UUIDbase, so that every initialization of this class will have a different id, even if they share the same state values.
+For utility, this extends mixins.UUID, so that every initialization of this class will have a different id, even if they share the same state values.
 That also means if you intialize it once, but copy it (so it's a copy of the same state realizaton), it will share the same id.
