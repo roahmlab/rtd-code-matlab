@@ -1,4 +1,4 @@
-classdef Simulation < mixins.NamedClass & handle
+classdef Simulation < rtd.mixins.NamedClass & handle
     % properties
     %     world_def
     % end

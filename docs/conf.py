@@ -38,7 +38,7 @@ matlab_keep_package_prefix = False
 #primary_domain='mat'
 autodoc_member_order='groupwise'
 
-# -- Options for HTML output -------------------------------------------------
+# -- Options for HTML output ------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
@@ -48,3 +48,12 @@ html_theme_options = {
     'sticky_navigation': True
 }
 
+# -- Special Ignore Configuration -------------------------------------------
+
+from sphinx.ext.autodoc import between
+
+def setup(app):
+    # Register a sphinx.ext.autodoc.between listener to ignore everything
+    # after lines that contain the word IGNORE
+    app.connect('autodoc-process-docstring', between('^.*--- More Info ---.*$', exclude=True))
+    return app

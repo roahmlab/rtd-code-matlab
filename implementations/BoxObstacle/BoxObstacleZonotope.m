@@ -1,4 +1,4 @@
-classdef BoxObstacleZonotope < mixins.NamedClass & handle
+classdef BoxObstacleZonotope < rtd.mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies

@@ -4,10 +4,17 @@ classdef NamedClass < handle
 % It pulls the classname and packagename the class is under and saves them.
 % With those saved names, it has a verbose logging capability which we can
 % specify levels of verbosity for. It follows a subset of the log4j log
-% levels defined in :mat:class:`utils.+types.LogLevel`. The log levels can
+% levels defined in :mat:class:`+rtd.+types.LogLevel`. The log levels can
 % also be set by its name string.
 %
-% See also types.LogLevel
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2022-10-05
+% Last Revised: 2023-01-19 (Adam Li)
+%
+% See also rtd.types.LogLevel
+%
+% --- More Info ---
 %
 
     properties
@@ -23,10 +30,13 @@ classdef NamedClass < handle
         % Option to include the packagename with the logging output. If
         % true, the packagename is prepended to the classname before
         % output.
-        include_packagename(1,1) logical = true
+        show_packagename(1,1) logical = true
+        
+        % The tab level to use as the output. 0 indicates no tabs.
+        tablevel(1,1) uint8 = 0
         
         % Log level of the class.
-        verboseLevel(1,1) types.LogLevel = 'OFF'
+        verboseLevel(1,1) rtd.types.LogLevel = 'OFF'
     end
     
     methods
@@ -56,31 +66,35 @@ classdef NamedClass < handle
             %
             % Arguments:
             %     output (String): The string to display if the log level is verbose enough
-            %     level (String, types.LogLevel): The level of the message
+            %     level (String, rtd.types.LogLevel): The level of the message
             %     options: Keyword arguments. See Below.
             % 
             % Keyword Arguments:
             %     wait (logical): Whether or not to pause execution after displaying the message
-            %     include_packagename (logical): Overrides the include_packagename property of the class
+            %     show_packagename (logical): Overrides the show_packagename property of the class
+            %     tablevel (uint8): Overrides the tablevel property of the class
             %
             arguments
-                self mixins.NamedClass
+                self rtd.mixins.NamedClass
                 output {mustBeTextScalar}
-                level(1,1) types.LogLevel = 'DEBUG'
+                level(1,1) rtd.types.LogLevel = 'DEBUG'
                 options.wait(1,1) logical = false
-                options.include_packagename(1,1) logical = self.include_packagename
+                options.show_packagename(1,1) logical = self.show_packagename
+                options.tablevel(1,1) uint8 = self.tablevel
             end
             
             if level >= self.verboseLevel
                 % Generate the prefix
                 disp_name = self.classname;
-                if options.include_packagename && ~isempty(self.packagename)
+                if options.show_packagename && ~isempty(self.packagename)
                     disp_name = [self.packagename, '.', disp_name];
                 end
                 if ~isempty(self.name)
                     disp_name = [self.name, '-', disp_name];
                 end
                 disp_name = [disp_name, '-', char(level)];
+                % Add the tablevel
+                disp_name = [repmat('  ', 1, options.tablevel), disp_name];
                 % Add the message
                 disp([disp_name, ': ', char(output)])
                 % Pause if we want to wait after the message
@@ -94,11 +108,11 @@ classdef NamedClass < handle
             % Set the verbosity of the current class's output
             %
             % Arguments:
-            %     level (String, types.LogLevel): The level of the current class
+            %     level (String, rtd.types.LogLevel): The level of the current class
             %
             arguments
-                self mixins.NamedClass
-                level(1,1) types.LogLevel
+                self rtd.mixins.NamedClass
+                level(1,1) rtd.types.LogLevel
             end
             % Change the verbose level
             self.verboseLevel = level;
@@ -108,7 +122,7 @@ classdef NamedClass < handle
             % Get the verbosity of the current class's output
             %
             % Returns:
-            %     types.LogLevel: The level of the current class
+            %     rtd.types.LogLevel: The level of the current class
             %
             vlevel = self.verboseLevel;
         end

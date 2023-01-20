@@ -1,7 +1,7 @@
 Utility Types and Enumerations
 ==============================
 
-.. mat:autoclass:: utils.+types.LogLevel
+.. mat:autoclass:: +rtd.+types.LogLevel
    :show-inheritance:
    :members:
    

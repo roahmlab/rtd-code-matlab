@@ -5,17 +5,17 @@ Mixins are utility classes that you add as a superclass to a given class to quic
 functionality. They do anything from provide additional generated properties for easy
 names or identification, or add quick array functionality.
 
-.. mat:autoclass:: utils.+mixins.NamedClass
+.. mat:autoclass:: +rtd.+mixins.NamedClass
    :show-inheritance:
    :members:
    :undoc-members:
 
-.. mat:autoclass:: utils.+mixins.Options
+.. mat:autoclass:: +rtd.+mixins.Options
    :show-inheritance:
    :members:
    :undoc-members:
 
-.. mat:autoclass:: utils.+mixins.UUID
+.. mat:autoclass:: +rtd.+mixins.UUID
    :show-inheritance:
    :members:
    :undoc-members:

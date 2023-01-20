@@ -1,4 +1,4 @@
-classdef ArmKinematics < mixins.NamedClass & mixins.Options & handle
+classdef ArmKinematics < rtd.mixins.NamedClass & rtd.mixins.Options & handle
     % A collection of useful function for arm robot kinematics
 
     % Leftover Old Dependencies

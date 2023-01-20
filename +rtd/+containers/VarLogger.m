@@ -10,6 +10,13 @@ classdef VarLogger < handle
 %     method of this class. Please check the source for how to use it!
 %     https://github.com/sphinx-contrib/matlabdomain/issues/151
 %
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2022-12-10
+% Last Revised: 2023-01-18 (Adam Li)
+%
+% --- More Info ---
+%
 
     properties
         % The Map which holds the data we have logged.
@@ -67,7 +74,7 @@ classdef VarLogger < handle
             %     key_names (String - Repeating): Keys for values to log
             %
             arguments
-                self containers.VarLogger
+                self rtd.containers.VarLogger
             end
             arguments (Repeating)
                 key_names {mustBeTextScalar}
@@ -88,7 +95,7 @@ classdef VarLogger < handle
             %     value (String - Repeating): Data to log
             %
             arguments
-                self containers.VarLogger
+                self rtd.containers.VarLogger
             end
             arguments (Repeating)
                 key_name {mustBeTextScalar}
@@ -120,7 +127,7 @@ classdef VarLogger < handle
             %     struct_data (struct): Data to log as a struct
             %
             arguments
-                self containers.VarLogger
+                self rtd.containers.VarLogger
                 struct_data struct
             end
             args = namedargs2cell(struct_data);
@@ -142,7 +149,7 @@ classdef VarLogger < handle
             %     struct or any: Struct holding the logged data or multiple output arguments with the requested log data.
             %
             arguments
-                self containers.VarLogger
+                self rtd.containers.VarLogger
             end
             arguments (Repeating)
                 key_name {mustBeTextScalar}

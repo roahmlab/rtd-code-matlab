@@ -1,4 +1,4 @@
-classdef ArmourPatchVisual < PatchVisualObject & mixins.NamedClass & mixins.Options & handle
+classdef ArmourPatchVisual < PatchVisualObject & rtd.mixins.NamedClass & rtd.mixins.Options & handle
     
     
     % Leftover Old Dependencies

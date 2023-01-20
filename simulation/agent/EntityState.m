@@ -1,4 +1,4 @@
-classdef EntityState < mixins.UUID & handle
+classdef EntityState < rtd.mixins.UUID & handle
     % RobotState
     % The state of a generic robot at a point in time, which is saved.
     % Each hard instance of this (unique object, not seperate handles to

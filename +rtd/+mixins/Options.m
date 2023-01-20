@@ -12,6 +12,15 @@ classdef Options < handle
 %     class's constructor as Name-Value arguments.
 %     https://www.mathworks.com/help/matlab/matlab_prog/function-argument-validation-1.html#mw_1b62b6d6-a445-4c55-a9b9-9c70becfdbe6
 %
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2022-12-08
+% Last Revised: 2023-01-18 (Adam Li)
+%
+% See also arguments
+%
+% --- More Info ---
+%
     
     properties
         % A struct that holds the configuration options
@@ -49,9 +58,8 @@ classdef Options < handle
             % Returns:
             %     struct: Optional copy of the merged `instanceOptions`.
             %
-            
             arguments
-                self mixins.Options
+                self rtd.mixins.Options
             end
             arguments (Repeating)
                 newOptions struct

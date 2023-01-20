@@ -1,4 +1,4 @@
-classdef ArmourPatchCollision < Patch3dDynamicObject & mixins.NamedClass & handle
+classdef ArmourPatchCollision < Patch3dDynamicObject & rtd.mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies

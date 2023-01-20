@@ -12,6 +12,13 @@ classdef UUID < handle
 %     objects.
 %     https://www.mathworks.com/help/matlab/matlab_oop/initializing-arrays-of-handle-objects.html
 %
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2022-10-05
+% Last Revised: 2023-01-18 (Adam Li)
+%
+% --- More Info ---
+%
 
     properties
         % A character-array string representing the UUID generated.

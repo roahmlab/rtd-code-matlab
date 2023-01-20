@@ -1,9 +1,9 @@
-classdef Patch3dCollisionSystem < SimulationSystem & mixins.NamedClass & mixins.Options & handle
+classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixins.Options & handle
     % Required inherited properties
     properties
         time = 0
         time_discretization = 0.1
-        system_log = containers.VarLogger.empty()
+        system_log = rtd.containers.VarLogger.empty()
     end
     % Additional properties we add
     properties
@@ -55,7 +55,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & mixins.NamedClass & mixins.
             
             % if we're going to log, set it up
             if options.log_collisions
-                self.system_log = containers.VarLogger('contactPairs');
+                self.system_log = rtd.containers.VarLogger('contactPairs');
             end
             
             % Set up verbose output
@@ -197,7 +197,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & mixins.NamedClass & mixins.
                 msg = sprintf("Collision at t=%.2f detected!", time);
                 self.vdisp(msg, 'ERROR');
                 % Debug all collision pairs
-                if types.LogLevel.DEBUG > self.verboseLevel
+                if rtd.types.LogLevel.DEBUG > self.verboseLevel
                     self.vdisp("Collision pairs are as follows", 'DEBUG');
                     for idx = 1:contactPairs.num_pairs
                         msg = sprintf("Collision detected between %s and %s", ...

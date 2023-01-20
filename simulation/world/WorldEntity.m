@@ -1,4 +1,4 @@
-classdef WorldEntity < matlab.mixin.Heterogeneous & mixins.Options & mixins.NamedClass & handle
+classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.mixins.Options & rtd.mixins.NamedClass & handle
 
     properties (Abstract)
         info EntityInfo
@@ -80,7 +80,7 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & mixins.Options & mixins.Name
             % Update all the component options before returning.
 
             % Get a proposal set of options
-            options = getoptions@mixins.Options(self);
+            options = getoptions@rtd.mixins.Options(self);
 
             % Get all the component options
             options.component_options = WorldEntity.get_componentoptions(options.components, self);
@@ -126,11 +126,11 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & mixins.Options & mixins.Name
                 component_classnames
                 components = component_classnames
             end
-            % Generate an entry for each field which is of type mixins.Options
+            % Generate an entry for each field which is of type rtd.mixins.Options
             fields = fieldnames(component_classnames).';
             componentoptions = struct;
             for fieldname = fields
-                if ismember('mixins.Options', superclasses(components.(fieldname{1})))
+                if ismember('rtd.mixins.Options', superclasses(components.(fieldname{1})))
                     try
                         componentoptions.(fieldname{1}) ...
                             = components.(fieldname{1}).getoptions();

@@ -1,4 +1,4 @@
-classdef EntityInfo < mixins.UUID & handle
+classdef EntityInfo < rtd.mixins.UUID & handle
     % EntityInfo This might go later
     properties (Abstract)
         dimension double {mustBeMember(dimension,[2, 3])}

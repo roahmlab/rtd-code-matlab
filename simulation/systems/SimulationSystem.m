@@ -1,8 +1,8 @@
-classdef SimulationSystem < mixins.UUID & handle
+classdef SimulationSystem < rtd.mixins.UUID & handle
     properties (Abstract)
         time (1,:) double
         time_discretization (1,1) double
-        system_log containers.VarLogger
+        system_log rtd.containers.VarLogger
     end
     methods (Abstract)
         reset(self)

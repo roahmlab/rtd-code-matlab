@@ -1,9 +1,9 @@
-classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & mixins.NamedClass & mixins.Options & handle
+classdef RandomArmConfigurationGoal < PatchVisualObject & SimulationSystem & rtd.mixins.NamedClass & rtd.mixins.Options & handle
     % Required properties from SimulationSystem
     properties
         time = 0
         time_discretization = 0.1
-        system_log = containers.VarLogger.empty()
+        system_log = rtd.containers.VarLogger.empty()
     end
     % Required properties from PatchVisualObject
     properties

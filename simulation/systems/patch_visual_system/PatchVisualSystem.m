@@ -1,4 +1,4 @@
-classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Options & handle
+classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixins.Options & handle
     % TODO incorporate axes so that it's actually plotting everything
     % without deleting stuff or requiring hold on
     
@@ -6,7 +6,7 @@ classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Optio
     properties
         time = 0
         time_discretization = 0.1
-        system_log = containers.VarLogger.empty()
+        system_log = rtd.containers.VarLogger.empty()
     end
     % Additional properties we add
     properties
@@ -62,7 +62,7 @@ classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Optio
             
             % if we're going to log, set it up
             %if options.log_collisions
-            %    self.system_log = containers.VarLogger('contactPairs');
+            %    self.system_log = rtd.containers.VarLogger('contactPairs');
             %end
             
             % Set up verbose output
@@ -78,7 +78,15 @@ classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Optio
 
             % Set camlight flag
             self.enable_camlight = options.enable_camlight;
+            
+            % Create a new figure if the current figure handle is bad.
+            self.validateOrCreateFigure()
 
+            % Reset pause flag
+            self.pause_requested = false;
+        end
+        
+        function validateOrCreateFigure(self)
             % Create a new figure if the current figure handle is bad.
             if isempty(self.figure_handle) || ...
                     ~isvalid(self.figure_handle) || ...
@@ -87,10 +95,7 @@ classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Optio
                 view(3);
                 set(self.figure_handle,'KeyPressFcn',@self.set_pause);
             end
-
-            % Reset pause flag
-            self.pause_requested = false;
-        end
+        end    
         
         function addObjects(self, objects)
             arguments
@@ -173,6 +178,8 @@ classdef PatchVisualSystem < SimulationSystem & mixins.NamedClass & mixins.Optio
                 self
                 time = self.time(end)
             end
+            % if the figure handle is deleted, recreate it
+            self.validateOrCreateFigure()
             % set the active figure
             set(0, 'CurrentFigure', self.figure_handle)
             % Save the camera view

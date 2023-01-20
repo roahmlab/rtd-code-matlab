@@ -1,4 +1,4 @@
-classdef BoxPatchVisual < PatchVisualObject & mixins.NamedClass & mixins.Options & handle
+classdef BoxPatchVisual < PatchVisualObject & rtd.mixins.NamedClass & rtd.mixins.Options & handle
     
     
     % Leftover Old Dependencies
