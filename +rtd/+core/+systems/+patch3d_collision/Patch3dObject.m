@@ -1,4 +1,4 @@
-classdef Patch3dObject < rtd.mixins.UUID
+classdef Patch3dObject < rtd.core.mixins.UUID
     properties
         parent_uuid
         faces(:,:) uint32
@@ -26,8 +26,8 @@ classdef Patch3dObject < rtd.mixins.UUID
         
         function [collision, pair] = inCollision(self, other)
             arguments
-                self Patch3dObject
-                other Patch3dObject
+                self rtd.core.systems.patch3d_collision.Patch3dObject
+                other rtd.core.systems.patch3d_collision.Patch3dObject
             end
             % Don't check collision if they share the same parent_uuid
             if strcmp(self.parent_uuid, other.parent_uuid)
@@ -70,8 +70,8 @@ end
 % Introduced for compat to retain parity with original
 function out = check_centers(patch3dObject_centers, patch3dObject_check)
     arguments
-        patch3dObject_centers Patch3dObject
-        patch3dObject_check Patch3dObject
+        patch3dObject_centers rtd.core.systems.patch3d_collision.Patch3dObject
+        patch3dObject_check rtd.core.systems.patch3d_collision.Patch3dObject
     end
     out = false;
     start = 1;

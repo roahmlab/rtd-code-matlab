@@ -8,7 +8,7 @@ classdef PatchVisualObject < matlab.mixin.Heterogeneous & handle
     % Make it so we can initialize it
     methods (Static, Sealed, Access = protected)
         function default_object = getDefaultScalarElement
-            default_object = EmptyPatchVisualObject;
+            default_object = rtd.core.systems.patch_visual.EmptyPatchVisualObject;
         end
     end
 end

@@ -59,7 +59,7 @@ classdef Options < handle
             %     struct: Optional copy of the merged `instanceOptions`.
             %
             arguments
-                self rtd.mixins.Options
+                self rtd.core.mixins.Options
             end
             arguments (Repeating)
                 newOptions struct

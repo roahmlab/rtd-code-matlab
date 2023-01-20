@@ -1,14 +1,17 @@
-classdef EmptyPatch3dDynamicObject < Patch3dDynamicObject & handle
+classdef EmptyPatchVisualObject < rtd.core.systems.patch_visual.PatchVisualObject & handle
+    properties
+        plot_data = struct.empty()
+    end
     methods
         % Get the Patch3dObject for whatever options.
         % Must have an Name-Value pair to specify a time.
         % should return a Patch3dObject!
-        function out = getCollisionObject(self,options)
+        function plot(self,options)
             arguments
                 self
                 options.time = 0
             end
-            out = Patch3dObject;
+            % NOP
         end
     end
 end

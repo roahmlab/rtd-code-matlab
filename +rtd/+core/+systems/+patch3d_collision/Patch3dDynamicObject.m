@@ -8,7 +8,7 @@ classdef Patch3dDynamicObject < matlab.mixin.Heterogeneous & handle
     % Make it so we can initialize it
     methods (Static, Sealed, Access = protected)
         function default_object = getDefaultScalarElement
-            default_object = EmptyPatch3dDynamicObject;
+            default_object = rtd.core.systems.patch3d_collision.EmptyPatch3dDynamicObject;
         end
     end
 end

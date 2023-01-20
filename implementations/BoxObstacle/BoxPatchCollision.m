@@ -1,4 +1,4 @@
-classdef BoxPatchCollision < Patch3dDynamicObject & rtd.mixins.NamedClass & handle
+classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicObject & rtd.core.mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies
@@ -92,7 +92,7 @@ classdef BoxPatchCollision < Patch3dDynamicObject & rtd.mixins.NamedClass & hand
             
             % Create the Patch3dObject object
             uuid = self.box_info.uuid;
-            out = Patch3dObject(uuid, F, V);
+            out = rtd.core.systems.patch3d_collision.Patch3dObject(uuid, F, V);
             % add centers
             out.centers = shift;
         end

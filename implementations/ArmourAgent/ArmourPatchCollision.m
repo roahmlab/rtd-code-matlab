@@ -1,4 +1,4 @@
-classdef ArmourPatchCollision < Patch3dDynamicObject & rtd.mixins.NamedClass & handle
+classdef ArmourPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicObject & rtd.core.mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies
@@ -115,7 +115,7 @@ classdef ArmourPatchCollision < Patch3dDynamicObject & rtd.mixins.NamedClass & h
             V_cell = self.collision_patch_data.vertices ;
             
             % Create the Patch3dObject object
-            out = Patch3dObject;
+            out = rtd.core.systems.patch3d_collision.Patch3dObject;
             out.parent_uuid = self.arm_info.uuid;
 
             switch self.arm_info.dimension

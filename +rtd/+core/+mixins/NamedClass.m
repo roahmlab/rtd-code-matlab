@@ -4,7 +4,7 @@ classdef NamedClass < handle
 % It pulls the classname and packagename the class is under and saves them.
 % With those saved names, it has a verbose logging capability which we can
 % specify levels of verbosity for. It follows a subset of the log4j log
-% levels defined in :mat:class:`+rtd.+types.LogLevel`. The log levels can
+% levels defined in :mat:class:`+rtd.+core.+types.LogLevel`. The log levels can
 % also be set by its name string.
 %
 % --- More Info ---
@@ -12,7 +12,7 @@ classdef NamedClass < handle
 % Written: 2022-10-05
 % Last Revised: 2023-01-19 (Adam Li)
 %
-% See also rtd.types.LogLevel
+% See also rtd.core.types.LogLevel
 %
 % --- More Info ---
 %
@@ -36,7 +36,7 @@ classdef NamedClass < handle
         tablevel(1,1) uint8 = 0
         
         % Log level of the class.
-        verboseLevel(1,1) rtd.types.LogLevel = 'OFF'
+        verboseLevel(1,1) rtd.core.types.LogLevel = 'OFF'
     end
     
     methods
@@ -66,7 +66,7 @@ classdef NamedClass < handle
             %
             % Arguments:
             %     output (String): The string to display if the log level is verbose enough
-            %     level (String, rtd.types.LogLevel): The level of the message
+            %     level (String, rtd.core.types.LogLevel): The level of the message
             %     options: Keyword arguments. See Below.
             % 
             % Keyword Arguments:
@@ -75,9 +75,9 @@ classdef NamedClass < handle
             %     tablevel (uint8): Overrides the tablevel property of the class
             %
             arguments
-                self rtd.mixins.NamedClass
+                self rtd.core.mixins.NamedClass
                 output {mustBeTextScalar}
-                level(1,1) rtd.types.LogLevel = 'DEBUG'
+                level(1,1) rtd.core.types.LogLevel = 'DEBUG'
                 options.wait(1,1) logical = false
                 options.show_packagename(1,1) logical = self.show_packagename
                 options.tablevel(1,1) uint8 = self.tablevel
@@ -108,11 +108,11 @@ classdef NamedClass < handle
             % Set the verbosity of the current class's output
             %
             % Arguments:
-            %     level (String, rtd.types.LogLevel): The level of the current class
+            %     level (String, rtd.core.types.LogLevel): The level of the current class
             %
             arguments
-                self rtd.mixins.NamedClass
-                level(1,1) rtd.types.LogLevel
+                self rtd.core.mixins.NamedClass
+                level(1,1) rtd.core.types.LogLevel
             end
             % Change the verbose level
             self.verboseLevel = level;
@@ -122,7 +122,7 @@ classdef NamedClass < handle
             % Get the verbosity of the current class's output
             %
             % Returns:
-            %     rtd.types.LogLevel: The level of the current class
+            %     rtd.core.types.LogLevel: The level of the current class
             %
             vlevel = self.verboseLevel;
         end

@@ -9,6 +9,14 @@ RTD Simulation Reference
    components
    systems
 
+Simulation
+----------
+.. mat:autoclass:: +rtd.+core.Simulation
+   :show-inheritance:
+   :members:
+   :undoc-members:
+
+
 * :ref:`genindex`
 * :ref:`mat-modindex`
 * :ref:`search`

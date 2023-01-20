@@ -1,4 +1,4 @@
-classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixins.Options & handle
+classdef PatchVisualSystem < rtd.core.systems.SimulationSystem & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
     % TODO incorporate axes so that it's actually plotting everything
     % without deleting stuff or requiring hold on
     
@@ -6,12 +6,12 @@ classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixi
     properties
         time = 0
         time_discretization = 0.1
-        system_log = rtd.containers.VarLogger.empty()
+        system_log = rtd.core.containers.VarLogger.empty()
     end
     % Additional properties we add
     properties
-        static_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
-        dynamic_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
+        static_objects (1,:) rtd.core.systems.patch_visual.PatchVisualObject = rtd.core.systems.patch_visual.PatchVisualObject.empty()
+        dynamic_objects (1,:) rtd.core.systems.patch_visual.PatchVisualObject = rtd.core.systems.patch_visual.PatchVisualObject.empty()
         draw_time = 0.05
         figure_handle
         pause_requested = false;
@@ -32,8 +32,8 @@ classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixi
     methods
         function self = PatchVisualSystem(objects, optionsStruct, options)
             arguments
-                objects.static_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
-                objects.dynamic_objects (1,:) PatchVisualObject = PatchVisualObject.empty()
+                objects.static_objects (1,:) rtd.core.systems.patch_visual.PatchVisualObject = rtd.core.systems.patch_visual.PatchVisualObject.empty()
+                objects.dynamic_objects (1,:) rtd.core.systems.patch_visual.PatchVisualObject = rtd.core.systems.patch_visual.PatchVisualObject.empty()
                 optionsStruct.optionsStruct struct = struct()
                 options.time_discretization
                 options.enable_camlight
@@ -62,7 +62,7 @@ classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixi
             
             % if we're going to log, set it up
             %if options.log_collisions
-            %    self.system_log = rtd.containers.VarLogger('contactPairs');
+            %    self.system_log = rtd.core.containers.VarLogger('contactPairs');
             %end
             
             % Set up verbose output
@@ -73,8 +73,8 @@ classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixi
             self.time_discretization = options.time_discretization;
             
             % Clear all the stored objects
-            self.static_objects = PatchVisualObject.empty();
-            self.dynamic_objects = PatchVisualObject.empty();
+            self.static_objects = rtd.core.systems.patch_visual.PatchVisualObject.empty();
+            self.dynamic_objects = rtd.core.systems.patch_visual.PatchVisualObject.empty();
 
             % Set camlight flag
             self.enable_camlight = options.enable_camlight;
@@ -99,9 +99,9 @@ classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixi
         
         function addObjects(self, objects)
             arguments
-                self PatchVisualSystem
-                objects.static (1,:) PatchVisualObject = PatchVisualObject.empty()
-                objects.dynamic (1,:) PatchVisualObject = PatchVisualObject.empty()
+                self rtd.core.systems.patch_visual.PatchVisualSystem
+                objects.static (1,:) rtd.core.systems.patch_visual.PatchVisualObject = rtd.core.systems.patch_visual.PatchVisualObject.empty()
+                objects.dynamic (1,:) rtd.core.systems.patch_visual.PatchVisualObject = rtd.core.systems.patch_visual.PatchVisualObject.empty()
             end
             % Merge the objects in
             self.static_objects = [self.static_objects, objects.static];
@@ -110,7 +110,7 @@ classdef PatchVisualSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixi
         
         function remove(self, object)
             arguments
-                self PatchVisualSystem
+                self rtd.core.systems.patch_visual.PatchVisualSystem
             end
             arguments (Repeating)
                 object (1,1)

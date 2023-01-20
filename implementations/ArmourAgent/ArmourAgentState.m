@@ -1,4 +1,4 @@
-classdef ArmourAgentState < EntityStateComponent & rtd.mixins.NamedClass & rtd.mixins.Options & handle
+classdef ArmourAgentState < EntityStateComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
     
     % Old functions
     % rand_range

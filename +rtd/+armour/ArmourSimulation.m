@@ -1,12 +1,11 @@
-classdef ArmourSimulation < Simulation & handle
+classdef ArmourSimulation < rtd.core.Simulation & handle
     properties
         simulation_timestep = 0.5
         world = struct
         world_by_uuid = struct
         entities
         %systems
-        simulation_state SimulationState = SimulationState.INVALID
-        simulation_log rtd.containers.VarLogger = rtd.containers.VarLogger.empty()
+        simulation_log rtd.core.containers.VarLogger = rtd.core.containers.VarLogger.empty()
     end
     properties
         agent
@@ -28,13 +27,13 @@ classdef ArmourSimulation < Simulation & handle
                 optionsStruct struct = struct()
                 options.simulation_timestep
             end
-            self.simulation_state = SimulationState.CONSTRUCTED;
+            self.simulation_state = 'CONSTRUCTED';
         end
         
         % Add object
         function add_object(self, object, options)
             arguments
-                self ArmourSimulation
+                self rtd.armour.ArmourSimulation
                 object
                 options.isentity = false
                 options.update_name = false
@@ -93,19 +92,19 @@ classdef ArmourSimulation < Simulation & handle
         
         function setup(self, agent)
             arguments
-                self ArmourSimulation
+                self rtd.armour.ArmourSimulation
                 agent ArmourAgent
             end
-            if self.simulation_state > SimulationState.SETTING_UP
+            if self.simulation_state > "SETTING_UP"
                 self.world = struct;
                 self.entities = [];
             end
-            self.simulation_state = SimulationState.SETTING_UP;
+            self.simulation_state = 'SETTING_UP';
             
             self.agent = agent;
             % Initialize the visual and collision systems
-            self.visual_system = PatchVisualSystem;
-            self.collision_system = Patch3dCollisionSystem(time_discretization=0.01);
+            self.visual_system = rtd.core.systems.patch_visual.PatchVisualSystem;
+            self.collision_system = rtd.core.systems.patch3d_collision.Patch3dCollisionSystem(time_discretization=0.01);
             %self.systems = {self.visual_system, self.collision_system};
             
             % add the agent
@@ -146,16 +145,16 @@ classdef ArmourSimulation < Simulation & handle
             % For other simulations, you might want to validate keys and
             % manually add them to ensure the summary section works as
             % expected.
-            self.simulation_log = rtd.containers.VarLogger(validate_keys=false);
+            self.simulation_log = rtd.core.containers.VarLogger(validate_keys=false);
 
-            self.simulation_state = SimulationState.SETUP_READY;
+            self.simulation_state = 'SETUP_READY';
         end
         
         function initialize(self)
-            if self.simulation_state > SimulationState.INITIALIZING
+            if self.simulation_state > "INITIALIZING"
                 %error("This simulation currently does not support reinitialization without resetup");
             end
-            self.simulation_state = SimulationState.INITIALIZING;
+            self.simulation_state = 'INITIALIZING';
 
             % A lot of temporaries
             timeout = 10;
@@ -219,10 +218,10 @@ classdef ArmourSimulation < Simulation & handle
             % redraw
             self.visual_system.redraw();
             
-            self.simulation_state = SimulationState.READY;
+            self.simulation_state = 'READY';
         end
         function info = pre_step(self)
-            self.simulation_state = SimulationState.PRE_STEP;
+            self.simulation_state = 'PRE_STEP';
             
             % CALL PLANNER
             info = struct;
@@ -231,7 +230,7 @@ classdef ArmourSimulation < Simulation & handle
             notify(self, 'PreStep')
         end
         function info = step(self)
-            self.simulation_state = SimulationState.STEP;
+            self.simulation_state = 'STEP';
             
             % Update entities
             agent_results = self.agent.update(self.simulation_timestep);
@@ -252,7 +251,7 @@ classdef ArmourSimulation < Simulation & handle
             notify(self, 'Step')
         end
         function info = post_step(self)
-            self.simulation_state = SimulationState.POST_STEP;
+            self.simulation_state = 'POST_STEP';
             % Check if goal was achieved
             goal = self.goal_system.updateGoal(self.simulation_timestep);
             pause_requested = self.visual_system.updateVisual(self.simulation_timestep);
@@ -266,7 +265,7 @@ classdef ArmourSimulation < Simulation & handle
         end
         function run(self, options)
             arguments
-                self ArmourSimulation
+                self rtd.armour.ArmourSimulation
                 options.max_steps = 1e8
                 options.max_time = Inf
                 options.pre_step_callback cell = {}

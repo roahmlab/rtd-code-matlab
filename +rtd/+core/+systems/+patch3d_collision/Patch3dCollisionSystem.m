@@ -1,14 +1,14 @@
-classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd.mixins.Options & handle
+classdef Patch3dCollisionSystem < rtd.core.systems.SimulationSystem & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
     % Required inherited properties
     properties
         time = 0
         time_discretization = 0.1
-        system_log = rtd.containers.VarLogger.empty()
+        system_log = rtd.core.containers.VarLogger.empty()
     end
     % Additional properties we add
     properties
-        static_objects (1,:) Patch3dObject = Patch3dObject.empty()
-        dynamic_objects (1,:) Patch3dDynamicObject = Patch3dDynamicObject.empty()
+        static_objects (1,:) rtd.core.systems.patch3d_collision.Patch3dObject = rtd.core.systems.patch3d_collision.Patch3dObject.empty()
+        dynamic_objects (1,:) rtd.core.systems.patch3d_collision.Patch3dDynamicObject = rtd.core.systems.patch3d_collision.Patch3dDynamicObject.empty()
     end
     
     % Default Options
@@ -24,8 +24,8 @@ classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd
     methods
         function self = Patch3dCollisionSystem(objects, optionsStruct, options)
             arguments
-                objects.static_objects (1,:) Patch3dObject = Patch3dObject.empty()
-                objects.dynamic_objects (1,:) Patch3dDynamicObject = Patch3dDynamicObject.empty()
+                objects.static_objects (1,:) rtd.core.systems.patch3d_collision.Patch3dObject = rtd.core.systems.patch3d_collision.Patch3dObject.empty()
+                objects.dynamic_objects (1,:) rtd.core.systems.patch3d_collision.Patch3dDynamicObject = rtd.core.systems.patch3d_collision.Patch3dDynamicObject.empty()
                 optionsStruct.options struct = struct()
                 options.time_discretization
                 options.log_collisions
@@ -55,7 +55,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd
             
             % if we're going to log, set it up
             if options.log_collisions
-                self.system_log = rtd.containers.VarLogger('contactPairs');
+                self.system_log = rtd.core.containers.VarLogger('contactPairs');
             end
             
             % Set up verbose output
@@ -66,15 +66,15 @@ classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd
             self.time_discretization = options.time_discretization;
             
             % Clear all the stored objects
-            self.static_objects = Patch3dObject.empty();
-            self.dynamic_objects = Patch3dDynamicObject.empty();
+            self.static_objects = rtd.core.systems.patch3d_collision.Patch3dObject.empty();
+            self.dynamic_objects = rtd.core.systems.patch3d_collision.Patch3dDynamicObject.empty();
         end
         
         function addObjects(self, objects)
             arguments
-                self Patch3dCollisionSystem
-                objects.static (1,:) Patch3dObject = Patch3dObject.empty()
-                objects.dynamic (1,:) Patch3dDynamicObject = Patch3dDynamicObject.empty()
+                self rtd.core.systems.patch3d_collision.Patch3dCollisionSystem
+                objects.static (1,:) rtd.core.systems.patch3d_collision.Patch3dObject = rtd.core.systems.patch3d_collision.Patch3dObject.empty()
+                objects.dynamic (1,:) rtd.core.systems.patch3d_collision.Patch3dDynamicObject = rtd.core.systems.patch3d_collision.Patch3dDynamicObject.empty()
             end
             % TODO fix assumptions
             self.static_objects = [self.static_objects, objects.static];
@@ -83,7 +83,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd
         
         function remove(self, object)
             arguments
-                self Patch3dCollisionSystem
+                self rtd.core.systems.patch3d_collision.Patch3dCollisionSystem
             end
             arguments (Repeating)
                 object (1,1)
@@ -197,7 +197,7 @@ classdef Patch3dCollisionSystem < SimulationSystem & rtd.mixins.NamedClass & rtd
                 msg = sprintf("Collision at t=%.2f detected!", time);
                 self.vdisp(msg, 'ERROR');
                 % Debug all collision pairs
-                if rtd.types.LogLevel.DEBUG > self.verboseLevel
+                if self.verboseLevel < "DEBUG"
                     self.vdisp("Collision pairs are as follows", 'DEBUG');
                     for idx = 1:contactPairs.num_pairs
                         msg = sprintf("Collision detected between %s and %s", ...

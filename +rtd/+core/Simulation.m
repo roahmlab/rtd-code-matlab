@@ -1,7 +1,10 @@
-classdef Simulation < rtd.mixins.NamedClass & handle
+classdef Simulation < rtd.core.mixins.NamedClass & handle
     % properties
     %     world_def
     % end
+    properties
+        simulation_state rtd.core.types.SimulationState = 'INVALID'
+    end
     properties (Abstract)
         simulation_timestep
     end

@@ -74,7 +74,7 @@ classdef VarLogger < handle
             %     key_names (String - Repeating): Keys for values to log
             %
             arguments
-                self rtd.containers.VarLogger
+                self rtd.core.containers.VarLogger
             end
             arguments (Repeating)
                 key_names {mustBeTextScalar}
@@ -95,7 +95,7 @@ classdef VarLogger < handle
             %     value (String - Repeating): Data to log
             %
             arguments
-                self rtd.containers.VarLogger
+                self rtd.core.containers.VarLogger
             end
             arguments (Repeating)
                 key_name {mustBeTextScalar}
@@ -127,7 +127,7 @@ classdef VarLogger < handle
             %     struct_data (struct): Data to log as a struct
             %
             arguments
-                self rtd.containers.VarLogger
+                self rtd.core.containers.VarLogger
                 struct_data struct
             end
             args = namedargs2cell(struct_data);
@@ -149,7 +149,7 @@ classdef VarLogger < handle
             %     struct or any: Struct holding the logged data or multiple output arguments with the requested log data.
             %
             arguments
-                self rtd.containers.VarLogger
+                self rtd.core.containers.VarLogger
             end
             arguments (Repeating)
                 key_name {mustBeTextScalar}

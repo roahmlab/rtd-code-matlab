@@ -1,4 +1,4 @@
-classdef GenericStateComponent < EntityStateComponent & rtd.mixins.NamedClass & rtd.mixins.Options & handle
+classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
     
     % Old functions
     % rand_range
