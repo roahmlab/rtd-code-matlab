@@ -16,7 +16,7 @@ classdef WorldModel < handle
         % Add object
         function addObject(self, object, options)
             arguments
-                self WorldModel
+                self rtd.core.world.WorldModel
                 object
                 options.type {mustBeMember(options.type,{'obstacle','agent'})} = 'obstacle'
                 options.collision = []

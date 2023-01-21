@@ -1,9 +1,9 @@
 classdef BaseDynamicsComponent < handle
     % BaseDynamicsComponent
     properties (Abstract)
-        robot_info EntityInfo
-        robot_state EntityStateComponent
-        controller BaseControllerComponent
+        robot_info rtd.core.components.BaseInfoComponent
+        robot_state rtd.core.components.BaseStateComponent
+        controller rtd.core.components.BaseControllerComponent
     end
     methods (Abstract)
         reset(self)

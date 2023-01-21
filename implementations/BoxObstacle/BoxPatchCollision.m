@@ -7,7 +7,7 @@ classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicOb
     
     properties
         box_info BoxObstacleInfo = BoxObstacleInfo.empty()
-        box_state GenericStateComponent = GenericStateComponent.empty()
+        box_state rtd.core.components.GenericEntityState = rtd.core.components.GenericEntityState.empty()
         
         collision_patch_data(1,1) struct
     end
@@ -18,7 +18,7 @@ classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicOb
         function self = BoxPatchCollision(box_info,box_state_component, verbose_level, name)
             arguments
                 box_info BoxObstacleInfo
-                box_state_component GenericStateComponent
+                box_state_component rtd.core.components.GenericEntityState
                 verbose_level = 'INFO'
                 name = ''
             end

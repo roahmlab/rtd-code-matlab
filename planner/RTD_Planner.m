@@ -16,7 +16,7 @@ classdef RTD_Planner < handle
         % the parameters or invalid signal (continue)
         trajectory = planTrajectory(self, robotState, worldState, waypoint)
             % Loops over each RTD_TrajOpt instance (thus, each trajectory
-            % type) with the given RobotState, WorldState, Waypoint, and
+            % type) with the given RobotState, rtd.core.world.WorldState, Waypoint, and
             % initial guess
 
             % From the results, selects the best valid Trajectory,

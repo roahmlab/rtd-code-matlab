@@ -1,7 +1,7 @@
-classdef EntityStateComponent < handle
+classdef BaseStateComponent < handle
     % EntityState Interface for some Entity state
     properties (Abstract)
-        entity_info EntityInfo
+        entity_info rtd.core.components.BaseInfoComponent
         % state space representation
         n_states(1,1) uint32
         state double

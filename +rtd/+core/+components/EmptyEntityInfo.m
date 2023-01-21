@@ -1,4 +1,4 @@
-classdef EmptyEntityInfo < EntityInfo & handle
+classdef EmptyEntityInfo < rtd.core.components.BaseInfoComponent & handle
     % EntityInfo This might go later
     properties
         dimension = 2

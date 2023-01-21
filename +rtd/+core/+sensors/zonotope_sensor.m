@@ -1,7 +1,7 @@
 function zonotopes = zonotope_sensor(world, agent, time)
     arguments
         world struct
-        agent WorldEntity
+        agent rtd.core.world.WorldEntity
         time = []
     end
     % flatten all objects in the world

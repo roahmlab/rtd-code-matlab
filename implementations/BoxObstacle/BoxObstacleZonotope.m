@@ -8,7 +8,7 @@ classdef BoxObstacleZonotope < rtd.core.mixins.NamedClass & handle
     
     properties
         box_info BoxObstacleInfo = BoxObstacleInfo.empty()
-        box_state GenericStateComponent = GenericStateComponent.empty()
+        box_state rtd.core.components.GenericEntityState = rtd.core.components.GenericEntityState.empty()
         
         base_zonotope
     end

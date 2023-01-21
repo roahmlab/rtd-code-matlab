@@ -22,3 +22,4 @@ Box Obstacle Entity
    :show-inheritance:
    :members:
    :undoc-members:
+

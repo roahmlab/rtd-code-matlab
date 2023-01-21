@@ -164,7 +164,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
                         
             % get current obstacles and create constraints
             P.vdisp('Running Wrapped Planner!',6)
-            worldState = WorldState;
+            worldState = rtd.core.world.WorldState;
             worldState.obstacles = world_info.obstacles;
             
             robotState = ArmRobotState;

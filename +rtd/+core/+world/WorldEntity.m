@@ -1,8 +1,8 @@
 classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.core.mixins.Options & rtd.core.mixins.NamedClass & handle
 
     properties (Abstract)
-        info EntityInfo
-        state EntityStateComponent
+        info rtd.core.components.BaseInfoComponent
+        state rtd.core.components.BaseStateComponent
     end
 
     properties (Dependent)
@@ -42,6 +42,7 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.core.mixins.Options & rt
             self.(name) = component;
         end
 
+        % TODO add inclusion, exclusion options
         function reset_components(self)
             % Get the latest options
             options = self.getoptions();
@@ -83,7 +84,7 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.core.mixins.Options & rt
             options = getoptions@rtd.core.mixins.Options(self);
 
             % Get all the component options
-            options.component_options = WorldEntity.get_componentoptions(options.components, self);
+            options.component_options = rtd.core.world.WorldEntity.get_componentoptions(options.components, self);
 
             % Merge it back into the stored options
             options = self.mergeoptions(options);
@@ -118,7 +119,7 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.core.mixins.Options & rt
 
             % Preprocess the instances for options
             component_handles = [provided_component_names; provided_components];
-            options.component_options = WorldEntity.get_componentoptions(struct(component_handles{:}));
+            options.component_options = rtd.core.world.WorldEntity.get_componentoptions(struct(component_handles{:}));
         end
 
         function componentoptions = get_componentoptions(component_classnames, components)

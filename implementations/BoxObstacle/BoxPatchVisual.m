@@ -8,7 +8,7 @@ classdef BoxPatchVisual < rtd.core.systems.patch_visual.PatchVisualObject & rtd.
     
     properties
         box_info BoxObstacleInfo = BoxObstacleInfo.empty()
-        box_state GenericStateComponent = GenericStateComponent.empty()
+        box_state rtd.core.components.GenericEntityState = rtd.core.components.GenericEntityState.empty()
         
         patch_style(1,1) struct
         plot_patch_data(1,1) struct
@@ -37,7 +37,7 @@ classdef BoxPatchVisual < rtd.core.systems.patch_visual.PatchVisualObject & rtd.
         function self = BoxPatchVisual(box_info,box_state_component,optionsStruct,options)
             arguments
                 box_info BoxObstacleInfo
-                box_state_component GenericStateComponent
+                box_state_component rtd.core.components.GenericEntityState
                 optionsStruct struct = struct()
                 options.face_color
                 options.face_opacity

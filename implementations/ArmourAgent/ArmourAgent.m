@@ -1,4 +1,4 @@
-classdef ArmourAgent < WorldEntity & handle
+classdef ArmourAgent < rtd.core.world.WorldEntity & handle
 % The Agent with the robust controller for ARMOUR
 % Left to do are the helper safety check functions like check input limits
 % and glueing this together
@@ -68,7 +68,7 @@ classdef ArmourAgent < WorldEntity & handle
     
     methods (Static)
         function options = defaultoptions()
-            options = WorldEntity.baseoptions();
+            options = rtd.core.world.WorldEntity.baseoptions();
             
             % These are the names for the default components
             components.info = 'ArmourAgentInfo';
@@ -107,7 +107,7 @@ classdef ArmourAgent < WorldEntity & handle
             end
             % Get override options based on provided components
             components.info = info;
-            override_options = WorldEntity.get_componentOverrideOptions(components);
+            override_options = rtd.core.world.WorldEntity.get_componentOverrideOptions(components);
 
             % Merge all options
             self.mergeoptions(optionsStruct.optionsStruct, options, override_options);

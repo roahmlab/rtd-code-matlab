@@ -1,4 +1,4 @@
-classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef GenericEntityState < rtd.core.components.BaseStateComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
     
     % Old functions
     % rand_range
@@ -6,7 +6,7 @@ classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedCla
     % Inherited properties that must be defined
     properties
         % General information
-        entity_info = EmptyEntityInfo.empty()
+        entity_info = rtd.core.components.EmptyEntityInfo.empty()
         
         % state space representation
         n_states = 0
@@ -24,9 +24,9 @@ classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedCla
     end
     
     methods
-        function self = GenericStateComponent(entity_info, optionsStruct, options)
+        function self = GenericEntityState(entity_info, optionsStruct, options)
             arguments
-                entity_info EntityInfo
+                entity_info rtd.core.components.BaseInfoComponent
                 optionsStruct struct = struct()
                 options.initial_state
                 options.n_states
@@ -44,7 +44,7 @@ classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedCla
         
         function reset(self, optionsStruct, options)
             arguments
-                self GenericStateComponent
+                self rtd.core.components.GenericEntityState
                 optionsStruct struct = struct()
                 options.initial_state
                 options.n_states
@@ -103,10 +103,10 @@ classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedCla
         
         function state = get_state(self, time)
             arguments
-                self GenericStateComponent
+                self rtd.core.components.GenericEntityState
                 time = self.time(end)
             end
-            state = EntityState();
+            state = rtd.core.containers.EntityState();
             
             % Default to the last time and state
             state.time = time;
@@ -126,7 +126,7 @@ classdef GenericStateComponent < EntityStateComponent & rtd.core.mixins.NamedCla
         
         function set_state(self, state, time)
             arguments
-                self GenericStateComponent
+                self rtd.core.components.GenericEntityState
                 state(:,1) double
                 time(1,:) double = self.time(end)
             end

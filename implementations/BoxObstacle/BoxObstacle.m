@@ -1,4 +1,4 @@
-classdef BoxObstacle < WorldEntity & handle
+classdef BoxObstacle < rtd.core.world.WorldEntity & handle
 % BoxObstacle
 % The Agent with the robust controller for ARMOUR
 % Left to do are the helper safety check functions like check input limits
@@ -15,7 +15,7 @@ classdef BoxObstacle < WorldEntity & handle
         
         % The changing values and their history that fully describe the
         % state of the agent at any given (valid) point in time
-        state = GenericStateComponent.empty()
+        state = rtd.core.components.GenericEntityState.empty()
     end
 
     % Specific for this entity
@@ -44,11 +44,11 @@ classdef BoxObstacle < WorldEntity & handle
     
     methods (Static)
         function options = defaultoptions()
-            options = WorldEntity.baseoptions();
+            options = rtd.core.world.WorldEntity.baseoptions();
             
             % These are the names for the default components
             components.info = 'BoxObstacleInfo';
-            components.state = 'GenericStateComponent';
+            components.state = 'rtd.core.components.GenericEntityState';
             components.collision = 'BoxPatchCollision';
             components.visual = 'BoxPatchVisual';
             components.representation = 'BoxObstacleZonotope';
@@ -85,7 +85,7 @@ classdef BoxObstacle < WorldEntity & handle
                 options.name
             end
             % Get override options based on provided components
-            override_options = WorldEntity.get_componentOverrideOptions(components);
+            override_options = rtd.core.world.WorldEntity.get_componentOverrideOptions(components);
 
             % Merge all options
             self.mergeoptions(optionsStruct.optionsStruct, options, override_options);

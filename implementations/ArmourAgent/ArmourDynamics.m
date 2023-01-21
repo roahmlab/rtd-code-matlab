@@ -1,4 +1,4 @@
-classdef ArmourDynamics < BaseDynamicsComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef ArmourDynamics < rtd.core.components.BaseDynamicsComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
     
     % Torque dynamics with optional measurement noise
     % Leftover Old Dependencies
