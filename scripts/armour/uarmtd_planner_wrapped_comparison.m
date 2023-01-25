@@ -70,7 +70,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             P.combs.combs = generate_combinations_upto(200);
             
             % Here's where the wrapper really starts
-            trajOptProps = TrajOptProps;
+            trajOptProps = rtd.planner.trajopt.TrajOptProps;
             trajOptProps.planTime = P.t_move;
             trajOptProps.horizonTime = P.t_stop;
             trajOptProps.doTimeout = false;
@@ -98,7 +98,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             use_robust_input = P.use_robust_input;
             smooth_obs = P.smooth_obstacle_constraints_flag;
             
-            P.planner = ArmourPlanner( ...
+            P.planner = armour.ArmourPlanner( ...
                     trajOptProps, robotInfo, worldInfo, ...
                     input_constraints_flag, use_robust_input, smooth_obs, P.traj_type ...
                 );
@@ -143,7 +143,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             if P.first_iter_pause_flag && P.iter == 0
                 % Create initial trajectory
                 P.vdisp('Generating initial trajectory for new planner', 6)
-                robotState = ArmRobotState;
+                robotState = rtd.entity.states.ArmRobotState;
                 robotState.time = 0.0;
                 robotState.q = q_0;
                 robotState.q_dot = q_dot_0;
@@ -178,7 +178,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             worldState = rtd.sim.world.WorldState;
             worldState.obstacles = world_info.obstacles;
             
-            robotState = ArmRobotState;
+            robotState = rtd.entity.states.ArmRobotState;
             robotState.time = agent_info.time(end);
             robotState.q = q_0;
             robotState.q_dot = q_dot_0;

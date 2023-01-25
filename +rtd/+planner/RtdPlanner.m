@@ -1,4 +1,4 @@
-classdef RTD_Planner < handle
+classdef RtdPlanner < handle
     % This class specifies the overall planner, so it sets up everything
     % for any special type of RTD_Planner.
     methods

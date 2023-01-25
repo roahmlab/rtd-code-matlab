@@ -1,8 +1,8 @@
-# Armour planner implementation example
+ Armour planner implementation example
 
 In this folder is an example reimplementation of Armour into this template.
 The extras folder then demonstrates how you might go ahead and wrap this to work with the old RTD simulator code.
-Specifically, armour_planner_wrapper will show how it can be wrapped fairly easily.
+Specifically, armour.planner_wrapper will show how it can be wrapped fairly easily.
 
 To run this code, you'll need to add to your path:
 

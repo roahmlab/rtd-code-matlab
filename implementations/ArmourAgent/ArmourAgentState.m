@@ -152,7 +152,7 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
                 self
                 time = self.time(end);
             end
-            state = ArmRobotState(self.position_indices, self.velocity_indices);
+            state = rtd.entity.states.ArmRobotState(self.position_indices, self.velocity_indices);
             
             % Default to the last time and state
             state.time = time;

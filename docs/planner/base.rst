@@ -3,30 +3,30 @@ RTD Planner Interfaces and Base Classes
 
 The core components to any mid-level RTD Planner.
 
-The RTD_Planner
+The RTD Planner
 ---------------
-.. mat:automodule:: planner
+.. mat:autoclass:: +rtd.+planner.RtdPlanner
    :show-inheritance:
    :members:
    :undoc-members:
 
 Reachable Sets Generation Interfaces
 ------------------------------------
-.. mat:automodule:: planner.reachablesets
+.. mat:automodule:: +rtd.+planner.+reachsets
    :show-inheritance:
    :members:
    :undoc-members:
 
 Trajectory Interfaces
 ---------------------
-.. mat:automodule:: planner.trajectories
+.. mat:automodule:: +rtd.+planner.+trajectory
    :show-inheritance:
    :members:
    :undoc-members:
 
-Trajectory Optimization Interfaces
-----------------------------------
-.. mat:automodule:: planner.trajopt
+Trajectory Optimization Interfaces & Components
+-----------------------------------------------
+.. mat:automodule:: +rtd.+planner.+trajopt
    :show-inheritance:
    :members:
    :undoc-members:

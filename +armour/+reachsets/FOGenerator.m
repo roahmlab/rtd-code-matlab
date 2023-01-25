@@ -1,4 +1,4 @@
-classdef ForwardOccupancy < ReachableSets
+classdef FOGenerator < rtd.planner.reachsets.ReachSetGenerator
     % ForwardOccupancy
     % This acts as a generator for a single instance of a
     % ForwardReachableSet, and return FOInstance
@@ -8,7 +8,7 @@ classdef ForwardOccupancy < ReachableSets
         smooth_obs;
     end
     methods
-        function self = ForwardOccupancy( ...
+        function self = FOGenerator( ...
                     robot, jrsHandle, smooth_obs ...
                 )
             self.robot = robot;
@@ -36,7 +36,7 @@ classdef ForwardOccupancy < ReachableSets
                end
             end
             
-            reachableSet = FOInstance(self.robot.info, R_w, p_w, FO, jrsInstance, self.smooth_obs);
+            reachableSet = armour.reachsets.FOInstance(self.robot.info, R_w, p_w, FO, jrsInstance, self.smooth_obs);
         end
     end
 end

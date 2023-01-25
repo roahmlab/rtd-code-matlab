@@ -1,4 +1,4 @@
-classdef JRSInstance < ReachableSetInstance
+classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
     % JRSInstance
     % This is just an individual instance of an original ARMTD JRS.
     properties

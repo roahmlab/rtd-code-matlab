@@ -1,4 +1,4 @@
-classdef ArmourPlanner < RTD_Planner
+classdef ArmourPlanner < rtd.planner.RtdPlanner
     properties
         %trajOptProps
         %robot
@@ -14,7 +14,7 @@ classdef ArmourPlanner < RTD_Planner
         trajopt
     end
     % This class specifies the overall planner, so it sets up everything
-    % for any special type of RTD_Planner.
+    % for any special type of rtd.planner.RtdPlanner.
     methods
         % The constructor would do the following
         % - determine RTD_TrajOpt parameters
@@ -45,11 +45,11 @@ classdef ArmourPlanner < RTD_Planner
             %smooth_obs = false;
             
             % Create our reachable sets
-            self.jrsHandle = JointReachableSetsOnline(robot, "traj_type", traj_type);
-            self.foHandle = ForwardOccupancy(robot, self.jrsHandle, smooth_obs);
+            self.jrsHandle = armour.reachsets.JRSGenerator(robot, "traj_type", traj_type);
+            self.foHandle = armour.reachsets.FOGenerator(robot, self.jrsHandle, smooth_obs);
             self.reachableSets = {self.jrsHandle, self.foHandle};
             if input_constraints_flag
-                self.irsHandle = InputReachableSet(robot, self.jrsHandle, use_robust_input);
+                self.irsHandle = armour.reachsets.IRSGenerator(robot, self.jrsHandle, use_robust_input);
                 self.reachableSets = [self.reachableSets, {self.irsHandle}];
             end
             
@@ -57,25 +57,25 @@ classdef ArmourPlanner < RTD_Planner
             if strcmp(traj_type,'orig')
                 self.trajectoryFactory = ...
                     @(varargin)...
-                    ArmTdTrajectory(...
+                    armour.trajectory.PiecewiseArmTrajectory(...
                         trajOptProps,       ...
                         varargin{:});
             else
                 self.trajectoryFactory = ...
                     @(varargin)...
-                    ArmourBernsteinTrajectory(...
+                    armour.trajectory.BernsteinArmTrajectory(...
                         trajOptProps,       ...
                         varargin{:});
             end
             
             % Create the objective
-            self.objective = GenericArmObjective(trajOptProps, self.trajectoryFactory);
+            self.objective = rtd.planner.trajopt.GenericArmObjective(trajOptProps, self.trajectoryFactory);
             
             % Selection the optimization engine
-            self.optimizationEngine = FminconOptimizationEngine(trajOptProps);
+            self.optimizationEngine = rtd.planner.trajopt.FminconOptimizationEngine(trajOptProps);
             
             % Create the trajopt object.
-            self.trajopt = {RTD_TrajOpt( ...
+            self.trajopt = {rtd.planner.trajopt.RtdTrajOpt( ...
                 trajOptProps,           ...
                 robot,              ...
                 self.reachableSets,          ...

@@ -1,5 +1,5 @@
-classdef ZeroHoldTrajectory < Trajectory
-    % ArmTdTrajectory
+classdef ZeroHoldArmTrajectory < rtd.planner.trajectory.Trajectory
+    % ZeroHoldArmTrajectory
     % The original ArmTD trajectory with peicewise accelerations
     properties (Constant)
         % Size of the trajectoryParams, we want this set for all use
@@ -11,11 +11,11 @@ classdef ZeroHoldTrajectory < Trajectory
         robotState
     end
     methods
-        % The ArmTdTrajectory constructor, which simply sets parameters and
+        % The ZeroHoldArmTrajectory constructor, which simply sets parameters and
         % attempts to call internalUpdate, a helper function made for this
         % class to update all other internal parameters once fully
         % parameterized.
-        function self = ZeroHoldTrajectory(    ...
+        function self = ZeroHoldArmTrajectory(    ...
                     robotState,             ...
                     varargin                ...
                 )
@@ -51,7 +51,7 @@ classdef ZeroHoldTrajectory < Trajectory
             % Ensure time is valid
             if t < 0
                 ME = MException('RTD:Trajectory:InvalidTime', ...
-                    'Invalid time provided to ArmTdTrajectory');
+                    'Invalid time provided to ZeroHoldArmTrajectory');
                 throw(ME)
             end
             
@@ -59,7 +59,7 @@ classdef ZeroHoldTrajectory < Trajectory
             q_dot_des = self.robotState.q*0;
 
             n_q = length(q_des);
-            command = ArmRobotState(1:n_q, n_q+1:n_q*2, n_q+1:n_q*2);
+            command = rtd.entity.states.ArmRobotState(1:n_q, n_q+1:n_q*2, n_q+1:n_q*2);
             command.time = time;
             command.state = [q_des; q_dot_des];
         end

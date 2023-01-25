@@ -118,7 +118,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             self.alpha_constant = self.LLC_wrapped.alpha_constant;
             
             % Create the initial trajectory
-            a = ZeroHoldTrajectory(self.robot_state.get_state);
+            a = armour.trajectory.ZeroHoldArmTrajectory(self.robot_state.get_state);
             self.trajectories = {a};
         end
             
@@ -126,7 +126,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         function setTrajectory(self, trajectory)
             arguments
                 self
-                trajectory Trajectory
+                trajectory rtd.planner.trajectory.Trajectory
             end
             % Add the trajectory if it is valid
             if trajectory.validate()

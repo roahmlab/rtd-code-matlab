@@ -1,4 +1,4 @@
-classdef GenericArmObjective < Objective
+classdef GenericArmObjective < rtd.planner.trajopt.Objective
     % GenericArmObjective
     % This objective generalizes the joint space objective used for ArmTD
     % and allows us to use any joint-space trajectory for ArmTD based

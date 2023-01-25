@@ -1,4 +1,4 @@
-classdef armour_planner_wrapper < robot_arm_generic_planner
+classdef planner_wrapper < robot_arm_generic_planner
     
     
     properties
@@ -50,7 +50,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
     end
     
     methods
-        function P = armour_planner_wrapper(varargin)
+        function P = planner_wrapper(varargin)
             t_move = 0.5;
             lookahead_distance = 0.4;
             HLP = robot_arm_straight_line_HLP( );
@@ -68,7 +68,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             P.combs.combs = generate_combinations_upto(200);
             
             % Here's where the wrapper really starts
-            trajOptProps = TrajOptProps;
+            trajOptProps = rtd.planner.trajopt.TrajOptProps;
             trajOptProps.planTime = P.t_move;
             trajOptProps.horizonTime = P.t_stop;
             trajOptProps.doTimeout = false;
@@ -96,7 +96,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             use_robust_input = P.use_robust_input;
             smooth_obs = P.smooth_obstacle_constraints_flag;
             
-            P.planner = ArmourPlanner( ...
+            P.planner = armour.ArmourPlanner( ...
                     trajOptProps, robotInfo, worldInfo, ...
                     input_constraints_flag, use_robust_input, smooth_obs, P.traj_type ...
                 );
@@ -138,7 +138,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             if P.first_iter_pause_flag && P.iter == 0
                 % Create initial trajectory
                 P.vdisp('Generating initial trajectory', 6)
-                robotState = ArmRobotState;
+                robotState = rtd.entity.states.ArmRobotState;
                 robotState.time = 0.0;
                 robotState.q = q_0;
                 robotState.q_dot = q_dot_0;
@@ -167,7 +167,7 @@ classdef armour_planner_wrapper < robot_arm_generic_planner
             worldState = rtd.sim.world.WorldState;
             worldState.obstacles = world_info.obstacles;
             
-            robotState = ArmRobotState;
+            robotState = rtd.entity.states.ArmRobotState;
             robotState.time = agent_info.time(end);
             robotState.q = q_0;
             robotState.q_dot = q_dot_0;

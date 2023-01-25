@@ -1,9 +1,9 @@
-classdef RTD_TrajOpt < handle & rtd.util.mixins.NamedClass
-    % RTD_TrajOpt
+classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
+    % RtdTrajOpt
     % This object handles the necessary calls to perform the actual
     % trajectory optimization when requested.
     properties
-        trajOptProps TrajOptProps
+        trajOptProps rtd.planner.trajopt.TrajOptProps
     end
     % Make protected later (Debate).
     properties%(Access = 'protected')
@@ -18,7 +18,7 @@ classdef RTD_TrajOpt < handle & rtd.util.mixins.NamedClass
         % This should encapsulate the main trajectory optimization
         % aspection of RTD & ideally need very little specialization
         % between versions.
-        function self = RTD_TrajOpt(    ...
+        function self = RtdTrajOpt(    ...
                     trajOptProps,       ...
                     robotInfo,          ...
                     reachableSets,      ...

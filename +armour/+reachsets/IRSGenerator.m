@@ -1,4 +1,4 @@
-classdef InputReachableSet < ReachableSets & rtd.util.mixins.NamedClass
+classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixins.NamedClass
     % InputReachableSet
     % This generates the upper and lower bound reachable sets on the input,
     % and creates an IRSInstance object.
@@ -8,7 +8,7 @@ classdef InputReachableSet < ReachableSets & rtd.util.mixins.NamedClass
         use_robust_input
     end
     methods
-        function self = InputReachableSet( ...
+        function self = IRSGenerator( ...
                     robot, jrsHandle, use_robust_input ...
                 )
             self.robot = robot;
@@ -130,7 +130,7 @@ classdef InputReachableSet < ReachableSets & rtd.util.mixins.NamedClass
             end
             
             % Save the generated reachable sets into the IRSInstance
-            reachableSet = IRSInstance(u_ub, u_lb, jrsInstance);
+            reachableSet = armour.reachsets.IRSInstance(u_ub, u_lb, jrsInstance);
         end
     end
 end

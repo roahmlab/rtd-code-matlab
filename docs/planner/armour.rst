@@ -8,28 +8,21 @@ requires the use of the matching robust controller.
 
 The Base ARMOUR Planner
 -----------------------
-.. mat:automodule:: implementations.ArmourPlanner
+.. mat:autoclass:: +armour.ArmourPlanner
    :show-inheritance:
    :members:
    :undoc-members:
 
 Reachable Sets Generation
 -------------------------
-.. mat:automodule:: implementations.ArmourPlanner.reachablesets
+.. mat:automodule:: +armour.+reachsets
    :show-inheritance:
    :members:
    :undoc-members:
 
 Trajectory Types
 ----------------
-.. mat:automodule:: implementations.ArmourPlanner.trajectories
-   :show-inheritance:
-   :members:
-   :undoc-members:
-
-Trajectory Optimization Components
-----------------------------------
-.. mat:automodule:: implementations.ArmourPlanner.trajopt
+.. mat:automodule:: +armour.+trajectory
    :show-inheritance:
    :members:
    :undoc-members:

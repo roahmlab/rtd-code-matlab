@@ -1,4 +1,4 @@
-classdef JointReachableSetsOnline < ReachableSets & rtd.util.mixins.NamedClass
+classdef JRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixins.NamedClass
     % JointReachableSetsOnline
     % This does the online computation of joint reachable sets. It then
     % generates a JRSInstance object.
@@ -9,7 +9,7 @@ classdef JointReachableSetsOnline < ReachableSets & rtd.util.mixins.NamedClass
         traj_type
     end
     methods
-        function self = JointReachableSetsOnline( ...
+        function self = JRSGenerator( ...
                     robot, options ...
                 )
                 arguments
@@ -33,7 +33,7 @@ classdef JointReachableSetsOnline < ReachableSets & rtd.util.mixins.NamedClass
             % The way I choose to wrap this is not the way it has to be
             % done. I choose to have it create the object first, then
             % initialize the remaining properties from this loaded data.
-            rs = JRSInstance;
+            rs = armour.reachsets.JRSInstance;
             
             self.vdisp("Following message is from create_jrs_online");
             % Generate it online as per the original implementation

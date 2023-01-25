@@ -1,11 +1,11 @@
-classdef FminconOptimizationEngine < OptimizationEngine
+classdef FminconOptimizationEngine < rtd.planner.trajopt.OptimizationEngine
     % FminconOptimizationEngine
     % This class wraps the fmincon call to the format expected for
     % OptimizationEngin subclasses. It includes our recommended default
     % fmincon options and handles optimization timeout if requested.
     properties
         % general trajectory optimiation properties
-        trajOptProps TrajOptProps
+        trajOptProps rtd.planner.trajopt.TrajOptProps
         % Fmincon options
         options
     end

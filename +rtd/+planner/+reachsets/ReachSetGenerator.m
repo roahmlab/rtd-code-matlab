@@ -1,4 +1,4 @@
-classdef ReachableSets < handle
+classdef ReachSetGenerator < handle
     % ReachableSets
     % This either encapsulates the reachable sets in memory, or enables the
     % online computation of reachable sets. It acts as a generator for a

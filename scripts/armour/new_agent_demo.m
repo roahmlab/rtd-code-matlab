@@ -86,7 +86,7 @@ disp("press enter to continue")
 pause
 
 %% Interface of Planner should improve
-trajOptProps = TrajOptProps;
+trajOptProps = rtd.planner.trajopt.TrajOptProps;
 trajOptProps.planTime = 0.5;
 trajOptProps.horizonTime = 1.0;
 trajOptProps.doTimeout = false;
@@ -94,13 +94,13 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = false;
-use_robust_input = false;
+input_constraints_flag = true;
+use_robust_input = true;
 smooth_obs = false;
 
-planner = ArmourPlanner( ...
+planner = armour.ArmourPlanner( ...
         trajOptProps, sim.agent, ...
-        input_constraints_flag, use_robust_input, smooth_obs, 'orig' ...
+        input_constraints_flag, use_robust_input, smooth_obs, 'bernstein' ...
     );
 
 %% HLP stuff to migrate

@@ -11,7 +11,7 @@ classdef Trajectory < handle
     properties
         % Properties from the trajectory optimization, which also describe
         % properties for the trajectory.
-        trajOptProps TrajOptProps
+        trajOptProps rtd.planner.trajopt.TrajOptProps
         % The parameters used for the trajectory
         trajectoryParams {mustBeNumeric}
         % The initial state for the trajectory

@@ -1,22 +1,18 @@
-classdef ArmTdTrajectory < Trajectory
-    % ArmTdTrajectory
-    % The original ArmTD trajectory with peicewise accelerations
+classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
+    % BernsteinArmTrajectory
+    % This encapsulates the conversion of parameters used in optimization
+    % to the actual trajectory generated from those parameters. It's also
+    % indirectly used to specify the OptimizationEngine's size
     properties (Constant)
         % Size of the trajectoryParams, we want this set for all use
         param_shape = 7; % This already needs a change!
-        % TODO - update to add dynamic parameter as an option
     end
     properties
         % Initial parameters from the robot used to calculate the desired
         % trajectory
-        q_0            {mustBeNumeric}
-        q_dot_0        {mustBeNumeric}
-        q_ddot_0       {mustBeNumeric}
-        % Precomputed for stopping
-        q_peak         {mustBeNumeric}
-        q_dot_peak     {mustBeNumeric}
-        q_ddot_to_stop {mustBeNumeric}
-        q_end          {mustBeNumeric}
+        n_q     {mustBeNumeric, mustBeScalarOrEmpty}
+        alpha   {mustBeNumeric}
+        q_end   {mustBeNumeric}
         % I flatten these out for simplicity, but startState is updated to
         % include these following handles too.
         % The JRS which contains the center and range to scale the
@@ -26,32 +22,31 @@ classdef ArmTdTrajectory < Trajectory
         robotState
     end
     methods
-        % The ArmTdTrajectory constructor, which simply sets parameters and
-        % attempts to call internalUpdate, a helper function made for this
-        % class to update all other internal parameters once fully
-        % parameterized.
-        function self = ArmTdTrajectory(    ...
-                    trajOptProps,           ...
-                    robotState,             ...
-                    rsInstances,            ...
-                    trajectoryParams,       ...
-                    varargin                ...
+        % An example constructor for the trajectory object. Should be
+        % implemented with varargin
+        function self = BernsteinArmTrajectory(     ...
+                    trajOptProps,       ...
+                    robotState,         ...
+                    rsInstances,        ...
+                    trajectoryParams,   ...
+                    varargin            ...
                 )
             % Always requires this (find way to add to parent)
             self.trajOptProps = trajOptProps;
             
             % Check for each of the args and update.
             if exist('robotState','var')
-                if ~isa(robotState, 'ArmRobotState')
-                    error('Robot must inherit an ArmRobotState to use ArmTdTrajectory');
+                if ~isa(robotState, 'rtd.entity.states.ArmRobotState')
+                    error('Robot must inherit an rtd.entity.states.ArmRobotState to use BernsteinArmTrajectory');
                 end
                 self.robotState = robotState;
             end
-
+            
+            % Look for the JRS
             if exist('rsInstances','var')
                 % Look for the JRS
                 for i = 1:length(rsInstances)
-                    if isa(rsInstances{i}, 'JRSInstance')
+                    if isa(rsInstances{i}, 'armour.reachsets.JRSInstance')
                         self.jrsInstance = rsInstances{i};
                     end
                 end
@@ -61,7 +56,8 @@ classdef ArmTdTrajectory < Trajectory
                     error('No handle for a JRSInstance was found');
                 end
             end
-            
+
+            % Set parameters
             if exist('trajectoryParams','var')
                 self.trajectoryParams = trajectoryParams;
             end
@@ -70,8 +66,8 @@ classdef ArmTdTrajectory < Trajectory
             self.internalUpdate();
         end
         
-        % Set the parameters of the trajectory, with a focus on the
-        % parameters as the state should be set from the constructor.
+        % A validated method to set the parameters for the trajectory.
+        % Should be implemented with a varargin.
         function setTrajectory(         ...
                     self,               ...
                     trajectoryParams,   ...
@@ -99,8 +95,8 @@ classdef ArmTdTrajectory < Trajectory
             end
 
             if exist('robotState','var')
-                if ~isa(robotState, 'ArmRobotState')
-                    error('Robot must inherit an ArmRobotState to use ArmTdTrajectory');
+                if ~isa(robotState, 'rtd.entity.states.ArmRobotState')
+                    error('Robot must inherit an rtd.entity.states.ArmRobotState to use BernsteinArmTrajectory');
                 end
                 self.robotState = robotState;
             end
@@ -124,7 +120,7 @@ classdef ArmTdTrajectory < Trajectory
                 throw(errMsg)
             end
         end
-        
+
         % Update internal parameters to reduce long term calculations.
         function internalUpdate(self)
             % internal update if valid
@@ -136,80 +132,89 @@ classdef ArmTdTrajectory < Trajectory
             % Required parameters from parent classes
             self.startState.robotState = self.robotState;
             self.startState.jrsInstance = self.jrsInstance;
-            
+
             % Parameters of our class
-            self.q_0 = self.robotState.q;
-            self.q_dot_0 = self.robotState.q_dot;
-            self.q_ddot_0 = self.robotState.q_ddot;
-            
-            % Precompute peak and stop parameters
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.parameter_range;
-            k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            q_goal = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            %q_goal = self.jrsInstance.jrs_info.c_k_bernstein + self.jrsInstance.jrs_info.g_k_bernstein.*self.trajectoryParams;
+            self.n_q = length(self.robotState.q);
+            self.alpha = zeros(self.n_q, 6);
+            for j = 1:self.n_q  % Modified to use matrix instead of cells
+                beta = match_deg5_bernstein_coefficients({...
+                    self.robotState.q(j); ...
+                    self.robotState.q_dot(j); ...
+                    self.robotState.q_ddot(j); ...
+                    q_goal(j); ...
+                    0; 0});
+                self.alpha(j,:) = cell2mat(bernstein_to_poly(beta, 5));
+            end
             
-            self.q_peak = self.q_0 + ...
-                self.q_dot_0 * self.trajOptProps.planTime + ...
-                (1/2) * k_scaled * self.trajOptProps.planTime^2;
-            self.q_dot_peak = self.q_dot_0 + ...
-                k_scaled * self.trajOptProps.planTime;
-            self.q_ddot_to_stop = (0-self.q_dot_peak) / ...
-                (self.trajOptProps.horizonTime - self.trajOptProps.planTime);
-            self.q_end = self.q_peak + ...
-                self.q_dot_peak * self.trajOptProps.planTime + ...
-                (1/2) * self.q_ddot_to_stop * self.trajOptProps.planTime^2;
+            % Precompute end position
+            % Adapted Original
+            % End position should actually just be q_goal
+            %self.q_end = zeros(self.n_q, 1);
+            %for j = 1:self.n_q
+            %    for coeff_idx = 0:5
+            %        self.q_end(j) = self.q_end(j) + ...
+            %            self.alpha(j,coeff_idx+1) * self.trajOptProps.horizonTime^coeff_idx;
+            %    end
+            %end
+            self.q_end = q_goal;
+            % Proposed vectorized implementation
+            %self.q_end = sum(self.alpha.*(trajOptProps.horizon.^(0:5)),2);
         end
         
         % Computes the actual input commands for the given time.
         % throws RTD:InvalidTrajectory if the trajectory isn't set
-        % throws RTD:Trajectory:InvalidTime if the time is before the
-        % trajectory exists
         % TODO: write in a vectorized manner
         function command = getCommand(self, time)
-            % Validate, if invalid, throw
-            self.validate(true);
             % TODO: throw invalid trajectory
             t = time - self.robotState.time;
-            
-            out = self.jrsInstance.output_range;
-            in = self.jrsInstance.parameter_range;
-            k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             
             % Ensure time is valid
             if t < 0
                 ME = MException('RTD:Trajectory:InvalidTime', ...
-                    'Invalid time provided to ArmTdTrajectory');
+                    'Invalid time provided to BernsteinArmTrajectory');
                 throw(ME)
-                
-            % First half of the trajectory
-            elseif t < self.trajOptProps.planTime
-                q_des = self.q_0 + ...
-                    self.q_dot_0 * t + ...
-                    (1/2) * k_scaled * t^2;
-                q_dot_des = self.q_dot_0 + ...
-                    k_scaled * t;
-                q_ddot_des = k_scaled;
             
-            % Second half of the trajectory
+            % Valid time of trajectory
             elseif t < self.trajOptProps.horizonTime
-                % Shift time for ease
-                t = t - self.trajOptProps.planTime;
-                
-                q_des = self.q_peak + ...
-                    self.q_dot_peak * t + ...
-                    (1/2) * self.q_ddot_to_stop * t^2;
-                q_dot_des = self.q_dot_peak + ...
-                    self.q_ddot_to_stop * t;
-                q_ddot_des = self.q_ddot_to_stop;
+                % Original implementation adapted
+                q_des = zeros(self.n_q, 1);
+                q_dot_des = zeros(self.n_q, 1);
+                q_ddot_des = zeros(self.n_q, 1);
+                % TODO: Figure out how to adapt this!!!
             
+                for j = 1:self.n_q
+                    for coeff_idx = 0:5
+                        q_des(j) = q_des(j) + ...
+                            self.alpha(j,coeff_idx+1) * t^coeff_idx;
+                        if coeff_idx > 0
+                            q_dot_des(j) = q_dot_des(j) + ...
+                                coeff_idx * self.alpha(j,coeff_idx+1) * t^(coeff_idx-1);
+                        end
+                        if coeff_idx > 1
+                            q_ddot_des(j) = q_ddot_des(j) + ...
+                                (coeff_idx) * (coeff_idx-1) * self.alpha(j,coeff_idx+1) * t^(coeff_idx-2);
+                        end
+                    end
+                end
+                
+                % Proposed vectorized implementation
+                %deg = 5;
+                %command.q_des = sum(self.alpha.*(t.^(0:deg)),2);
+                %command.q_dot_des = sum((1:deg).*self.alpha(:,2:end).*(t.^(0:deg-1)),2);
+                %command.q_ddot_des = sum(((2:deg).*(1:deg-1)).*self.alpha(:,3:end).*(t.^(0:deg-2)),2);
+
             % The trajectory has reached a stop
             else
                 q_des = self.q_end;
-                q_dot_des = zeros(size(self.q_dot_0));
-                q_ddot_des = zeros(size(self.q_ddot_0));
+                q_dot_des = zeros(self.n_q, 1);
+                q_ddot_des = zeros(self.n_q, 1);
             end
-
-            n_q = length(q_des);
-            command = ArmRobotState(1:n_q, n_q+1:n_q*2, n_q*2+1:n_q*3);
+            
+            command = rtd.entity.states.ArmRobotState(1:self.n_q, self.n_q+1:self.n_q*2, self.n_q*2+1:self.n_q*3);
             command.time = time;
             command.state = [q_des; q_dot_des; q_ddot_des];
         end

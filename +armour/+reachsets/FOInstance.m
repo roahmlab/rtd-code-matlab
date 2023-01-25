@@ -1,4 +1,4 @@
-classdef FOInstance < ReachableSetInstance
+classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
     % FOInstance
     % This is just an individual instance of an original ARMTD FO
     % generation.
