@@ -7,7 +7,7 @@ classdef BoxObstacleZonotope < rtd.util.mixins.NamedClass & handle
     % check_if_plot_is_available - This is probably a major hog!
     
     properties
-        box_info BoxObstacleInfo = BoxObstacleInfo.empty()
+        box_info rtd.entity.box_obstacle.BoxObstacleInfo = rtd.entity.box_obstacle.BoxObstacleInfo.empty()
         box_state rtd.entity.components.GenericEntityState = rtd.entity.components.GenericEntityState.empty()
         
         base_zonotope

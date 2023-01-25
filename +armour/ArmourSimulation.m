@@ -93,7 +93,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
         function setup(self, agent)
             arguments
                 self armour.ArmourSimulation
-                agent ArmourAgent
+                agent armour.ArmourAgent
             end
             if self.simulation_state > "SETTING_UP"
                 self.world = struct;
@@ -120,19 +120,19 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             base_options.visual.face_color = face_color;
             base_options.visual.edge_color = edge_color;
             optionsStruct.component_options = base_options;
-            base = BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
+            base = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
                                         2*[0.2794, 0.2794, 0.1778], ...
                                         optionsStruct);
-            tower = BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
+            tower = rtd.entity.BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
                                         2*[0.1016, 0.1651, 0.3312], ...
                                         optionsStruct);
-            head = BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
+            head = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
                                         2*[0.1651, 0.1397, 0.0635], ...
                                         optionsStruct);
             % Floor
             floor_color = [0.9, 0.9, 0.9];
             optionsStruct.component_options.visual.face_color = floor_color;
-            floor = BoxObstacle.makeBox([-0.0331;0;0.005], ...
+            floor = rtd.entity.BoxObstacle.makeBox([-0.0331;0;0.005], ...
                                         2*[1.3598, 1.3598, 0.0025], ...
                                         optionsStruct);
 
@@ -193,7 +193,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                     % Create obstacle
                     optionsStruct = struct;
                     optionsStruct.component_options.info.creation_buffer = creation_buffer;
-                    prop_obs = BoxObstacle.makeBox(center, side_lengths, optionsStruct);
+                    prop_obs = rtd.entity.BoxObstacle.makeBox(center, side_lengths, optionsStruct);
 
                     % test it
                     proposal_obj = prop_obs.collision.getCollisionObject(buffered=true);
@@ -207,7 +207,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             end
 
             % Create and add the goal
-            self.goal_system = RandomArmConfigurationGoal(self.collision_system, self.agent);
+            self.goal_system = armour.deprecation.RandomArmConfigurationGoal(self.collision_system, self.agent);
             self.goal_system.reset();
             self.goal_system.createGoal();
             self.visual_system.addObjects(static=self.goal_system);

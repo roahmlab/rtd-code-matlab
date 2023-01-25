@@ -7,8 +7,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
     
     % Inherited properties that must be defined
     properties
-        robot_info = ArmourAgentInfo.empty()
-        robot_state = ArmourAgentState.empty()
+        robot_info = armour.agent.ArmourAgentInfo.empty()
+        robot_state = armour.agent.ArmourAgentState.empty()
         
         n_inputs uint32 = 0
     end
@@ -41,8 +41,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
     methods
         function self = ArmourController(arm_info, arm_state_component, optionsStruct, options)
             arguments
-                arm_info ArmourAgentInfo
-                arm_state_component ArmourAgentState
+                arm_info armour.agent.ArmourAgentInfo
+                arm_state_component armour.agent.ArmourAgentState
                 optionsStruct struct = struct()
                 options.use_true_params_for_robust
                 options.use_disturbance_norm

@@ -11,14 +11,14 @@ Because of this, there is no base entity class (as of yet). The following are im
 
 Armour Agent
 ------------
-.. mat:autoclass:: implementations.ArmourAgent.ArmourAgent
+.. mat:autoclass:: +armour.ArmourAgent
    :show-inheritance:
    :members:
    :undoc-members:
 
 Box Obstacle Entity
 -------------------
-.. mat:autoclass:: implementations.BoxObstacle.BoxObstacle
+.. mat:autoclass:: +rtd.+entity.BoxObstacle
    :show-inheritance:
    :members:
    :undoc-members:

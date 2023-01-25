@@ -1,10 +1,10 @@
-classdef ArmourCadPatchVisual < ArmourPatchVisual
+classdef ArmourCadPatchVisual < armour.agent.ArmourPatchVisual
     % Extended form the ArmourPatchVisual component to plot CAD models
     % instead. Lighting should NOT run in this.
     
     methods (Static)
         function options = defaultoptions()
-            options = ArmourPatchVisual.defaultoptions();
+            options = armour.agent.ArmourPatchVisual.defaultoptions();
             options.face_color = [0.8 0.8 1];
             options.face_opacity = 1;
             options.edge_color = [0 0 1];

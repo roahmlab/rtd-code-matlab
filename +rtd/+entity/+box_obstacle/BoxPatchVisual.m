@@ -7,7 +7,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
     % check_if_plot_is_available - This is probably a major hog!
     
     properties
-        box_info BoxObstacleInfo = BoxObstacleInfo.empty()
+        box_info rtd.entity.box_obstacle.BoxObstacleInfo = rtd.entity.box_obstacle.BoxObstacleInfo.empty()
         box_state rtd.entity.components.GenericEntityState = rtd.entity.components.GenericEntityState.empty()
         
         patch_style(1,1) struct
@@ -36,7 +36,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
     methods
         function self = BoxPatchVisual(box_info,box_state_component,optionsStruct,options)
             arguments
-                box_info BoxObstacleInfo
+                box_info rtd.entity.box_obstacle.BoxObstacleInfo
                 box_state_component rtd.entity.components.GenericEntityState
                 optionsStruct struct = struct()
                 options.face_color
@@ -114,7 +114,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
     methods
         function plot(self, options)
             arguments
-                self BoxPatchVisual
+                self rtd.entity.box_obstacle.BoxPatchVisual
                 options.time(1,1) double = self.box_state.time(end)
             end
             

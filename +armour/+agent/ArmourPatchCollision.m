@@ -8,9 +8,9 @@ classdef ArmourPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamic
     % check_if_plot_is_available - This is probably a major hog!
     
     properties
-        arm_info ArmourAgentInfo = ArmourAgentInfo.empty()
-        arm_state ArmourAgentState = ArmourAgentState.empty()
-        kinematics ArmKinematics = ArmKinematics.empty()
+        arm_info armour.agent.ArmourAgentInfo = armour.agent.ArmourAgentInfo.empty()
+        arm_state armour.agent.ArmourAgentState = armour.agent.ArmourAgentState.empty()
+        kinematics armour.agent.ArmKinematics = armour.agent.ArmKinematics.empty()
         
         collision_patch_data(1,1) struct
     end
@@ -20,9 +20,9 @@ classdef ArmourPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamic
     methods
         function self = ArmourPatchCollision(arm_info,arm_state_component,kinematics_component, verbose_level, name)
             arguments
-                arm_info ArmourAgentInfo
-                arm_state_component ArmourAgentState
-                kinematics_component ArmKinematics
+                arm_info armour.agent.ArmourAgentInfo
+                arm_state_component armour.agent.ArmourAgentState
+                kinematics_component armour.agent.ArmKinematics
                 verbose_level = 'INFO'
                 name = ''
             end

@@ -10,9 +10,9 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
     % check_if_plot_is_available - This is probably a major hog!
     
     properties
-        arm_info ArmourAgentInfo = ArmourAgentInfo.empty()
-        arm_state ArmourAgentState = ArmourAgentState.empty()
-        kinematics ArmKinematics = ArmKinematics.empty()
+        arm_info armour.agent.ArmourAgentInfo = armour.agent.ArmourAgentInfo.empty()
+        arm_state armour.agent.ArmourAgentState = armour.agent.ArmourAgentState.empty()
+        kinematics armour.agent.ArmKinematics = armour.agent.ArmKinematics.empty()
         
         patch_style(1,1) struct
         link_plot_data(1,1) struct
@@ -40,9 +40,9 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
     methods
         function self = ArmourPatchVisual(arm_info,arm_state_component,kinematics_component,optionsStruct,options)
             arguments
-                arm_info ArmourAgentInfo
-                arm_state_component ArmourAgentState
-                kinematics_component ArmKinematics
+                arm_info armour.agent.ArmourAgentInfo
+                arm_state_component armour.agent.ArmourAgentState
+                kinematics_component armour.agent.ArmKinematics
                 optionsStruct struct = struct()
                 options.face_color
                 options.face_opacity

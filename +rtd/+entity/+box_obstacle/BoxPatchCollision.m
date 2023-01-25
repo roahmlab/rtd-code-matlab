@@ -6,7 +6,7 @@ classdef BoxPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamicObj
     % make_box
     
     properties
-        box_info BoxObstacleInfo = BoxObstacleInfo.empty()
+        box_info rtd.entity.box_obstacle.BoxObstacleInfo = rtd.entity.box_obstacle.BoxObstacleInfo.empty()
         box_state rtd.entity.components.GenericEntityState = rtd.entity.components.GenericEntityState.empty()
         
         collision_patch_data(1,1) struct
@@ -17,7 +17,7 @@ classdef BoxPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamicObj
     methods
         function self = BoxPatchCollision(box_info,box_state_component, verbose_level, name)
             arguments
-                box_info BoxObstacleInfo
+                box_info rtd.entity.box_obstacle.BoxObstacleInfo
                 box_state_component rtd.entity.components.GenericEntityState
                 verbose_level = 'INFO'
                 name = ''

@@ -24,8 +24,8 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
     methods
         function self = ArmKinematics(arm_info, arm_state_component, optionsStruct, options)
             arguments
-                arm_info ArmourAgentInfo
-                arm_state_component ArmourAgentState
+                arm_info armour.agent.ArmourAgentInfo
+                arm_state_component armour.agent.ArmourAgentState
                 optionsStruct struct = struct()
                 options.verbose_level
                 options.name

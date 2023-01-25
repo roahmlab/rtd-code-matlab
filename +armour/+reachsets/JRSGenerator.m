@@ -13,7 +13,7 @@ classdef JRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
                     robot, options ...
                 )
                 arguments
-                    robot ArmourAgent
+                    robot armour.ArmourAgent
                     options.taylor_degree = 1
                     options.add_ultimate_bound = true
                     options.traj_type {mustBeMember(options.traj_type,{'orig','bernstein'})} = 'orig'

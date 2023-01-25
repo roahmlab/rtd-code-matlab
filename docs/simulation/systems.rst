@@ -23,7 +23,7 @@ PatchVisualSystem
 
 RandomArmConfigurationGoal
 --------------------------
-.. mat:autoclass:: implementations.ArmGoalSystem.RandomArmConfigurationGoal
+.. mat:autoclass:: +armour.+deprecation.RandomArmConfigurationGoal
    :show-inheritance:
    :members:
    :undoc-members:

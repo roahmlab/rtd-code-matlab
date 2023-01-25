@@ -20,7 +20,7 @@ Base Components
 
 Armour Components
 -----------------
-.. mat:automodule:: implementations.ArmourAgent
+.. mat:automodule:: +armour.+agent
    :show-inheritance:
    :members:
    :undoc-members:
@@ -28,7 +28,7 @@ Armour Components
 
 Box Obstacle Components
 -----------------------
-.. mat:automodule:: implementations.BoxObstacle
+.. mat:automodule:: +rtd.+entity.+box_obstacle
    :show-inheritance:
    :members:
    :undoc-members:

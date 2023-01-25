@@ -12,13 +12,13 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
     % Inherited properties that must be defined
     properties
         % General information of the robot arm
-        robot_info = ArmourAgentInfo.empty()
+        robot_info = armour.agent.ArmourAgentInfo.empty()
         
         % The state of the arm
-        robot_state = ArmourAgentState.empty()
+        robot_state = armour.agent.ArmourAgentState.empty()
         
         % The controller used
-        controller = ArmourController.empty()
+        controller = armour.agent.ArmourController.empty()
     end
     
     % Extra properties we define
@@ -50,9 +50,9 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
     methods
         function self = ArmourDynamics(arm_info, arm_state_component, controller_component, optionsStruct, options)
             arguments
-                arm_info ArmourAgentInfo
-                arm_state_component ArmourAgentState
-                controller_component ArmourController
+                arm_info armour.agent.ArmourAgentInfo
+                arm_state_component armour.agent.ArmourAgentState
+                controller_component armour.agent.ArmourController
                 optionsStruct struct = struct()
                 options.time_discretization
                 options.measurement_noise_points

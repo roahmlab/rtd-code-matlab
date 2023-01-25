@@ -1,5 +1,7 @@
 classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.sim.systems.SimulationSystem & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     % Required properties from SimulationSystem
+    % This class will be replaced soon with a agent-specific component to
+    % better handle goal checking.
     properties
         time = 0
         time_discretization = 0.1
@@ -160,7 +162,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
         
         function createGoal(self, position)
             arguments
-                self RandomArmConfigurationGoal
+                self armour.deprecation.RandomArmConfigurationGoal
                 position = []
             end
             

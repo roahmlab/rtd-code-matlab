@@ -33,7 +33,7 @@ input_limits = [-33.82, -131.76, -76.94, -66.18, -29.35, -25.70, -7.36;
                  33.82,  131.76,  76.94,  66.18,  29.35,  25.70,  7.36]; % matlab doesn't import these from urdf
 M_min_eigenvalue = 0.0017;
 
-agent_info = ArmourAgentInfo(robot, params, ...
+agent_info = armour.agent.ArmourAgentInfo(robot, params, ...
                 joint_velocity_limits=vel_limits, ...
                 joint_torque_limits=input_limits, ...
                 M_min_eigenvalue=M_min_eigenvalue);
@@ -42,12 +42,12 @@ agent_info = ArmourAgentInfo(robot, params, ...
 visual = [];
 if visualize_cad
     % this could be improved
-    visual = ArmourCadPatchVisual(ArmourAgentInfo.empty(),ArmourAgentState.empty(),ArmKinematics.empty());
+    visual = armour.agent.ArmourCadPatchVisual(armour.agent.ArmourAgentInfo.empty(),armour.agent.ArmourAgentState.empty(),armour.agent.ArmKinematics.empty());
     camlight
 end
 
 % Create
-agent = ArmourAgent(agent_info, visual=visual, ...
+agent = armour.ArmourAgent(agent_info, visual=visual, ...
                 component_options=component_options, ...
                 component_logLevelOverride=verbosity);
 
@@ -94,13 +94,13 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = true;
-use_robust_input = true;
+input_constraints_flag = false;
+use_robust_input = false;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...
         trajOptProps, sim.agent, ...
-        input_constraints_flag, use_robust_input, smooth_obs, 'bernstein' ...
+        input_constraints_flag, use_robust_input, smooth_obs, 'orig' ...
     );
 
 %% HLP stuff to migrate

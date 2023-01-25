@@ -5,7 +5,7 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
     % Inherited properties that must be defined
     properties
         % General information of the robot arm
-        entity_info = ArmourAgentInfo.empty()
+        entity_info = armour.agent.ArmourAgentInfo.empty()
         
         % state space representation
         n_states = 0
@@ -39,7 +39,7 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
     methods
         function self = ArmourAgentState(arm_info, optionsStruct, options)
             arguments
-                arm_info ArmourAgentInfo
+                arm_info armour.agent.ArmourAgentInfo
                 optionsStruct struct = struct()
                 options.initial_position
                 options.initial_velocity
