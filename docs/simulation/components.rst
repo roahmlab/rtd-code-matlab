@@ -13,7 +13,7 @@ updated at any point of the simulation loop.
 
 Base Components
 ---------------
-.. mat:automodule:: simulation.agent
+.. mat:automodule:: +rtd.+entity.+components
    :show-inheritance:
    :members:
    :undoc-members:

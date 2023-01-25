@@ -12,7 +12,7 @@ RTD Simulation Reference
 
 Simulation
 ----------
-.. mat:autoclass:: +rtd.+core.Simulation
+.. mat:autoclass:: +rtd.+sim.Simulation
    :show-inheritance:
    :members:
    :undoc-members:

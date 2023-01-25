@@ -9,14 +9,14 @@ to call systems whenever relevant.
 
 Patch3dCollisionSystem
 ----------------------
-.. mat:automodule:: +rtd.+core.+systems.+patch3d_collision
+.. mat:automodule:: +rtd.+sim.+systems.+patch3d_collision
    :show-inheritance:
    :members:
    :undoc-members:
 
 PatchVisualSystem
 -----------------
-.. mat:automodule:: +rtd.+core.+systems.+patch_visual
+.. mat:automodule:: +rtd.+sim.+systems.+patch_visual
    :show-inheritance:
    :members:
    :undoc-members:

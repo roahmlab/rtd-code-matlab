@@ -74,7 +74,7 @@ agent = ArmourAgent(agent_info, visual=visual, ...
 % pause
 
 %% Create the simulation
-sim = rtd.armour.ArmourSimulation;
+sim = armour.ArmourSimulation;
 sim.setup(agent)
 sim.initialize()
 % not the proper way to do it, but proper way isn't implemented yet
@@ -160,7 +160,7 @@ function info = planner_callback(sim, planner, agent_info, world_info, lookahead
     end
 
     % get the sensor readings at the time
-    worldState.obstacles = rtd.core.sensors.zonotope_sensor(sim.world, sim.agent, time);
+    worldState.obstacles = rtd.sim.sensors.zonotope_sensor(sim.world, sim.agent, time);
     [trajectory, plan_info] = planner.planTrajectory(ref_state, worldState, q_des);
     %FO = plan_info.rsInstances{2}.FO;
     %jrsinfo = plan_info.rsInstances{1}.jrs_info;

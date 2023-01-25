@@ -1,4 +1,4 @@
-classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicObject & rtd.core.mixins.NamedClass & handle
+classdef BoxPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamicObject & rtd.util.mixins.NamedClass & handle
     
     
     % Leftover Old Dependencies
@@ -7,7 +7,7 @@ classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicOb
     
     properties
         box_info BoxObstacleInfo = BoxObstacleInfo.empty()
-        box_state rtd.core.components.GenericEntityState = rtd.core.components.GenericEntityState.empty()
+        box_state rtd.entity.components.GenericEntityState = rtd.entity.components.GenericEntityState.empty()
         
         collision_patch_data(1,1) struct
     end
@@ -18,7 +18,7 @@ classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicOb
         function self = BoxPatchCollision(box_info,box_state_component, verbose_level, name)
             arguments
                 box_info BoxObstacleInfo
-                box_state_component rtd.core.components.GenericEntityState
+                box_state_component rtd.entity.components.GenericEntityState
                 verbose_level = 'INFO'
                 name = ''
             end
@@ -92,7 +92,7 @@ classdef BoxPatchCollision < rtd.core.systems.patch3d_collision.Patch3dDynamicOb
             
             % Create the Patch3dObject object
             uuid = self.box_info.uuid;
-            out = rtd.core.systems.patch3d_collision.Patch3dObject(uuid, F, V);
+            out = rtd.sim.systems.patch3d_collision.Patch3dObject(uuid, F, V);
             % add centers
             out.centers = shift;
         end

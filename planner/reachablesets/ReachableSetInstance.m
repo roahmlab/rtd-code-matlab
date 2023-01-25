@@ -1,4 +1,4 @@
-classdef ReachableSetInstance < rtd.core.mixins.UUID & handle
+classdef ReachableSetInstance < rtd.util.mixins.UUID & handle
     % ReachableSetInstance
     % This is just an individual instance of a reachable set. It should
     % hold the necessary information to make a nonlinear constraint. If a

@@ -1,4 +1,4 @@
-classdef ArmourDynamics < rtd.core.components.BaseDynamicsComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     
     % Torque dynamics with optional measurement noise
     % Leftover Old Dependencies
@@ -28,7 +28,7 @@ classdef ArmourDynamics < rtd.core.components.BaseDynamicsComponent & rtd.core.m
         time_discretization double = 0.01
         
         % Logging
-        controller_log rtd.core.containers.VarLogger = rtd.core.containers.VarLogger.empty()
+        controller_log rtd.util.containers.VarLogger = rtd.util.containers.VarLogger.empty()
 
         % Measurement Noise (This probably should eventually be its own
         % class and type
@@ -88,7 +88,7 @@ classdef ArmourDynamics < rtd.core.components.BaseDynamicsComponent & rtd.core.m
             
             % if we're going to log, set it up
             if options.log_controller
-                self.controller_log = rtd.core.containers.VarLogger('input_time', ...
+                self.controller_log = rtd.util.containers.VarLogger('input_time', ...
                                      'input', ...
                                      'nominal_input', ...
                                      'robust_input', ...

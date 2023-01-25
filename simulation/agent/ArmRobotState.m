@@ -1,4 +1,4 @@
-classdef ArmRobotState < rtd.core.containers.EntityState
+classdef ArmRobotState < rtd.entity.states.EntityState
     % ArmRobotState
     % Information on the atomic state of the robot at a given point of
     % time. Each hard instance of this (unique object, not seperate

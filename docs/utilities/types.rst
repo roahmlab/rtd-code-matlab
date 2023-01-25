@@ -1,6 +1,6 @@
 Utility Types and Enumerations
 ==============================
 
-.. mat:automodule:: +rtd.+core.+types
+.. mat:automodule:: +rtd.+util.+types
    :show-inheritance:
    :members:

@@ -1,4 +1,4 @@
-classdef ArmourPatchVisual < rtd.core.systems.patch_visual.PatchVisualObject & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     
     
     % Leftover Old Dependencies

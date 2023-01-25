@@ -175,7 +175,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             new_planner_time = tic;
             
             P.vdisp('Running Wrapped Planner!',6)
-            worldState = rtd.core.world.WorldState;
+            worldState = rtd.sim.world.WorldState;
             worldState.obstacles = world_info.obstacles;
             
             robotState = ArmRobotState;

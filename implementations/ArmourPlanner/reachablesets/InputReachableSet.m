@@ -1,4 +1,4 @@
-classdef InputReachableSet < ReachableSets & rtd.core.mixins.NamedClass
+classdef InputReachableSet < ReachableSets & rtd.util.mixins.NamedClass
     % InputReachableSet
     % This generates the upper and lower bound reachable sets on the input,
     % and creates an IRSInstance object.

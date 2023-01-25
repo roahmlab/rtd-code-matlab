@@ -1,4 +1,4 @@
-classdef ArmourAgentInfo < rtd.core.components.BaseInfoComponent & rtd.core.mixins.Options & handle
+classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mixins.Options & handle
     
     % Leftover Old Dependencies
     % load_robot_params by extension -> make it a class

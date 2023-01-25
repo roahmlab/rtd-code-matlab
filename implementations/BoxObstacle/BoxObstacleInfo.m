@@ -1,4 +1,4 @@
-classdef BoxObstacleInfo < rtd.core.components.BaseInfoComponent & rtd.core.mixins.Options & handle
+classdef BoxObstacleInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mixins.Options & handle
     % Leftover Old Dependencies
     % load_robot_params by extension -> make it a class
     % create_pz_bounding_boxes

@@ -1,4 +1,4 @@
-classdef BoxPatchVisual < rtd.core.systems.patch_visual.PatchVisualObject & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     
     
     % Leftover Old Dependencies
@@ -8,7 +8,7 @@ classdef BoxPatchVisual < rtd.core.systems.patch_visual.PatchVisualObject & rtd.
     
     properties
         box_info BoxObstacleInfo = BoxObstacleInfo.empty()
-        box_state rtd.core.components.GenericEntityState = rtd.core.components.GenericEntityState.empty()
+        box_state rtd.entity.components.GenericEntityState = rtd.entity.components.GenericEntityState.empty()
         
         patch_style(1,1) struct
         plot_patch_data(1,1) struct
@@ -37,7 +37,7 @@ classdef BoxPatchVisual < rtd.core.systems.patch_visual.PatchVisualObject & rtd.
         function self = BoxPatchVisual(box_info,box_state_component,optionsStruct,options)
             arguments
                 box_info BoxObstacleInfo
-                box_state_component rtd.core.components.GenericEntityState
+                box_state_component rtd.entity.components.GenericEntityState
                 optionsStruct struct = struct()
                 options.face_color
                 options.face_opacity

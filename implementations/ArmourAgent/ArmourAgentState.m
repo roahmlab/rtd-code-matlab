@@ -1,4 +1,4 @@
-classdef ArmourAgentState < rtd.core.components.BaseStateComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     
     % Old functions
     % rand_range

@@ -1,4 +1,4 @@
-classdef RTD_TrajOpt < handle & rtd.core.mixins.NamedClass
+classdef RTD_TrajOpt < handle & rtd.util.mixins.NamedClass
     % RTD_TrajOpt
     % This object handles the necessary calls to perform the actual
     % trajectory optimization when requested.

@@ -1,4 +1,4 @@
-classdef ArmourController < rtd.core.components.BaseControllerComponent & rtd.core.mixins.NamedClass & rtd.core.mixins.Options & handle
+classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     
     % Leftover Old Dependencies
     % robot_arm_LLC and uarmtd_robust_CBF_LLC

@@ -1,4 +1,4 @@
-classdef JointReachableSetsOnline < ReachableSets & rtd.core.mixins.NamedClass
+classdef JointReachableSetsOnline < ReachableSets & rtd.util.mixins.NamedClass
     % JointReachableSetsOnline
     % This does the online computation of joint reachable sets. It then
     % generates a JRSInstance object.
