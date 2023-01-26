@@ -1,1 +1,14 @@
-% TODO: Use this in place of arbitrary function call handle
+classdef TrajectoryFactory < matlab.mixin.Heterogeneous & handle
+    properties (Abstract)
+        plot_data (1,1) struct
+    end
+    methods (Abstract)
+        createTrajectory(self,options)
+    end
+    % Make it so we can initialize it
+    methods (Static, Sealed, Access = protected)
+        function default_object = getDefaultScalarElement
+            default_object = rtd.sim.systems.patch_visual.EmptyPatchVisualObject;
+        end
+    end
+end
