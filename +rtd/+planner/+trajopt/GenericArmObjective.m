@@ -30,7 +30,7 @@ classdef GenericArmObjective < rtd.planner.trajopt.Objective
 
             % Create an trajectory instance for whatever generic trajectory
             % factory we were given.
-            trajectoryObj = self.trajectoryFactory(robotState, reachableSets);
+            trajectoryObj = self.trajectoryFactory.createTrajectory(robotState, reachableSets);
 
             % create and return the function handle.
             objectiveCallback = @(trajectoryParams) ...
@@ -43,7 +43,7 @@ end
 % which a handle can be made to to evaluate the trajectory for the cost.
 % Should work for any generic arm trajectory in joint space.
 function [cost] = evalTrajectory(trajectoryParams, trajectoryObj, q_des, t_cost)
-    trajectoryObj.setTrajectory(trajectoryParams);
+    trajectoryObj.setParameters(trajectoryParams);
     plan = trajectoryObj.getCommand(t_cost);
     cost = sum((plan.q_des - q_des).^2);
 end

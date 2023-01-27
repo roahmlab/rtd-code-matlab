@@ -1,40 +1,44 @@
 classdef ZeroHoldArmTrajectory < rtd.planner.trajectory.Trajectory
     % ZeroHoldArmTrajectory
-    % The original ArmTD trajectory with peicewise accelerations
-    properties (Constant)
-        % Size of the trajectoryParams, we want this set for all use
-        param_shape = 7; % This already needs a change!
-        % TODO - update to add dynamic parameter as an option
-    end
-    properties
-        % The starting state of the robot
-        robotState
-    end
     methods
         % The ZeroHoldArmTrajectory constructor, which simply sets parameters and
         % attempts to call internalUpdate, a helper function made for this
         % class to update all other internal parameters once fully
         % parameterized.
-        function self = ZeroHoldArmTrajectory(    ...
-                    robotState,             ...
-                    varargin                ...
-                )
-            self.robotState = robotState;
+        function self = ZeroHoldArmTrajectory(startState)
+            arguments
+                startState(1,1) rtd.entity.states.ArmRobotState
+            end
+            self.startState = startState;
         end
         
         % Set the parameters of the trajectory, with a focus on the
         % parameters as the state should be set from the constructor.
-        function setTrajectory(         ...
-                    self,               ...
-                    robotState,         ...
-                    varargin            ...
-                )
-            self.robotState = robotState;
+        function setParameters(self, trajectoryParams, options)
+            arguments
+                self armour.trajectory.ZeroHoldArmTrajectory
+                trajectoryParams(1,:) double
+                options.startState rtd.entity.states.ArmRobotState = self.startState
+            end
+            self.trajectoryParams = trajectoryParams;
+            self.startState = options.startState;
         end
         
         % Validate that the trajectory is fully characterized
         function valid = validate(self, throwOnError)
-            valid = true;
+            arguments
+                self armour.trajectory.ZeroHoldArmTrajectory
+                throwOnError(1,1) logical = false
+            end
+            % Make sure we actually have a robot state to work with.
+            valid = ~isempty(self.startState);
+
+            % Throw if wanted
+            if ~valid && throwOnError
+                errMsg = MException('ZeroHoldArmTrajectory:InvalidTrajectory', ...
+                    'Must have some existing robot state to use this!');
+                throw(errMsg)
+            end
         end
         
         % Computes the actual input commands for the given time.
@@ -43,25 +47,30 @@ classdef ZeroHoldArmTrajectory < rtd.planner.trajectory.Trajectory
         % trajectory exists
         % TODO: write in a vectorized manner
         function command = getCommand(self, time)
-            % Validate, if invalid, throw
+            arguments
+                self armour.trajectory.ZeroHoldArmTrajectory
+                time(1,:) double
+            end
+
+            % Do a parameter check and time check, and throw if anything is
+            % invalid.
             self.validate(true);
-            % TODO: throw invalid trajectory
-            t = time - self.robotState.time;
-            
-            % Ensure time is valid
-            if t < 0
-                ME = MException('RTD:Trajectory:InvalidTime', ...
+            if any(time < self.startState.time)
+                ME = MException('ZeroHoldArmTrajectory:InvalidTime', ...
                     'Invalid time provided to ZeroHoldArmTrajectory');
                 throw(ME)
             end
             
-            q_des = self.robotState.q;
-            q_dot_des = self.robotState.q*0;
+            % Make the state
+            n_q = length(self.startState.q);
+            state = repmat([self.startState.q;0], 1, length(time));
+            pos_idx = 1:n_q;
+            acc_vel_idx = ones(1,n_q)+n_q;
 
-            n_q = length(q_des);
-            command = rtd.entity.states.ArmRobotState(1:n_q, n_q+1:n_q*2, n_q+1:n_q*2);
+            % Generate the output.
+            command = rtd.entity.states.ArmRobotState(pos_idx, acc_vel_idx, acc_vel_idx);
             command.time = time;
-            command.state = [q_des; q_dot_des];
+            command.state = state;
         end
     end
 end

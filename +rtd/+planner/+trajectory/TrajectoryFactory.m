@@ -1,14 +1,5 @@
-classdef TrajectoryFactory < matlab.mixin.Heterogeneous & handle
-    properties (Abstract)
-        plot_data (1,1) struct
-    end
+classdef TrajectoryFactory < handle
     methods (Abstract)
-        createTrajectory(self,options)
-    end
-    % Make it so we can initialize it
-    methods (Static, Sealed, Access = protected)
-        function default_object = getDefaultScalarElement
-            default_object = rtd.sim.systems.patch_visual.EmptyPatchVisualObject;
-        end
+        createTrajectory(self, robotState, rsInstances, trajectoryParams, options)
     end
 end

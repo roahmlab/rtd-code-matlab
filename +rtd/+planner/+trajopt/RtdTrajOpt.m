@@ -45,12 +45,12 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
                 )
             % Generate reachable sets and their relevant constraints.
             self.vdisp("Generating RS's and constraints!")
-            rsInstances = {};
+            rsInstances = struct;
             nlconCallbacks = {};
             n_k = 0;
             param_bounds = [];
-            for i=1:length(self.reachableSets)
-                rs = self.reachableSets{i}.getReachableSet(robotState, false);
+            for rs_name=fieldnames(self.reachableSets).'
+                rs = self.reachableSets.(rs_name{1}).getReachableSet(robotState, false);
                 new_n_k = max(n_k, rs.n_k);
                 comp = min(n_k, rs.n_k);
                 % compute new bounds
@@ -65,12 +65,14 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
                 n_k = new_n_k;
                 param_bounds = new_bounds;
                 % store instances and callbacks
-                rsInstances = [rsInstances, {rs}];
+                rsInstances.(rs_name{1}) = rs;
                 nlconCallbacks = [nlconCallbacks, {rs.genNLConstraint(worldState)}];
             end
             
             % Combine nlconCallback with any other constraints needed
-            constraintCallback = @(k) merge_constraints(k, n_k, rsInstances, nlconCallbacks);
+            % TODO update
+            rsInstances_cell = struct2cell(rsInstances);
+            constraintCallback = @(k) merge_constraints(k, n_k, rsInstances_cell, nlconCallbacks);
             
             % create bounds (robotInfo and worldInfo come into play here?)
             bounds.param_limits = param_bounds;
@@ -99,7 +101,7 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
             
             % if success
             if success
-                trajectory = self.trajectoryFactory(robotState, rsInstances, parameters);
+                trajectory = self.trajectoryFactory.createTrajectory(robotState, rsInstances, parameters);
             else
                 trajectory = [];
             end

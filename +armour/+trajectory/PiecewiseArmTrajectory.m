@@ -1,18 +1,9 @@
 classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
     % PiecewiseArmTrajectory
     % The original ArmTD trajectory with peicewise accelerations
-    properties (Constant)
-        % Size of the trajectoryParams, we want this set for all use
-        param_shape = 7; % This already needs a change!
-        % TODO - update to add dynamic parameter as an option
-    end
     properties
-        % Initial parameters from the robot used to calculate the desired
-        % trajectory
-        q_0            {mustBeNumeric}
-        q_dot_0        {mustBeNumeric}
-        q_ddot_0       {mustBeNumeric}
-        % Precomputed for stopping
+        % Precomputed values
+        q_ddot         {mustBeNumeric}
         q_peak         {mustBeNumeric}
         q_dot_peak     {mustBeNumeric}
         q_ddot_to_stop {mustBeNumeric}
@@ -22,104 +13,59 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
         % The JRS which contains the center and range to scale the
         % parameters
         jrsInstance
-        % The starting state of the robot
-        robotState
     end
+
     methods
         % The PiecewiseArmTrajectory constructor, which simply sets parameters and
         % attempts to call internalUpdate, a helper function made for this
         % class to update all other internal parameters once fully
         % parameterized.
-        function self = PiecewiseArmTrajectory(    ...
-                    trajOptProps,           ...
-                    robotState,             ...
-                    rsInstances,            ...
-                    trajectoryParams,       ...
-                    varargin                ...
-                )
-            % Always requires this (find way to add to parent)
+        function self = PiecewiseArmTrajectory(trajOptProps, startState, jrsInstance)
+            arguments
+                trajOptProps(1,1) rtd.planner.trajopt.TrajOptProps
+                startState(1,1) rtd.entity.states.ArmRobotState
+                jrsInstance(1,1) armour.reachsets.JRSInstance
+            end
             self.trajOptProps = trajOptProps;
-            
-            % Check for each of the args and update.
-            if exist('robotState','var')
-                if ~isa(robotState, 'rtd.entity.states.ArmRobotState')
-                    error('Robot must inherit an rtd.entity.states.ArmRobotState to use PiecewiseArmTrajectory');
-                end
-                self.robotState = robotState;
-            end
-
-            if exist('rsInstances','var')
-                % Look for the JRS
-                for i = 1:length(rsInstances)
-                    if isa(rsInstances{i}, 'armour.reachsets.JRSInstance')
-                        self.jrsInstance = rsInstances{i};
-                    end
-                end
-                if isempty(self.jrsInstance)
-                    % Do something if we don't have the JRS within the
-                    % passed in reachable sets
-                    error('No handle for a JRSInstance was found');
-                end
-            end
-            
-            if exist('trajectoryParams','var')
-                self.trajectoryParams = trajectoryParams;
-            end
-            
-            % Perform an internal update (compute peak and stopping values)
-            self.internalUpdate();
+            self.startState = startState;
+            self.jrsInstance = jrsInstance;
         end
         
         % Set the parameters of the trajectory, with a focus on the
         % parameters as the state should be set from the constructor.
-        function setTrajectory(         ...
-                    self,               ...
-                    trajectoryParams,   ...
-                    rsInstances,        ...
-                    robotState,         ...
-                    varargin            ...
-                )
-            % Check for each of the args and update.
-            if exist('trajectoryParams','var')
-                self.trajectoryParams = trajectoryParams;
+        function setParameters(self, trajectoryParams, options)
+            arguments
+                self armour.trajectory.PiecewiseArmTrajectory
+                trajectoryParams(1,:) double
+                options.startState rtd.entity.states.ArmRobotState = self.startState
+                options.jrsInstance armour.reachsets.JRSInstance = self.jrsInstance
             end
-
-            if exist('rsInstances','var')
-                % Look for the JRS
-                for i = 1:length(rsInstances)
-                    if isa(rsInstances{i}, 'JRSInstance')
-                        self.jrsInstance = rsInstances{i};
-                    end
-                end
-                if isempty(self.jrsInstance)
-                    % Do something if we don't have the JRS within the
-                    % passed in reachable sets
-                    error('No handle for a JRSInstance was found');
-                end
-            end
-
-            if exist('robotState','var')
-                if ~isa(robotState, 'rtd.entity.states.ArmRobotState')
-                    error('Robot must inherit an rtd.entity.states.ArmRobotState to use PiecewiseArmTrajectory');
-                end
-                self.robotState = robotState;
-            end
+            self.trajectoryParams = trajectoryParams;
+            self.startState = options.startState;
+            self.jrsInstance = options.jrsInstance;
             
             % Perform an internal update (compute peak and stopping values)
-            % TODO: do something about the code duplication
             self.internalUpdate();
         end
         
         % Validate that the trajectory is fully characterized
         function valid = validate(self, throwOnError)
+            arguments
+                self armour.trajectory.PiecewiseArmTrajectory
+                throwOnError(1,1) logical = false
+            end
+            % Make sure everything is nonempty
             valid = not( ...
                 isempty(self.trajectoryParams) || ...
                 isempty(self.jrsInstance) || ...
-                isempty(self.robotState));
+                isempty(self.startState));
+
+            % Make sure the trajectory params make sense
+            valid = valid && length(self.trajectoryParams) == self.jrsInstance.n_q;
             
             % Throw if wanted
-            if exist('throwOnError','var') && ~valid && throwOnError
-                errMsg = MException('RTD:InvalidTrajectory', ...
+            if ~valid && throwOnError
+                errMsg = MException('PiecewiseArmTrajectory:InvalidTrajectory', ...
                     'Called trajectory object does not have complete parameterization!');
                 throw(errMsg)
             end
@@ -127,31 +73,28 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
         
         % Update internal parameters to reduce long term calculations.
         function internalUpdate(self)
-            % internal update if valid
+            % internal update if valid. short circuit if not.
             if ~self.validate()
                 return
             end
             
-            % Set all parameters
-            % Required parameters from parent classes
-            self.startState.robotState = self.robotState;
-            self.startState.jrsInstance = self.jrsInstance;
+            % Rename variables
+            q_0 = self.startState.position;
+            q_dot_0 = self.startState.velocity;
             
-            % Parameters of our class
-            self.q_0 = self.robotState.q;
-            self.q_dot_0 = self.robotState.q_dot;
-            self.q_ddot_0 = self.robotState.q_ddot;
-            
-            % Precompute peak and stop parameters
+            % Scale the parameters
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.parameter_range;
-            k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            self.q_ddot = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             
-            self.q_peak = self.q_0 + ...
-                self.q_dot_0 * self.trajOptProps.planTime + ...
-                (1/2) * k_scaled * self.trajOptProps.planTime^2;
-            self.q_dot_peak = self.q_dot_0 + ...
-                k_scaled * self.trajOptProps.planTime;
+            % Compute the peak parameters
+            self.q_peak = q_0 + ...
+                q_dot_0 * self.trajOptProps.planTime + ...
+                (1/2) * self.q_ddot * self.trajOptProps.planTime^2;
+            self.q_dot_peak = q_dot_0 + ...
+                self.q_ddot * self.trajOptProps.planTime;
+
+            % Compute the stopping parameters
             self.q_ddot_to_stop = (0-self.q_dot_peak) / ...
                 (self.trajOptProps.horizonTime - self.trajOptProps.planTime);
             self.q_end = self.q_peak + ...
@@ -165,53 +108,66 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
         % trajectory exists
         % TODO: write in a vectorized manner
         function command = getCommand(self, time)
-            % Validate, if invalid, throw
-            self.validate(true);
-            % TODO: throw invalid trajectory
-            t = time - self.robotState.time;
-            
-            out = self.jrsInstance.output_range;
-            in = self.jrsInstance.parameter_range;
-            k_scaled = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
-            
-            % Ensure time is valid
-            if t < 0
-                ME = MException('RTD:Trajectory:InvalidTime', ...
-                    'Invalid time provided to PiecewiseArmTrajectory');
-                throw(ME)
-                
-            % First half of the trajectory
-            elseif t < self.trajOptProps.planTime
-                q_des = self.q_0 + ...
-                    self.q_dot_0 * t + ...
-                    (1/2) * k_scaled * t^2;
-                q_dot_des = self.q_dot_0 + ...
-                    k_scaled * t;
-                q_ddot_des = k_scaled;
-            
-            % Second half of the trajectory
-            elseif t < self.trajOptProps.horizonTime
-                % Shift time for ease
-                t = t - self.trajOptProps.planTime;
-                
-                q_des = self.q_peak + ...
-                    self.q_dot_peak * t + ...
-                    (1/2) * self.q_ddot_to_stop * t^2;
-                q_dot_des = self.q_dot_peak + ...
-                    self.q_ddot_to_stop * t;
-                q_ddot_des = self.q_ddot_to_stop;
-            
-            % The trajectory has reached a stop
-            else
-                q_des = self.q_end;
-                q_dot_des = zeros(size(self.q_dot_0));
-                q_ddot_des = zeros(size(self.q_ddot_0));
+            arguments
+                self armour.trajectory.PiecewiseArmTrajectory
+                time(1,:) double
             end
 
-            n_q = length(q_des);
-            command = rtd.entity.states.ArmRobotState(1:n_q, n_q+1:n_q*2, n_q*2+1:n_q*3);
+            % Do a parameter check and time check, and throw if anything is
+            % invalid.
+            self.validate(true);
+            t_shifted = time - self.startState.time;
+            if t_shifted < 0
+                ME = MException('PiecewiseArmTrajectory:InvalidTrajectory', ...
+                    'Invalid time provided to PiecewiseArmTrajectory');
+                throw(ME)
+            end
+
+            % Mask the first and second half of the trajectory
+            t_plan_mask = t_shifted < self.trajOptProps.planTime;
+            t_stop_mask = logical((t_shifted < self.trajOptProps.horizonTime) - t_plan_mask);
+            t_plan_vals = t_shifted(t_plan_mask);
+            t_stop_vals = t_shifted(t_stop_mask) - self.trajOptProps.planTime;
+
+            % Create the combined state variable
+            t_size = length(time);
+            n_q = self.jrsInstance.n_q;
+            pos_idx = 1:n_q;
+            vel_idx = pos_idx + n_q;
+            acc_idx = vel_idx + n_q;
+            state = zeros(n_q*3, t_size);
+            
+            % Rename variables
+            q_0 = self.startState.position;
+            q_dot_0 = self.startState.velocity;
+
+            % Compute the first half of the trajectory
+            if any(t_plan_mask)
+                state(pos_idx,t_plan_mask) = q_0 + ...
+                                q_dot_0 * t_plan_vals + ...
+                                (1/2) * self.q_ddot * t_plan_vals.^2;
+                state(vel_idx,t_plan_mask) = q_dot_0 + ...
+                                self.q_ddot * t_plan_vals;
+                state(acc_idx,t_plan_mask) = repmat(self.q_ddot, 1, length(t_plan_vals));
+            end
+            
+            % Compute the second half of the trajectory
+            if any(t_stop_mask)
+                state(pos_idx,t_stop_mask) = self.q_peak + ...
+                                self.q_dot_peak * t_stop_vals + ...
+                                (1/2) * self.q_ddot_to_stop * t_stop_vals.^2;
+                state(vel_idx,t_stop_mask) = self.q_dot_peak + ...
+                                self.q_ddot_to_stop * t_stop_vals;
+                state(acc_idx,t_stop_mask) = repmat(self.q_ddot_to_stop, 1, length(t_stop_vals));
+            end
+
+            % Update all states after the horizon time
+            state(pos_idx,~(t_plan_mask+t_stop_mask)) = repmat(self.q_end, 1, t_size-sum(t_plan_mask+t_stop_mask));
+
+            % Generate the output.
+            command = rtd.entity.states.ArmRobotState(pos_idx, vel_idx, acc_idx);
             command.time = time;
-            command.state = [q_des; q_dot_des; q_ddot_des];
+            command.state = state;
         end
     end
 end

@@ -148,9 +148,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
                 robotState.q = q_0;
                 robotState.q_dot = q_dot_0;
                 robotState.q_ddot = q_ddot_0;
-                rs = P.planner.jrsHandle.getReachableSet(robotState, false);
-                traj = P.planner.trajectoryFactory(robotState,{rs});
-                traj.setTrajectory(zeros(traj.param_shape,1));
+                traj = armour.trajectory.ZeroHoldArmTrajectory(robotState);
                 P.new_info.desired_trajectory = [P.new_info.desired_trajectory, {@(t) unwrap_traj(traj.getCommand(t))}];
                 P.latest_trajectory = traj;
 

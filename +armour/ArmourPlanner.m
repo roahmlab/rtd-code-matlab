@@ -45,28 +45,20 @@ classdef ArmourPlanner < rtd.planner.RtdPlanner
             %smooth_obs = false;
             
             % Create our reachable sets
-            self.jrsHandle = armour.reachsets.JRSGenerator(robot, "traj_type", traj_type);
-            self.foHandle = armour.reachsets.FOGenerator(robot, self.jrsHandle, smooth_obs);
-            self.reachableSets = {self.jrsHandle, self.foHandle};
+            rsGenerators = struct;
+            rsGenerators.jrs = armour.reachsets.JRSGenerator(robot, "traj_type", traj_type);
+            rsGenerators.fo = armour.reachsets.FOGenerator(robot, rsGenerators.jrs, smooth_obs);
             if input_constraints_flag
-                self.irsHandle = armour.reachsets.IRSGenerator(robot, self.jrsHandle, use_robust_input);
-                self.reachableSets = [self.reachableSets, {self.irsHandle}];
+                rsGenerators.irs = armour.reachsets.IRSGenerator(robot, rsGenerators.jrs, use_robust_input);
             end
+            self.reachableSets = rsGenerators;
             
             % Create the trajectoryFactory
+            % Compat
             if strcmp(traj_type,'orig')
-                self.trajectoryFactory = ...
-                    @(varargin)...
-                    armour.trajectory.PiecewiseArmTrajectory(...
-                        trajOptProps,       ...
-                        varargin{:});
-            else
-                self.trajectoryFactory = ...
-                    @(varargin)...
-                    armour.trajectory.BernsteinArmTrajectory(...
-                        trajOptProps,       ...
-                        varargin{:});
+                traj_type = 'piecewise';
             end
+            self.trajectoryFactory = armour.trajectory.ArmTrajectoryFactory(trajOptProps, traj_type);
             
             % Create the objective
             self.objective = rtd.planner.trajopt.GenericArmObjective(trajOptProps, self.trajectoryFactory);
