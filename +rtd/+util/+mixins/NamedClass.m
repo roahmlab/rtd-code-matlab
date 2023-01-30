@@ -77,7 +77,7 @@ classdef NamedClass < handle
             arguments
                 self rtd.util.mixins.NamedClass
                 output {mustBeTextScalar}
-                level(1,1) rtd.util.types.LogLevel = 'DEBUG'
+                level(1,1) rtd.util.types.LogLevel = 'GENERAL'
                 options.wait(1,1) logical = false
                 options.show_packagename(1,1) logical = self.show_packagename
                 options.tablevel(1,1) uint8 = self.tablevel

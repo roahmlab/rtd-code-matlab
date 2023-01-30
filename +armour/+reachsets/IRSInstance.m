@@ -3,9 +3,8 @@ classdef IRSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
     % This is just an individual instance of input reachable set from
     % armour.
     properties
-        parameter_range = [-1.0, 1.0]
-        output_range = []
-        n_k = []
+        input_range = [-1.0, 1.0]
+        num_parameters = 0
         
         % properties carried over from the original implementation
         u_ub
@@ -21,10 +20,9 @@ classdef IRSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
             self.u_lb = u_lb;
             self.n_q = jrsInstance.n_q;
             self.n_t = jrsInstance.n_t;
-            self.n_k = jrsInstance.n_k;
+            self.num_parameters = jrsInstance.n_k;
             
-            self.parameter_range = jrsInstance.parameter_range;
-            self.output_range = [];
+            self.input_range = jrsInstance.input_range;
         end
         
         % Generates an nlconstraint if needed, or will return a NOP

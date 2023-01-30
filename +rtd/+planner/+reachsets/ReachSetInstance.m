@@ -6,8 +6,8 @@ classdef ReachSetInstance < rtd.util.mixins.UUID & matlab.mixin.Heterogeneous & 
     % change class properties, the cache for the generating RS class should
     % be disabled by setting cache_max_size to 0.
     properties (Abstract)
-        parameter_range
-        output_range
+        input_range (:,2) double
+        num_parameters (1,1) double
     end
     methods (Abstract)
         % An example constructor, but can take anything needed for the

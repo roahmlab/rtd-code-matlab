@@ -43,39 +43,69 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
                     waypoint,               ...
                     initialGuess            ...
                 )
-            % Generate reachable sets and their relevant constraints.
-            self.vdisp("Generating RS's and constraints!")
+
+            self.vdisp("Generating reachable sets and nonlinear constraints", 'INFO')
+            
+            % Generate reachable sets
             rsInstances = struct;
-            nlconCallbacks = {};
-            n_k = 0;
-            param_bounds = [];
             for rs_name=fieldnames(self.reachableSets).'
+                self.vdisp(['Generating ', rs_name{1}], 'DEBUG')
                 rs = self.reachableSets.(rs_name{1}).getReachableSet(robotState, false);
-                new_n_k = max(n_k, rs.n_k);
-                comp = min(n_k, rs.n_k);
-                % compute new bounds
-                % TODO: consider multiple RS's with slack variables
-                new_bounds = zeros(n_k, 2);
-                new_bounds(1:n_k,:) = param_bounds;
-                new_bounds(1:rs.n_k,:) = rs.parameter_range;
-                if comp > 0
-                    new_bounds(1:comp, 1) = max(param_bounds(1:comp, 1), new_bounds(1:comp, 1));
-                    new_bounds(1:comp, 2) = min(param_bounds(1:comp, 2), new_bounds(1:comp, 2));
-                end
-                n_k = new_n_k;
-                param_bounds = new_bounds;
-                % store instances and callbacks
                 rsInstances.(rs_name{1}) = rs;
-                nlconCallbacks = [nlconCallbacks, {rs.genNLConstraint(worldState)}];
+            end
+
+            % Generate nonlinear constraints
+            self.vdisp("Generating nonlinear constraints", 'DEBUG')
+            rsInstances_cell = struct2cell(rsInstances).';
+            nlconCallbacks = cellfun(@(rs)rs.genNLConstraint(worldState), ...
+                                    rsInstances_cell, ...
+                                    UniformOutput = false);
+
+            % Validate rs sizes
+            self.vdisp("Validating sizes", 'DEBUG')
+            num_parameters = cellfun(@(rs)rs.num_parameters, rsInstances_cell);
+            if ~all(num_parameters == num_parameters(1))
+                error("Reachable set parameter sizes don't match!")
+            end
+            num_parameters = num_parameters(1);
+
+            % Compute slack sizes
+            num_slack = cellfun(@(rs)size(rs.input_range,1), rsInstances_cell);
+            mask_ones = num_slack == 1;
+            num_slack(mask_ones) = num_parameters;
+            num_slack = num_slack - num_parameters;
+            if any(num_slack < 0)
+                error("Reachable sets have invalid `num_parameters` or invalid size on `input_range`.")
+            end
+            slack_idxs = [0, cumsum(num_slack)];
+
+            % Compute bounds
+            self.vdisp("Computing bounds", 'DEBUG')
+            param_bounds = [ones(num_parameters,1)*-Inf, ones(num_parameters,1)*Inf];
+            slack_bounds = zeros(slack_idxs(end), 2);
+            for i=1:length(num_slack)
+                new_bounds = rsInstances_cell{i}.input_range;
+                if mask_ones(i)
+                    new_bounds = repmat(new_bonds, num_parameters, 1);
+                elseif num_slack(i) > 0
+                    % Isolate and add the slack
+                    slack_bounds(slack_idxs(i)+1:slack_idxs(i+1),:) = new_bounds(num_parameters+1:end,:);
+                    new_bounds = new_bounds(1:num_parameters,:);
+                end
+
+                % Ensure bounds are the intersect of the intervals for the
+                % parameters
+                param_bounds(:, 1) = max(param_bounds(:, 1), new_bounds(:, 1));
+                param_bounds(:, 2) = min(param_bounds(:, 2), new_bounds(:, 2));
             end
             
-            % Combine nlconCallback with any other constraints needed
-            % TODO update
-            rsInstances_cell = struct2cell(rsInstances);
-            constraintCallback = @(k) merge_constraints(k, n_k, rsInstances_cell, nlconCallbacks);
+            % Combine nlconCallbacks
+            % TODO update to allow combination with any other constraints
+            % needed if wanted
+            constraintCallback = @(k) merge_constraints(k, num_parameters, num_slack, nlconCallbacks);
             
             % create bounds (robotInfo and worldInfo come into play here?)
-            bounds.param_limits = param_bounds;
+            bounds.param_limits = [param_bounds; slack_bounds];
             bounds.ouput_limits = [];
             
             % Create the objective
@@ -83,13 +113,9 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
                 waypoint, rsInstances);
             
             % If initialGuess is none, or invalid, make a zero
-            if exist('initialGuess','var')
-                try
-                    [guess,~] = initialGuess.getTrajParams();
-                catch
-                    guess = zeros(initialGuess.num_params);
-                end
-            else
+            try
+                guess = initialGuess.trajectoryParams;
+            catch
                 guess = [];
             end
             
@@ -114,7 +140,7 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
             info.objectiveCallback = objectiveCallback;
             info.waypoint = waypoint;
             info.bounds = bounds;
-            info.n_k = n_k;
+            info.n_k = num_parameters;
             info.guess = guess;
             info.trajectory = trajectory;
             info.cost = cost;
@@ -123,18 +149,35 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
 end
 
 % Utility function to merge the constraints.
-function [h, heq, grad_h, grad_heq] = merge_constraints(k, n_k, rsInstances, nlconCallbacks)
+function [h, heq, grad_h, grad_heq] = merge_constraints(k, num_parameters, num_slack, nlconCallbacks)
     h = [];
     heq = [];
     grad_h = [];
     grad_heq = [];
+
+    slack_idxs = [0, cumsum(num_slack)];
+    full_param_size = num_parameters + slack_idxs(end);
     
     for i=1:length(nlconCallbacks)
-        temp_k = rsInstances{i}.n_k;
-        [rs_h, rs_heq, rs_grad_h, rs_grad_heq] = nlconCallbacks{i}(k(1:temp_k));
+        if isempty(nlconCallbacks{i})
+            continue
+        end
+        % Run the nlcon callback with the expected parameters
+        k_idx = 1:num_parameters;
+        if num_slack(i) > 0
+            k_idx = [k_idx, slack_idxs(i)+1:slack_idxs(i+1)];
+        end
+        [rs_h, rs_heq, rs_grad_h, rs_grad_heq] = nlconCallbacks{i}(k(k_idx));
+
+        % Combine
+        temp_grad_h = zeros(full_param_size, length(rs_h));
+        temp_grad_heq = zeros(full_param_size, length(rs_heq));
+        temp_grad_h(k_idx,:) = rs_grad_h;
+        temp_grad_heq(k_idx,:) = rs_grad_heq;
+
         h = [h; rs_h];
         heq = [heq; rs_heq];
-        grad_h = [grad_h, [rs_grad_h;zeros(n_k-temp_k, length(rs_h))]];
-        grad_heq = [grad_heq, [rs_grad_heq;zeros(n_k-temp_k, length(rs_heq))]];
+        grad_h = [grad_h, temp_grad_h];
+        grad_heq = [grad_heq, temp_grad_heq];
     end
 end

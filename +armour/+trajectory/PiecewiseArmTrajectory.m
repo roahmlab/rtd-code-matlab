@@ -41,6 +41,9 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
                 options.jrsInstance armour.reachsets.JRSInstance = self.jrsInstance
             end
             self.trajectoryParams = trajectoryParams;
+            if length(self.trajectoryParams) > self.jrsInstance.n_q
+                self.trajectoryParams = self.trajectoryParams(1:self.jrsInstance.n_q);
+            end
             self.startState = options.startState;
             self.jrsInstance = options.jrsInstance;
             
@@ -84,7 +87,7 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
             
             % Scale the parameters
             out = self.jrsInstance.output_range;
-            in = self.jrsInstance.parameter_range;
+            in = self.jrsInstance.input_range;
             self.q_ddot = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
             
             % Compute the peak parameters

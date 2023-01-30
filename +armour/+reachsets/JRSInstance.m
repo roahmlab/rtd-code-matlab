@@ -2,9 +2,9 @@ classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
     % JRSInstance
     % This is just an individual instance of an original ARMTD JRS.
     properties
-        parameter_range = [-1.0, 1.0]
+        input_range = [-1.0, 1.0]
         output_range = [-1.0, 1.0]
-        n_k = []
+        num_parameters = 0
         
         % properties carried over from the original implementation
         q_des
@@ -24,6 +24,7 @@ classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
         n_q
         n_t
         k_id
+        n_k
     end
     methods
         % An example constructor, but can take anything needed for the
@@ -41,10 +42,11 @@ classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
                     c_k = self.jrs_info.c_k_bernstein;
                     g_k = self.jrs_info.g_k_bernstein;
             end
-            self.parameter_range = ones(self.jrs_info.n_k, 1) * self.parameter_range;
+            self.input_range = ones(self.jrs_info.n_k, 1) * self.input_range;
             self.output_range = c_k + [-1.0, 1.0] .* g_k;
             
             self.n_q = self.jrs_info.n_q;
+            self.num_parameters = self.jrs_info.n_k;
             self.n_k = self.jrs_info.n_k;
             self.n_t = self.jrs_info.n_t;
             self.k_id = self.jrs_info.k_id;
@@ -55,14 +57,7 @@ classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
         % Returns a function handle for the nlconstraint generated
         % where the function's return type is [c, ceq, gc, gceq]
         function nlconFunction = genNLConstraint(self, worldState)
-            nlconFunction = @NOP;
+            nlconFunction = [];
         end
     end
-end
-
-function [h, heq, grad_h, grad_heq] = NOP(varargin)
-    h = [];
-    heq = [];
-    grad_h = [];
-    grad_heq = [];
 end

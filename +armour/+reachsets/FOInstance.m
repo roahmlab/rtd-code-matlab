@@ -3,9 +3,8 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
     % This is just an individual instance of an original ARMTD FO
     % generation.
     properties
-        parameter_range = [-1.0, 1.0]
-        output_range = []
-        n_k = []
+        input_range = [-1.0, 1.0]
+        num_parameters = 0
         
         % properties carried over from the original implementation
         robotInfo
@@ -27,9 +26,9 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
             self.FO = FO;
             self.jrsInstance = jrsInstance;
             self.smooth_obs = smooth_obs;
-            self.n_k = jrsInstance.n_k;
+            self.num_parameters = jrsInstance.n_k;
             
-            self.parameter_range = jrsInstance.parameter_range;
+            self.input_range = jrsInstance.input_range;
             % self.output_range = jrsInstance.output_range;
             
             % initialize combinations (for obstacle avoidance constraints)
@@ -99,10 +98,11 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
                 end
             end
             % update n_k and parameter_range if smooth
-            if self.smooth_obs
-                self.n_k = self.jrsInstance.n_k + smooth_obs_lambda_index{end}(end);
-                lambda_range = ones(5, 2) .* [0.0, 1.0];
-                self.parameter_range = [self.jrsInstance.parameter_range; lambda_range];
+            if self.smooth_obs && ~isempty(smooth_obs_lambda_index)
+                self.num_parameters = self.jrsInstance.num_parameters;% + smooth_obs_lambda_index{end}(end);
+                %lambda_range = ones(5, 2) .* [0.0, 1.0];
+                lambda_range = ones(smooth_obs_lambda_index{end}(end), 2) .* [0.0, 1.0];
+                self.input_range = [self.jrsInstance.input_range; lambda_range];
             end
             % create the constraint callback
             if self.smooth_obs

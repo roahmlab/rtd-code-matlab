@@ -94,13 +94,13 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = false;
-use_robust_input = false;
+input_constraints_flag = true;
+use_robust_input = true;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...
         trajOptProps, sim.agent, ...
-        input_constraints_flag, use_robust_input, smooth_obs, 'bernstein' ...
+        input_constraints_flag, use_robust_input, smooth_obs, 'orig' ...
     );
 
 %% HLP stuff to migrate
