@@ -10,7 +10,7 @@ classdef NamedClass < handle
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
 % Written: 2022-10-05
-% Last Revised: 2023-01-19 (Adam Li)
+% Last Revised: 2023-01-30 (Adam Li)
 %
 % See also rtd.util.types.LogLevel
 %

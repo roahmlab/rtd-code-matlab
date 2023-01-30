@@ -102,7 +102,7 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
             % Combine nlconCallbacks
             % TODO update to allow combination with any other constraints
             % needed if wanted
-            constraintCallback = @(k) merge_constraints(k, num_parameters, num_slack, nlconCallbacks);
+            constraintCallback = @(k) merge_constraints(k, num_parameters, num_slack, nlconCallbacks, fieldnames(self.reachableSets).');
             
             % create bounds (robotInfo and worldInfo come into play here?)
             bounds.param_limits = [param_bounds; slack_bounds];
@@ -148,8 +148,9 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
     end
 end
 
-% Utility function to merge the constraints.
-function [h, heq, grad_h, grad_heq] = merge_constraints(k, num_parameters, num_slack, nlconCallbacks)
+% Utility function to merge the constraints. nlconNames is added to ease
+% debugging if needed.
+function [h, heq, grad_h, grad_heq] = merge_constraints(k, num_parameters, num_slack, nlconCallbacks, nlconNames)
     h = [];
     heq = [];
     grad_h = [];

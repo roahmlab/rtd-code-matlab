@@ -1,4 +1,4 @@
-classdef ReachSetInstance < rtd.util.mixins.UUID & matlab.mixin.Heterogeneous & handle
+classdef ReachSetInstance < rtd.util.mixins.UUID & handle
     % ReachSetInstance
     % This is just an individual instance of a reachable set. It should
     % hold the necessary information to make a nonlinear constraint. If a
@@ -21,12 +21,5 @@ classdef ReachSetInstance < rtd.util.mixins.UUID & matlab.mixin.Heterogeneous & 
         % Returns a function handle for the nlconstraint generated
         % where the function's return type is [c, ceq, gc, gceq]
         nlconFunction = genNLConstraint(self, worldState)
-    end
-    
-    % Make it so we can initialize it
-    methods (Static, Sealed, Access = protected)
-        function default_object = getDefaultScalarElement
-            default_object = rtd.planner.reachsets.EmptyReachSetInstance;
-        end
     end
 end
