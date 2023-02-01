@@ -1,18 +1,23 @@
-classdef ArmourPlanner < rtd.planner.RtdPlanner
+classdef ArmourPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
     properties
-        %trajOptProps
-        %robot
-        %worldInfo
-        jrsHandle
-        foHandle
-        irsHandle
-        reachableSets
+        rsGenerators
         objective
         optimizationEngine
         trajectoryFactory
         
         trajopt
     end
+    
+    methods (Static)
+        function options = defaultoptions()
+            options.input_constraints_flag = false;
+            options.use_robust_input = false;
+            options.smooth_obs = false;
+            options.traj_type = 'piecewise';
+            options.verboseLevel = 'DEBUG';
+        end
+    end
+
     % This class specifies the overall planner, so it sets up everything
     % for any special type of rtd.planner.RtdPlanner.
     methods
@@ -24,41 +29,28 @@ classdef ArmourPlanner < rtd.planner.RtdPlanner
         
         % - Create RTD_TrajOpt for each trajectory type
         % - Create initial trajectories for each trajectory type
-        function self = ArmourPlanner( ...
-                    trajOptProps, robot, ...
-                    input_constraints_flag, use_robust_input, smooth_obs, traj_type ...
-                )
-            
-            % conduct validation here
-            % TODO
-            
-            %trajOptProps = TrajOptProps;
-            %trajOptProps.timeout = 0.5;
-            %trajOptProps.horizon = 1.0;
-            %timeForCost = 0.5;
-            
-            %robot = ArmRobotInfo;
-            %worldInfo = WorldInfo;
-            
-            %input_constraints_flag = false;
-            %use_robust_input = false;
-            %smooth_obs = false;
+        function self = ArmourPlanner(trajOptProps, robot, options)
+            arguments
+                trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
+                robot (1,1) armour.ArmourAgent
+                options.input_constraints_flag (1,1) logical
+                options.use_robust_input (1,1) logical
+                options.smooth_obs (1,1) logical
+                options.traj_type {mustBeMember(options.traj_type,{'piecewise','bernstein'})}
+                options.verboseLevel (1,1) rtd.util.types.LogLevel
+            end
+            options = self.mergeoptions(options);
             
             % Create our reachable sets
-            rsGenerators = struct;
-            rsGenerators.jrs = armour.reachsets.JRSGenerator(robot, "traj_type", traj_type);
-            rsGenerators.fo = armour.reachsets.FOGenerator(robot, rsGenerators.jrs, smooth_obs);
-            if input_constraints_flag
-                rsGenerators.irs = armour.reachsets.IRSGenerator(robot, rsGenerators.jrs, use_robust_input);
+            self.rsGenerators = struct;
+            self.rsGenerators.jrs = armour.reachsets.JRSGenerator(robot, traj_type=options.traj_type);
+            self.rsGenerators.fo = armour.reachsets.FOGenerator(robot, self.rsGenerators.jrs, smooth_obs=options.smooth_obs);
+            if options.input_constraints_flag
+                self.rsGenerators.irs = armour.reachsets.IRSGenerator(robot, self.rsGenerators.jrs, use_robust_input=options.use_robust_input);
             end
-            self.reachableSets = rsGenerators;
             
             % Create the trajectoryFactory
-            % Compat
-            if strcmp(traj_type,'orig')
-                traj_type = 'piecewise';
-            end
-            self.trajectoryFactory = armour.trajectory.ArmTrajectoryFactory(trajOptProps, traj_type);
+            self.trajectoryFactory = armour.trajectory.ArmTrajectoryFactory(trajOptProps, options.traj_type);
             
             % Create the objective
             self.objective = rtd.planner.trajopt.GenericArmObjective(trajOptProps, self.trajectoryFactory);
@@ -70,7 +62,7 @@ classdef ArmourPlanner < rtd.planner.RtdPlanner
             self.trajopt = {rtd.planner.trajopt.RtdTrajOpt( ...
                 trajOptProps,           ...
                 robot,              ...
-                self.reachableSets,          ...
+                self.rsGenerators,          ...
                 self.objective,              ...
                 self.optimizationEngine,     ...
                 self.trajectoryFactory)};
@@ -80,6 +72,12 @@ classdef ArmourPlanner < rtd.planner.RtdPlanner
         % Use RTD to solve for a trajectory and return either
         % the parameters or invalid signal (continue)
         function [trajectory, info] = planTrajectory(self, robotState, worldState, waypoint)
+            arguments
+                self armour.ArmourPlanner
+                robotState rtd.entity.states.ArmRobotState
+                worldState
+                waypoint
+            end
             % Loops over each RTD_TrajOpt instance (thus, each trajectory
             % type) with the given RobotState, rtd.sim.world.WorldState, Waypoint, and
             % initial guess

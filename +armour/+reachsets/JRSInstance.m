@@ -35,7 +35,7 @@ classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
         function initialize(self, traj_type)
             % expand the parameter range to match the number of joints
             switch traj_type
-                case 'orig'
+                case 'piecewise'
                     c_k = self.jrs_info.c_k;
                     g_k = self.jrs_info.g_k;
                 case 'bernstein'

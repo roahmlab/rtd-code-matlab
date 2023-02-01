@@ -7,7 +7,7 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
     end
     % Make protected later (Debate).
     properties%(Access = 'protected')
-        robotInfo
+        robot
         reachableSets
         objective
         optimizationEngine
@@ -20,18 +20,29 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
         % between versions.
         function self = RtdTrajOpt(    ...
                     trajOptProps,       ...
-                    robotInfo,          ...
+                    robot,          ...
                     reachableSets,      ...
                     objective,          ...
                     optimizationEngine, ...
-                    trajectoryFactory   ...
+                    trajectoryFactory,  ...
+                    options             ...
                 )
+            arguments
+                trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
+                robot (1,1) rtd.sim.world.WorldEntity
+                reachableSets (1,1) struct
+                objective (1,1) rtd.planner.trajopt.Objective
+                optimizationEngine (1,1) rtd.planner.trajopt.OptimizationEngine
+                trajectoryFactory (1,1) rtd.planner.trajectory.TrajectoryFactory
+                options.verboseLevel (1,1) rtd.util.types.LogLevel = 'DEBUG'
+            end
             self.trajOptProps = trajOptProps;
-            self.robotInfo = robotInfo; % there's a chance these two info
+            self.robot = robot; % there's a chance these two info
             self.reachableSets = reachableSets;
             self.objective = objective;
             self.optimizationEngine = optimizationEngine;
             self.trajectoryFactory = trajectoryFactory;
+            self.set_vdisplevel(options.verboseLevel);
         end
         
         % Execute the solver for trajectory optimization.
@@ -41,8 +52,14 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
                     robotState,             ...
                     worldState,             ...
                     waypoint,               ...
-                    initialGuess            ...
+                    initialGuess,           ...
+                    rsAdditionalArgs        ...
                 )
+
+            % Temp
+            if ~exist('rsAdditionalArgs', 'var')
+                rsAdditionalArgs = struct;
+            end
 
             self.vdisp("Generating reachable sets and nonlinear constraints", 'INFO')
             
@@ -50,7 +67,12 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
             rsInstances = struct;
             for rs_name=fieldnames(self.reachableSets).'
                 self.vdisp(['Generating ', rs_name{1}], 'DEBUG')
-                rs = self.reachableSets.(rs_name{1}).getReachableSet(robotState, false);
+                rs_args = {};
+                if isfield(rsAdditionalArgs, rs_name{1})
+                    self.vdisp(['Passing additional arguments to generate ', rs_name{1}], 'GENERAL')
+                    rs_args = namedargs2cell(rsAdditionalArgs.(rs_name{1}));
+                end
+                rs = self.reachableSets.(rs_name{1}).getReachableSet(robotState, rs_args{:}, ignore_cache=false);
                 rsInstances.(rs_name{1}) = rs;
             end
 
@@ -121,7 +143,7 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
             
             
             % Optimize
-            self.vdisp("Optimizing!")
+            self.vdisp("Optimizing!",'INFO')
             [success, parameters, cost] = self.optimizationEngine.performOptimization(guess, ...
                 objectiveCallback, constraintCallback, bounds);
             
@@ -140,7 +162,7 @@ classdef RtdTrajOpt < handle & rtd.util.mixins.NamedClass
             info.objectiveCallback = objectiveCallback;
             info.waypoint = waypoint;
             info.bounds = bounds;
-            info.n_k = num_parameters;
+            info.num_parameters = num_parameters;
             info.guess = guess;
             info.trajectory = trajectory;
             info.cost = cost;

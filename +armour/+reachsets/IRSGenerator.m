@@ -1,21 +1,34 @@
-classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixins.NamedClass
+classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
     % InputReachableSet
     % This generates the upper and lower bound reachable sets on the input,
     % and creates an IRSInstance object.
+
+    % Required Abstract Properties
     properties
         cache_max_size = 1
-        jrsHandle
+    end
+
+    % Additional Properties
+    properties
+        jrsGenerator
         use_robust_input
+        robot
     end
     methods
-        function self = IRSGenerator( ...
-                    robot, jrsHandle, use_robust_input ...
-                )
+        function self = IRSGenerator(robot, jrsGenerator, options)
+            arguments
+                robot armour.ArmourAgent
+                jrsGenerator armour.reachsets.JRSGenerator
+                options.use_robust_input(1,1) logical = true
+                options.verboseLevel(1,1) rtd.util.types.LogLevel = "DEBUG"
+            end
             self.robot = robot;
-            self.jrsHandle = jrsHandle;
-            self.use_robust_input = use_robust_input;
-            self.set_vdisplevel('OFF');
+            self.jrsGenerator = jrsGenerator;
+            self.use_robust_input = options.use_robust_input;
+            self.set_vdisplevel(options.verboseLevel);
         end
+    end
+    methods (Access=protected)
         
         % Obtains the relevant reachable set for the robotstate provided
         % and outputs the singular instance of a reachable set.
@@ -25,18 +38,20 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
             
             % First get the JRS (allow the use of a cached value if it
             % exists)
-            jrsInstance = self.jrsHandle.getReachableSet(robotState, false);
+            jrsInstance = self.jrsGenerator.getReachableSet(robotState, ignore_cache=false);
             
+            self.vdisp("Generating input reachable set!", "INFO")
+
             % set up zeros and overapproximation of r
-            self.vdisp("Set up zeros for overapproximation")
+            self.vdisp("Set up zeros for overapproximation", 'TRACE')
             for j = 1:jrsInstance.n_q
                 zero_cell{j, 1} = polyZonotope_ROAHM(0); 
                 r{j, 1} = polyZonotope_ROAHM(0, [], self.robot.controller.ultimate_bound);
             end
             
-            self.vdisp("start RNEA")
+            self.vdisp("Start RNEA", 'TRACE')
             for i = 1:jrsInstance.n_t
-                self.vdisp("RNEA for nominal")
+                self.vdisp("RNEA for nominal", 'TRACE')
                 tau_nom{i, 1} = poly_zonotope_rnea( ...
                         jrsInstance.R{i}, ...
                         jrsInstance.R_t{i}, ...
@@ -46,7 +61,7 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
                         true, ...
                         self.robot.info.params.pz_nominal);
                 if self.use_robust_input
-                    self.vdisp("RNEA interval for robust input")
+                    self.vdisp("RNEA interval for robust input", 'TRACE')
                     [tau_int{i, 1}, f_int{i, 1}, n_int{i, 1}] = ...
                         poly_zonotope_rnea( ...
                             jrsInstance.R{i}, ...
@@ -57,13 +72,13 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
                             true, ...
                             self.robot.info.params.pz_interval);
                     
-                    self.vdisp("calculate w from robust controller")
+                    self.vdisp("calculate w from robust controller", 'TRACE')
                     for j = 1:jrsInstance.n_q
                         w{i, 1}{j, 1} = tau_int{i, 1}{j, 1} - tau_nom{i, 1}{j, 1};
                         w{i, 1}{j, 1} = reduce(w{i, 1}{j, 1}, 'girard', self.robot.info.params.pz_interval.zono_order);
                     end
                     
-                    self.vdisp("calculate v_cell")
+                    self.vdisp("calculate v_cell", 'TRACE')
                     V_cell = poly_zonotope_rnea( ...
                         jrsInstance.R{i}, ...
                         jrsInstance.R_t{i}, ...
@@ -94,7 +109,7 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
             % end
             % can get ||w|| <= ||\rho(\Phi)||, and compute the norm using interval arithmetic
             if self.use_robust_input
-                self.vdisp("another one bites the dust")
+                self.vdisp("robust input", 'TRACE')
                 for i = 1:jrsInstance.n_t
                     for j = 1:jrsInstance.n_q
                         w_int{i, 1}(j, 1) = interval(w{i, 1}{j, 1});
@@ -102,7 +117,7 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
                     rho_max{i, 1} = norm(max(abs(w_int{i, 1}.inf), abs(w_int{i, 1}.sup)));
                 end
 
-                self.vdisp("robust input bound tortatotope")
+                self.vdisp("robust input bound tortatotope", 'TRACE')
                 % compute robust input bound tortatotope:
                 for i = 1:jrsInstance.n_t
                     v_norm{i, 1} = (self.robot.controller.alpha_constant*V_diff_int{i, 1}.sup).*(1/self.robot.controller.ultimate_bound) + rho_max{i, 1};
@@ -115,7 +130,7 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator & rtd.util.mixin
             end
 
             % compute total input tortatotope
-            self.vdisp("Total input tortatotope")
+            self.vdisp("Total input tortatotope", 'TRACE')
             for i = 1:jrsInstance.n_t
                 for j = 1:jrsInstance.n_q
                     u_ub_tmp = tau_nom{i, 1}{j, 1} + v_norm{i, 1};
