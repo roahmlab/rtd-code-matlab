@@ -1,8 +1,4 @@
 classdef Waypoint
-    % Waypoint
-    % Unused, but remains in case abstraction is needed.
-    
-    properties
-    end
+% Unused class, but it remains in case abstraction is needed for waypoints.
 end
 

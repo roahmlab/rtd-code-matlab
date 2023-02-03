@@ -1,30 +1,64 @@
 classdef GenericArmObjective < rtd.planner.trajopt.Objective
-    % GenericArmObjective
-    % This objective generalizes the joint space objective used for ArmTD
-    % and allows us to use any joint-space trajectory for ArmTD based
-    % trajopt ptoblems. It should be setup in the planner itself and the
-    % handle for this object passed to the trajopt problem.
+% A general configuration-space objective object for arm robots.
+%
+% This objective generalizes the joint space objective used for ArmTD and
+% allows us to use any joint-space trajectory for ArmTD based trajopt
+% ptoblems. It should be setup in the planner itself and the handle for
+% this object passed to the trajopt problem.
+%
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2022-09-08
+% Last revised: 2023-02-03
+%
+% See also rtd.planner.trajopt, rtd.planner.trajopt.Objective
+%
+% --- More Info ---
+%
+
     properties
-        % we just need to time for the cost and the factory for the
-        % objective
-        trajectoryFactory
-        t_cost
+        % Handle to a trajectory factory to get the trajectory to optimize
+        trajectoryFactory %
+
+        % The time at which to compare waypoint to.
+        t_cost %
     end
     methods
-        % Construct this objective function generator. Provide a trajectory
-        % factory object which creates unique trajectory objects with each
-        % call and the properties of the overall trajopt problem.
         function self = GenericArmObjective(trajOptProps, trajectoryFactory)
-            % we just need to time for the cost and the factory for the
-            % objective
+            % Constructs this objective function generator.
+            % 
+            % Provide a trajectory factory object which creates unique
+            % trajectory objects with each call and the properties of the
+            % overall trajopt problem, from which the time for the cost is
+            % used with some trajectory to create the objective.
+            %
+            % Arguments:
+            %   trajOptProps (rtd.planner.trajopt.TrajOptProps)
+            %   trajectoryFactory (rtd.planner.trajectory.TrajectoryFactory)
+            %
+            arguments
+                trajOptProps rtd.planner.trajopt.TrajOptProps
+                trajectoryFactory rtd.planner.trajectory.TrajectoryFactory
+            end
             self.trajectoryFactory = trajectoryFactory;
             self.t_cost = trajOptProps.timeForCost;
         end
         
-        % Given the information, generate a handle for an objective
-        % function with two return values, where
-        % function [cost, grad_cost] = objectiveCallback(params)
         function objectiveCallback = genObjective(self, robotState, waypoint, reachableSets)
+            % Given the information, generate a handle for an objective function
+            %
+            % This creates a function_handle with two return values, where
+            % `function [cost, grad_cost] = objectiveCallback(params)`
+            %
+            % Arguments:
+            %   robotState: The starting state of the robot for this optimization
+            %   waypoint: The waypoint we want to optimize towards
+            %   reachableSets: Instance of the reachable sets used for the objective.
+            %
+            % Returns:
+            %   function_handle: a function handle to be use for the objective callback of the optimizer.
+            %
+
             %future intention: q_des = waypoint.q_des;
             q_des = waypoint; % Rename just for past readability
 

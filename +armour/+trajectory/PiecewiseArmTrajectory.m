@@ -1,6 +1,11 @@
 classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
     % PiecewiseArmTrajectory
     % The original ArmTD trajectory with peicewise accelerations
+    % Required properties
+    properties (Constant)
+        vectorized = true
+    end
+    % Additional properties
     properties
         % Precomputed values
         q_ddot         {mustBeNumeric}

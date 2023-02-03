@@ -4,7 +4,7 @@ classdef NamedClass < handle
 % It pulls the classname and packagename the class is under and saves them.
 % With those saved names, it has a verbose logging capability which we can
 % specify levels of verbosity for. It follows a subset of the log4j log
-% levels defined in :mat:class:`+rtd.+core.+types.LogLevel`. The log levels can
+% levels defined in :mat:class:`+rtd.+util.+types.LogLevel`. The log levels can
 % also be set by its name string.
 %
 % --- More Info ---
@@ -108,7 +108,7 @@ classdef NamedClass < handle
             % Set the verbosity of the current class's output
             %
             % Arguments:
-            %     level (String, rtd.util.types.LogLevel): The level of the current class
+            %     level (rtd.util.types.LogLevel): The level of the current class
             %
             arguments
                 self rtd.util.mixins.NamedClass

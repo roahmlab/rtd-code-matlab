@@ -3,6 +3,11 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
     % This encapsulates the conversion of parameters used in optimization
     % to the actual trajectory generated from those parameters. It's also
     % indirectly used to specify the OptimizationEngine's size
+    % Required properties
+    properties (Constant)
+        vectorized = true
+    end
+    % Additional properties
     properties
         % Initial parameters from the robot used to calculate the desired
         % trajectory

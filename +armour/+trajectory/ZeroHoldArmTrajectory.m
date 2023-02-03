@@ -1,5 +1,10 @@
 classdef ZeroHoldArmTrajectory < rtd.planner.trajectory.Trajectory
     % ZeroHoldArmTrajectory
+    % Required properties
+    properties (Constant)
+        vectorized = true
+    end
+    % Additional properties
     methods
         % The ZeroHoldArmTrajectory constructor, which simply sets parameters and
         % attempts to call internalUpdate, a helper function made for this

@@ -1,44 +1,87 @@
 classdef Trajectory < handle
-    % Trajectory
-    % This encapsulates the conversion of parameters used in optimization
-    % to the actual trajectory generated from those parameters. It's also
-    % indirectly used to specify the OptimizationEngine's size
+% Base class for a parameterized trajectory.
+%
+% This encapsulates the conversion of parameters used in optimization to
+% the actual trajectory generated from those parameters. This can also be
+% used by an :mat:class:`+rtd.+planner.+trajopt.Objective` object as part
+% of the objective function call. It should be generated with some
+% :mat:class:`+rtd.+planner.+trajectory.TrajectoryFactory`.
+%
+% Note:
+%   The functions `validate(self, throwOnError)`, `setParameters(self,
+%   trajectoryParams, options)`, and `getCommand(self, time)` should all be
+%   implemented. Check help to find more information.
+%
+% Note:
+%   Many of these functions should be implemented with argument validation
+%   to either provide default values or provide additional Name-Value
+%   arguments more easily.
+%
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2022-08-24
+% Last Revised: 2023-02-02
+% 
+% See also validate, setParameters, getCommand,
+% rtd.planner.trajectory.TrajectoryFactory, arguments
+%
+% ---More Info ---
+%
+
     properties
         % Properties from the trajectory optimization, which also describe
         % properties for the trajectory.
-        trajOptProps rtd.planner.trajopt.TrajOptProps
-        % The parameters used for the trajectory
-        trajectoryParams(:,1) double
-        % The initial state for the trajectory
-        startState(1,1) rtd.entity.states.EntityState
+        trajOptProps rtd.planner.trajopt.TrajOptProps %
+
+        % The parameters used for this trajectory
+        trajectoryParams(:,1) double %
+
+        % The initial state for this trajectory
+        startState(1,1) rtd.entity.states.EntityState %
     end
+    properties (Abstract, Constant)
+        % Set to true if this trajectory supports getting commands for a
+        % time vector instead of just a single moment in time.
+        vectorized(1,1) logical
+    end
+
     methods (Abstract)
-        % An example constructor for the trajectory object. Should be
-        % implemented with varargin for cross compatibility.
-        %self = Trajectory(              ...
-        %            trajOptProps,       ...
-        %            robotState,         ...
-        %            rsInstances,        ...
-        %            trajectoryParams,   ...
-        %            varargin            ...
-        %        )
-        
+        % Validates if the trajectory is parameterized right.
+        %
         % A validation method to ensure that the trajectory this object
-        % describes is fully set. Add an additional argument to allow
+        % describes is fully set. Has an additional argument to allow
         % throwing an error if incorrect.
+        %
+        % Arguments:
+        %   throwOnError (logical): whether or not to throw an error if invalid
+        %
+        % Returns:
+        %   logical: whether or not the trajectory is valid
+        %
         valid = validate(self, throwOnError)
 
-        % Set the parameters for the trajectory. This allows for the entire
-        % trajectory described to be changed, but it should focus on this
-        % trajectory params while the constructor should focus on the start
-        % state.
-        % Should be implemented with a varargin for compatability with all
-        % classes (some may want more parameters.)
+        % Set the parameters for the trajectory.
+        % 
+        % This allows for the entire trajectory described to be changed,
+        % but it should focus on this trajectory params while the
+        % constructor should focus on the start state.
+        %
+        % Arguments:
+        %   trajectoryParams: the parameters of the trajectory to set.
+        %   options: Any additiona keyword arguments or choice.
+        % 
         setParameters(self, trajectoryParams, options)
         
-
-        % Computes the actual input commands for the given time.
-        % Should throw RTD:InvalidTrajectory if the trajectory isn't set
+        % Computes the actual state to track for the given time.
+        %
+        % Should throw RTD:InvalidTrajectory if the trajectory isn't set.
+        %
+        % Arguments:
+        %   time: Time to use to calculate the desired state for this trajectory
+        %
+        % Returns:
+        %   rtd.entity.states.EntityState: Desired state at the given time
+        %
         command = getCommand(self, time)
     end
 end

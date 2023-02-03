@@ -2,7 +2,6 @@ classdef ArmTrajectoryFactory < rtd.planner.trajectory.TrajectoryFactory & handl
 
     properties
         traj_type {mustBeMember(traj_type,{'piecewise', 'bernstein', 'zerohold'})} = 'piecewise'
-        trajOptProps
     end
 
     methods

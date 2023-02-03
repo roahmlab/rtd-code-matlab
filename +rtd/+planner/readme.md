@@ -1,4 +1,4 @@
-# rtd_planner
+# rtd.planner
 
 This folder contains a proposed structure for the core RTD component of our RTD projects.
 This does not include the simulator or the set representation themselves.
