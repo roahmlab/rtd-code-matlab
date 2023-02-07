@@ -103,7 +103,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             
             % Flesh out the links from the robot
             link_shapes = repmat({'cuboid'}, 1, self.n_links_and_joints);
-            [link_poly_zonotopes, link_sizes, ~] = create_pz_bounding_boxes(self.robot);
+            [link_poly_zonotopes, link_sizes, ~] = armour.legacy.create_pz_bounding_boxes(self.robot);
             link_sizes = num2cell(link_sizes,1);
 
             % Store to the class links struct

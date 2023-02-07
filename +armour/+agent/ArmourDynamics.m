@@ -207,9 +207,9 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
 
         % Compute dynamic parameters given robot parameters
         function [M, C, g] = calculate_dynamics(~, q, qd, params)
-            M = rnea_mass(q, params);
-            C = rnea_coriolis(q, qd, params);
-            g = rnea_gravity(q, params);
+            M = armour.legacy.dynamics.rnea_mass(q, params);
+            C = armour.legacy.dynamics.rnea_coriolis(q, qd, params);
+            g = armour.legacy.dynamics.rnea_gravity(q, params);
         end
         
         % add measurement noise

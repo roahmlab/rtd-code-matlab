@@ -45,7 +45,7 @@ classdef FOGenerator < rtd.planner.reachsets.ReachSetGenerator
 
             % get forward kinematics and forward occupancy
             for i = 1:jrsInstance.n_t
-               [R_w{i, 1}, p_w{i, 1}] = pzfk(jrsInstance.R{i, 1}, self.robot.info.params.pz_nominal);
+               [R_w{i, 1}, p_w{i, 1}] = armour.legacy.dynamics.pzfk(jrsInstance.R{i, 1}, self.robot.info.params.pz_nominal);
                for j = 1:self.robot.info.params.pz_nominal.num_bodies
                   FO{i, 1}{j, 1} = R_w{i, 1}{j, 1}*self.robot.info.links(j).poly_zonotope + p_w{i, 1}{j, 1}; 
                   FO{i, 1}{j, 1} = reduce(FO{i, 1}{j, 1}, 'girard', self.robot.info.params.pz_interval.zono_order);
