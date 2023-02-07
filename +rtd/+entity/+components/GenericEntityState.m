@@ -92,7 +92,7 @@ classdef GenericEntityState < rtd.entity.components.BaseStateComponent & rtd.uti
             self.time = 0;
             
             % Make the random configuration
-            self.state(:) = rand_range(state_range(1,:),state_range(2,:))';
+            self.state(:) = rtd.random.deprecation.rand_range(state_range(1,:),state_range(2,:))';
             
             % Take these initials and merge them in again.
             if save_to_options

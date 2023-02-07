@@ -87,17 +87,18 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.input_range;
             q_goal = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            q_goal = self.startState.q + q_goal;
 
             n_q = self.jrsInstance.n_q;
             self.alpha = zeros(n_q, 6);
             for j = 1:n_q  % Modified to use matrix instead of cells
-                beta = match_deg5_bernstein_coefficients({...
+                beta = armour.legacy.match_deg5_bernstein_coefficients({...
                     self.startState.position(j); ...
                     self.startState.velocity(j); ...
                     self.startState.acceleration(j); ...
                     q_goal(j); ...
                     0; 0});
-                self.alpha(j,:) = cell2mat(bernstein_to_poly(beta, 5));
+                self.alpha(j,:) = cell2mat(armour.legacy.bernstein_to_poly(beta, 5));
             end
             
             % Precompute end position

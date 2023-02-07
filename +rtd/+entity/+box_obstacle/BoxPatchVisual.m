@@ -4,7 +4,6 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
     % Leftover Old Dependencies
     % make_cuboid_for_patch
     % make_box
-    % check_if_plot_is_available - This is probably a major hog!
     
     properties
         box_info rtd.entity.box_obstacle.BoxObstacleInfo = rtd.entity.box_obstacle.BoxObstacleInfo.empty()
@@ -100,9 +99,9 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
             
             switch dim
                 case 2
-                    [F,V] = make_box(side_len,center) ;
+                    [F,V] = rtd.functional.geometry.make_box(side_len,center) ;
                 case 3
-                    [F,V] = make_cuboid_for_patch(side_len(1),side_len(2),side_len(3),center) ;
+                    [F,V] = rtd.functional.geometry.make_cuboid_for_patch(side_len(1),side_len(2),side_len(3),center) ;
             end
             
             self.plot_patch_data.faces = F ;
@@ -126,7 +125,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
             F = self.plot_patch_data.faces;
             
             % Plot/update them
-            if check_if_plot_is_available(self,'body')
+            if self.isPlotDataValid('body')
                 self.plot_data.body.Faces = F ;
                 self.plot_data.body.Vertices = V ;
             else

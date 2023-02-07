@@ -21,6 +21,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         ultimate_bound_position double
         ultimate_bound_velocity double
         alpha_constant double
+        Kr double
         
         trajectories = {}
     end
@@ -116,6 +117,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             self.ultimate_bound_position = self.LLC_wrapped.ultimate_bound_position;
             self.ultimate_bound_velocity = self.LLC_wrapped.ultimate_bound_velocity;
             self.alpha_constant = self.LLC_wrapped.alpha_constant;
+            self.Kr = self.LLC_wrapped.Kr;
             
             % Create the initial trajectory
             a = armour.trajectory.ZeroHoldArmTrajectory(self.robot_state.get_state);

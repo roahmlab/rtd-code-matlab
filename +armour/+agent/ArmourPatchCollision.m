@@ -5,7 +5,6 @@ classdef ArmourPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamic
     % make_cuboid_for_patch
     % make_ellipsoid_for_patch
     % make_cylinder_for_patch
-    % check_if_plot_is_available - This is probably a major hog!
     
     properties
         arm_info armour.agent.ArmourAgentInfo = armour.agent.ArmourAgentInfo.empty()
@@ -60,13 +59,13 @@ classdef ArmourPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamic
 
                 switch self.arm_info.links(l_idx).shape
                     case 'cuboid'
-                        [~,link_vertices] = make_cuboid_for_patch(link) ;
+                        [~,link_vertices] = rtd.functional.geometry.make_cuboid_for_patch(link) ;
                     case 'ellipsoid'
                         link = link./2 ;
-                        [~,link_vertices] = make_ellipsoid_for_patch(link(1),link(2),link(3),zeros(3,1),6) ;
+                        [~,link_vertices] = rtd.functional.geometry.make_ellipsoid_for_patch(link(1),link(2),link(3),zeros(3,1),6) ;
                     case 'cylinder'
                         % l = (length, radius, (not used))
-                        [~,link_vertices] = make_cylinder_for_patch(link(2)/2,link(1),10,true,true) ;
+                        [~,link_vertices] = rtd.functional.geometry.make_cylinder_for_patch(link(2)/2,link(1),10,true,true) ;
                         R = axang2rotm([0 1 0 pi/2]) ;
                         link_vertices = (R*link_vertices')' ;
                     otherwise

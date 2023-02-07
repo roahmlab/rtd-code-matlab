@@ -36,8 +36,8 @@ classdef JRSInstance < rtd.planner.reachsets.ReachSetInstance
             % expand the parameter range to match the number of joints
             switch traj_type
                 case 'piecewise'
-                    c_k = self.jrs_info.c_k;
-                    g_k = self.jrs_info.g_k;
+                    c_k = self.jrs_info.c_k_orig;
+                    g_k = self.jrs_info.g_k_orig;
                 case 'bernstein'
                     c_k = self.jrs_info.c_k_bernstein;
                     g_k = self.jrs_info.g_k_bernstein;

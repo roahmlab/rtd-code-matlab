@@ -133,10 +133,12 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
             
             % Make the random configuration
             if options.random_position
-                self.state(self.position_indices) = rand_range(pos_range(1,:),pos_range(2,:))';
+                self.state(self.position_indices) = ...
+                    rtd.random.deprecation.rand_range(pos_range(1,:),pos_range(2,:))';
             end
             if options.random_velocity
-                self.state(self.velocity_indices) = rand_range(vel_range(1,:),vel_range(2,:))';
+                self.state(self.velocity_indices) = ...
+                    rtd.random.deprecation.rand_range(vel_range(1,:),vel_range(2,:))';
             end
             
             % Take these initials and merge them in again.
