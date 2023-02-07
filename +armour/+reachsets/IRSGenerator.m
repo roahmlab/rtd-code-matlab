@@ -145,7 +145,7 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
             end
             
             % Save the generated reachable sets into the IRSInstance
-            reachableSet = armour.reachsets.IRSInstance(u_ub, u_lb, jrsInstance);
+            reachableSet = armour.reachsets.IRSInstance(u_ub, u_lb, jrsInstance, self.get_vdisplevel);
         end
     end
 end
