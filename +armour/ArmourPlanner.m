@@ -43,10 +43,11 @@ classdef ArmourPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             
             % Create our reachable sets
             self.rsGenerators = struct;
-            self.rsGenerators.jrs = armour.reachsets.JRSGenerator(robot, traj_type=options.traj_type);
-            self.rsGenerators.fo = armour.reachsets.FOGenerator(robot, self.rsGenerators.jrs, smooth_obs=options.smooth_obs);
+            self.rsGenerators.jrs = armour.reachsets.JRSGenerator(robot, traj_type=options.traj_type, verboseLevel=options.verboseLevel);
+            self.rsGenerators.fo = armour.reachsets.FOGenerator(robot, self.rsGenerators.jrs, smooth_obs=options.smooth_obs, verboseLevel=options.verboseLevel);
             if options.input_constraints_flag
-                self.rsGenerators.irs = armour.reachsets.IRSGenerator(robot, self.rsGenerators.jrs, use_robust_input=options.use_robust_input);
+                self.rsGenerators.irs = armour.reachsets.IRSGenerator(robot, self.rsGenerators.jrs, use_robust_input=options.use_robust_input, verboseLevel=options.verboseLevel);
+                self.rsGenerators.jls = armour.reachsets.JLSGenerator(robot, self.rsGenerators.jrs, verboseLevel=options.verboseLevel);
             end
             
             % Create the trajectoryFactory

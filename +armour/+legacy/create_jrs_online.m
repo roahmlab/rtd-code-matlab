@@ -20,7 +20,7 @@ import armour.legacy.*
 
 %% setup
 if ~exist('add_ultimate_bound', 'var')
-    add_ultimate_bound = true;
+    add_ultimate_bound = false;
 end
 
 make_gens_independent = true; % treat time and error as independent generators
