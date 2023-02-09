@@ -4,20 +4,26 @@ classdef uarmtd_robust_CBF_LLC < robot_arm_LLC
     
     properties
         Kr = 10;
-        V_max = 3.1e-7; % max allowable value of lyapunov function
+        V_max = 1e-7; % 3.1e-7; % max allowable value of lyapunov function
+        r_norm_threshold = 0;
         alpha_constant = 1;
         alpha = [];
         use_true_params_for_robust = false;
-        use_disturbance_norm = true;
+        use_disturbance_norm = false;
         ultimate_bound;
         ultimate_bound_position;
-        ultimate_bound_velocity
+        ultimate_bound_velocity;
+        if_use_mex_controller = false;
+        internal_mex = [];
     end
     
     methods
         function LLC = uarmtd_robust_CBF_LLC(varargin)
             LLC = parse_args(LLC,varargin{:}) ;
             LLC.alpha = @(h) LLC.alpha_constant*h;
+            if LLC.if_use_mex_controller
+                LLC.internal_mex = armour.agent.controller.MexRobustController(0.03, LLC.Kr * ones(7,1), LLC.alpha_constant, LLC.V_max, LLC.r_norm_threshold);
+            end
         end
         
         %% setup
@@ -44,10 +50,11 @@ classdef uarmtd_robust_CBF_LLC < robot_arm_LLC
             info.ultimate_bound_velocity = LLC.ultimate_bound_velocity;
 
             info.alpha_constant = LLC.alpha_constant;
+            info.Kr = LLC.Kr;
         end
 
         %% get control inputs
-        function [u, tau, v, true_disturbance, true_V, r] = get_control_inputs(LLC, A, t, z_meas, planner_info)
+        function [u, tau, v, true_disturbance, true_V, r, int_disturbance, int_V] = get_control_inputs(LLC, A, t, z_meas, planner_info)
             % u = LLC.get_control_inputs(A, t_cur,z_cur,planner_info)
             %
             % Given the current time and measured state, and a reference trajectory
@@ -72,74 +79,92 @@ classdef uarmtd_robust_CBF_LLC < robot_arm_LLC
 
             r = d_err + LLC.Kr*err;
 
-            % nominal controller
-            tau = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.nominal);
-
-            % robust input
-            if norm(r) ~= 0
-                if LLC.use_true_params_for_robust
-                    % calculate true disturbance
-                    disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.true) - tau;
-
-                    % bounds on max disturbance
-                    if LLC.use_disturbance_norm
-                        norm_rho = norm(disturbance);
+            if ~LLC.if_use_mex_controller
+                % nominal controller
+                tau = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.nominal);
+    
+                % robust input
+                if norm(r) > LLC.r_norm_threshold
+                    if LLC.use_true_params_for_robust
+                        % calculate true disturbance
+                        disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.true) - tau;
+    
+                        % bounds on max disturbance
+                        if LLC.use_disturbance_norm
+                            norm_rho = norm(disturbance);
+                        else
+                            rho = abs(r)'*abs(disturbance);
+                        end
+                        
+                        % compute true Lyapunov function
+                        V_tmp = armour.legacy.dynamics.rnea(q, zeros(A.n_states/2, 1), zeros(A.n_states/2, 1), r, false, A.params.true);
+                        V = 0.5*r'*V_tmp;
                     else
-                        rho = r'*disturbance/norm(r);
+                        % calculate interval disturbance
+                        disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.interval) - tau;
+                        
+                        % bounds on max disturbance
+                        if LLC.use_disturbance_norm
+                            Phi_min = abs(infimum(disturbance));
+                            Phi_max = abs(supremum(disturbance));
+                            norm_rho = norm(max(Phi_min, Phi_max));
+                        else
+                            rho = supremum(abs(r)'*abs(disturbance));
+                        end
+                        
+                        % compute interval Lyapunov function
+                        V_tmp = armour.legacy.dynamics.rnea(q, zeros(A.n_states/2, 1), zeros(A.n_states/2, 1), r, false, A.params.interval);
+                        V_int = 0.5*r'*V_tmp;
+                        V = supremum(V_int);
                     end
                     
-                    % compute true Lyapunov function
-                    V_tmp = armour.legacy.dynamics.rnea(q, zeros(A.n_states/2, 1), zeros(A.n_states/2, 1), r, false, A.params.true);
-                    V = 0.5*r'*V_tmp;
-                else
-                    % calculate interval disturbance
-                    disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.interval) - tau;
-                    
-                    % bounds on max disturbance
+                    % assemble input
+                    h = -V + LLC.V_max; % value of CBF function
+    
                     if LLC.use_disturbance_norm
-                        Phi_min = abs(infimum(disturbance));
-                        Phi_max = abs(supremum(disturbance));
-                        norm_rho = norm(max(Phi_min, Phi_max));
+                        lambda = max(0, -LLC.alpha(h)/norm(r)^2 + norm_rho/norm(r)); % coefficient on r
                     else
-                        rho = supremum(r'*disturbance)/norm(r);
+                        lambda = max(0, (-LLC.alpha(h) + rho)/norm(r)^2);
                     end
-                    
-                    % compute interval Lyapunov function
-                    V_tmp = armour.legacy.dynamics.rnea(q, zeros(A.n_states/2, 1), zeros(A.n_states/2, 1), r, false, A.params.interval);
-                    V_int = 0.5*r'*V_tmp;
-                    V = supremum(V_int);
-                end
-                
-                % assemble input
-                h = -V + LLC.V_max; % value of CBF function
-
-                if LLC.use_disturbance_norm
-                    lambda = max(0, -LLC.alpha(h)/norm(r)^2 + norm_rho/norm(r)); % coefficient on r
+    
+                    v = lambda*r; % positive here! because u = tau + v in this code instead of tau - v
                 else
-                    lambda = max(0, (-LLC.alpha(h) + rho)/norm(r)^2);
+                    v = zeros(size(r));
+                    V = 0;
+                    if ~LLC.use_true_params_for_robust
+                        V_int = interval(0, 0);
+                        disturbance = interval(0, 0);                    
+                    end
                 end
-
-                v = lambda*r; % positive here! because u = tau + v in this code instead of tau - v
+    
+                % combine nominal and robust inputs
+                u = tau + v;
+    
+                % output more for logging if desired
+                if nargout > 3
+                    if ~LLC.use_true_params_for_robust
+                        true_disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.true) - tau;
+                        true_V_tmp = armour.legacy.dynamics.rnea(q, zeros(A.n_states/2, 1), zeros(A.n_states/2, 1), r, false, A.params.true);
+                        true_V = 0.5*r'*true_V_tmp;
+                        int_V = V_int;
+                        int_disturbance = disturbance;
+                    else
+                        if norm(r) == 0
+                            disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.true) - tau;
+                        end
+                        true_disturbance = disturbance;
+                        true_V = V;
+                        int_V = V;
+                        int_disturbance = disturbance;
+                    end
+                end
             else
-                v = zeros(size(r));
-                V = 0;
-            end
+                [u, tau, v] = LLC.internal_mex.update(q, qd, q_des, qd_des, qdd_des);
 
-            % combine nominal and robust inputs
-            u = tau + v;
-
-            % output more for logging if desired
-            if nargout > 3
-                if ~LLC.use_true_params_for_robust
+                if nargout > 3
                     true_disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.true) - tau;
                     true_V_tmp = armour.legacy.dynamics.rnea(q, zeros(A.n_states/2, 1), zeros(A.n_states/2, 1), r, false, A.params.true);
                     true_V = 0.5*r'*true_V_tmp;
-                else
-                    if norm(r) == 0
-                        disturbance = armour.legacy.dynamics.rnea(q, qd, qd_ref, qdd_ref, true, A.params.true) - tau;
-                    end
-                    true_disturbance = disturbance;
-                    true_V = V;
                 end
             end
         end
@@ -168,11 +193,11 @@ classdef uarmtd_robust_CBF_LLC < robot_arm_LLC
                 qd_ref = z_ref_agent(A.joint_speed_indices, t_idx);
                 for i = 1:length(q)
                     if abs(q(i) - q_ref(i)) > LLC.ultimate_bound_position
-                        fprintf('Time %.2f, joint %d position bound exceeded: %.5f vs +-%.5f \n', t_check(t_idx), i, q(i) - q_ref(i), LLC.ultimate_bound_position);
+                        fprintf('        LLC: Time %.2f, joint %d position bound exceeded: %.5f vs +-%.5f \n', t_check(t_idx), i, q(i) - q_ref(i), LLC.ultimate_bound_position);
                         out = true;
                     end
                     if abs(qd(i) - qd_ref(i)) > LLC.ultimate_bound_velocity
-                        fprintf('Time %.2f, joint %d velocity bound exceeded: %.5f vs +-%.5f \n', t_check(t_idx), i, qd(i) - qd_ref(i), LLC.ultimate_bound_velocity);
+                        fprintf('        LLC: Time %.2f, joint %d velocity bound exceeded: %.5f vs +-%.5f \n', t_check(t_idx), i, qd(i) - qd_ref(i), LLC.ultimate_bound_velocity);
                         out = true;
                     end
                 end

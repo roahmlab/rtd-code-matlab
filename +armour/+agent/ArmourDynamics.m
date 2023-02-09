@@ -179,6 +179,10 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             
             % True dynamics
             [M, C, g] = self.calculate_dynamics(q, qd, self.robot_info.params.true);
+
+            for i = 1:length(q)
+                M(i,i) = M(i,i) + self.robot_info.transmission_inertia(i);
+            end
             
             % Add measurement noise if desired
             if self.measurement_noise.points > 0
