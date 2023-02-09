@@ -157,7 +157,7 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
                         error('Prismatic joints are not yet supported!')
                     case 'fixed'
                         if dim == 3
-                            R_succ = self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3)*R_pred ;
+                            R_succ = R_pred*self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3);
                         else
                             % rotation matrix of current link assumed same as predecessor
                             R_succ = R_pred ;

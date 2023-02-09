@@ -109,36 +109,36 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             % add the agent
             self.add_object(agent, isentity=true, collision=agent.collision, visual=agent.visual);
 
-            % Create the base obstacles
-            base_creation_buffer = 0.025;
-            face_color = [0.5 0.5 0.5];
-            edge_color = [0 0 0];
-
-            base_options.info.is_base_obstacle = true;
-            base_options.info.creation_buffer = base_creation_buffer;
-            base_options.visual.face_color = face_color;
-            base_options.visual.edge_color = edge_color;
-            optionsStruct.component_options = base_options;
-            base = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
-                                        2*[0.2794, 0.2794, 0.1778], ...
-                                        optionsStruct);
-            tower = rtd.entity.BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
-                                        2*[0.1016, 0.1651, 0.3312], ...
-                                        optionsStruct);
-            head = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
-                                        2*[0.1651, 0.1397, 0.0635], ...
-                                        optionsStruct);
-            % Floor
-            floor_color = [0.9, 0.9, 0.9];
-            optionsStruct.component_options.visual.face_color = floor_color;
-            floor = rtd.entity.BoxObstacle.makeBox([-0.0331;0;0.005], ...
-                                        2*[1.3598, 1.3598, 0.0025], ...
-                                        optionsStruct);
-
-            % Add them to the world
-            for obs = [base, tower, head, floor]
-                self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
-            end
+%             % Create the base obstacles
+%             base_creation_buffer = 0.025;
+%             face_color = [0.5 0.5 0.5];
+%             edge_color = [0 0 0];
+% 
+%             base_options.info.is_base_obstacle = true;
+%             base_options.info.creation_buffer = base_creation_buffer;
+%             base_options.visual.face_color = face_color;
+%             base_options.visual.edge_color = edge_color;
+%             optionsStruct.component_options = base_options;
+%             base = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
+%                                         2*[0.2794, 0.2794, 0.1778], ...
+%                                         optionsStruct);
+%             tower = rtd.entity.BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
+%                                         2*[0.1016, 0.1651, 0.3312], ...
+%                                         optionsStruct);
+%             head = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
+%                                         2*[0.1651, 0.1397, 0.0635], ...
+%                                         optionsStruct);
+%             % Floor
+%             floor_color = [0.9, 0.9, 0.9];
+%             optionsStruct.component_options.visual.face_color = floor_color;
+%             floor = rtd.entity.BoxObstacle.makeBox([-0.0331;0;0.005], ...
+%                                         2*[1.3598, 1.3598, 0.0025], ...
+%                                         optionsStruct);
+% 
+%             % Add them to the world
+%             for obs = [base, tower, head, floor]
+%                 self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
+%             end
             
             % reset the log
             % For other simulations, you might want to validate keys and
@@ -173,7 +173,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             % start.
 
             % Create the random obstacles
-            n_obstacles = 10;
+            n_obstacles = 0;
             obstacle_size_range = [0.01 0.5] ; % [min, max] side length
             creation_buffer = 0.05;
             world_bounds = [self.agent.info.reach_limits(1:2:6); self.agent.info.reach_limits(2:2:6)];

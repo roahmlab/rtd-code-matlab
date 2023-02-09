@@ -113,12 +113,14 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
 
             % Preprocess and save the names
             provided_component_classnames = cellfun(@class, provided_components, 'UniformOutput', false);
+            string_mask = ismember(provided_component_classnames,{'char','string'});
+            provided_component_classnames(string_mask) = provided_components(string_mask);
             provided_component_names = names(provided_components_mask);
             options.components = [provided_component_names; provided_component_classnames];
             options.components = struct(options.components{:});
 
             % Preprocess the instances for options
-            component_handles = [provided_component_names; provided_components];
+            component_handles = [provided_component_names(~string_mask); provided_components(~string_mask)];
             options.component_options = rtd.sim.world.WorldEntity.get_componentoptions(struct(component_handles{:}));
         end
 

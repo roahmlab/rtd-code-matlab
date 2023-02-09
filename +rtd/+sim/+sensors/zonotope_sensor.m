@@ -10,6 +10,11 @@ function zonotopes = zonotope_sensor(world, agent, time)
     agent_mask = ~strcmp({world.uuid}, agent.uuid);
     rep_mask = arrayfun(@(x)isprop(x,'representation'),world);
     mask = agent_mask & rep_mask;
+    % Short circuit if no obstacles present.
+    if ~any(mask)
+        zonotopes = [];
+        return;
+    end
     % Get all the obstacles
     representations = [world(mask).representation];
     zonotopes = arrayfun(@(x)x.get_zonotope(time=time),representations);

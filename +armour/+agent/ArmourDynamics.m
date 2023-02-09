@@ -93,7 +93,10 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
                                      'robust_input', ...
                                      'disturbance', ...
                                      'lyapunov', ...
-                                     'r');
+                                     'r', ...
+                                     'info', ...
+                                     'int_disturbance', ...
+                                     'int_lyapunov');
             end
             
             % Set up verbose output
@@ -126,30 +129,29 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             
             % If we have an active log, initialize trajectories to log
             if ~isempty(self.controller_log)
-                uout = zeros(self.controller.n_inputs, size(tout, 2));
-                nominal_out = zeros(size(uout));
-                robust_out = zeros(size(uout));
-                disturbance_out = zeros(size(uout));
-                lyap_out = zeros(size(tout));
-                r_out = zeros(self.robot_info.num_q, size(tout, 2));
-
                 % store approximate inputs at each time:
-                for j = 1:length(tout)
+                % Reverse to preallocate.
+                for j = length(tout):-1:1
                     t = tout(j);
                     z_meas = zout(:,j);
-                    [uout(:, j), nominal_out(:, j), robust_out(:, j),...
-                     disturbance_out(:, j), lyap_out(:, j), r_out(:, j)] = ...
-                     self.controller.getControlInputs(t, z_meas);
+                    [uout(:, j), info(j)] = ...
+                        self.controller.getControlInputs(t, z_meas);
                 end
-                
+
                 % Save to the log
                 self.controller_log.add('input_time', state.time + tout, ...
-                             'input', uout, ...
-                             'nominal_input', nominal_out, ...
-                             'robust_input', robust_out, ...
-                             'disturbance', disturbance_out, ...
-                             'lyapunov', lyap_out, ...
-                             'r', r_out);
+                             'input', uout);
+
+                % Try to save info struct
+                if isstruct(info(1))
+                    for entries=fieldnames(info(1)).'
+                        flatinfo.(entries{1}) = [info.(entries{1})];
+                    end
+                    self.controller_log.addStruct(flatinfo);
+                % otherwise save the whole info
+                elseif ~isempty(info(1))
+                    self.controller_log.add('info', info);
+                end
             end
         end
         
@@ -178,6 +180,10 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             
             % True dynamics
             [M, C, g] = self.calculate_dynamics(q, qd, self.robot_info.params.true);
+
+            for i = 1:length(q)
+                M(i,i) = M(i,i) + self.robot_info.transmission_inertia(i);
+            end
             
             % Add measurement noise if desired
             if self.measurement_noise.points > 0
