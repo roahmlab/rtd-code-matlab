@@ -45,8 +45,8 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
             % set up zeros and overapproximation of r
             self.vdisp("Set up zeros for overapproximation", 'TRACE')
             for j = 1:jrsInstance.n_q
-                zero_cell{j, 1} = armour.legacy.pz_roahm.polyZonotope_ROAHM(0); 
-                r{j, 1} = armour.legacy.pz_roahm.polyZonotope_ROAHM(0, [], self.robot.controller.ultimate_bound);
+                zero_cell{j, 1} = armour.pz_roahm.polyZonotope_ROAHM(0); 
+                r{j, 1} = armour.pz_roahm.polyZonotope_ROAHM(0, [], self.robot.controller.ultimate_bound);
             end
             
             self.vdisp("Start RNEA", 'TRACE')
@@ -139,8 +139,8 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
                     u_lb_tmp = remove_dependence(u_lb_tmp, jrsInstance.k_id(end));
                     u_ub_buff = sum(abs(u_ub_tmp.Grest));
                     u_lb_buff = -sum(abs(u_lb_tmp.Grest));
-                    u_ub{i, 1}{j, 1} = armour.legacy.pz_roahm.polyZonotope_ROAHM(u_ub_tmp.c + u_ub_buff, u_ub_tmp.G, [], u_ub_tmp.expMat, u_ub_tmp.id) - self.robot.info.joints(j).torque_limits(2);
-                    u_lb{i, 1}{j, 1} = -1*armour.legacy.pz_roahm.polyZonotope_ROAHM(u_lb_tmp.c + u_lb_buff, u_lb_tmp.G, [], u_lb_tmp.expMat, u_lb_tmp.id) + self.robot.info.joints(j).torque_limits(1);
+                    u_ub{i, 1}{j, 1} = armour.pz_roahm.polyZonotope_ROAHM(u_ub_tmp.c + u_ub_buff, u_ub_tmp.G, [], u_ub_tmp.expMat, u_ub_tmp.id) - self.robot.info.joints(j).torque_limits(2);
+                    u_lb{i, 1}{j, 1} = -1*armour.pz_roahm.polyZonotope_ROAHM(u_lb_tmp.c + u_lb_buff, u_lb_tmp.G, [], u_lb_tmp.expMat, u_lb_tmp.id) + self.robot.info.joints(j).torque_limits(1);
                 end
             end
             

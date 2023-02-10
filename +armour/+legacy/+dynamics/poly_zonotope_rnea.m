@@ -1,6 +1,5 @@
 function [u, f, n] = poly_zonotope_rnea(R_in, R_t_in, qd, q_aux_d, qdd, use_gravity, robot_params)
-import armour.legacy.dyn_utils.*
-import armour.legacy.pz_roahm.*
+import armour.pz_roahm.*
     % outputs: u - nx1 cell of tortatotopes for n joints
 
 	%% Robot parameters

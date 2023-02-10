@@ -18,13 +18,13 @@ visualize_cad = true;
 % Add noise to the dynamics
 component_options.dynamics.measurement_noise_points = 0;
 component_options.dynamics.log_controller = true;
-component_options.controller.use_true_params_for_robust = true;
+component_options.controller.use_true_params_for_robust = false;
 
 %% Setup the info
 robot = importrobot(agent_urdf);
 robot.DataFormat = 'col';
 robot.Gravity = [0 0 -9.81];
-params = armour.legacy.load_robot_params(robot, ...
+params = armour.legacy.dynamics.load_robot_params(robot, ...
                            'add_uncertainty_to', add_uncertainty_to, ...
                            'links_with_uncertainty', links_with_uncertainty,...
                            'uncertain_mass_range', uncertain_mass_range);
@@ -101,8 +101,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = false;
-use_robust_input = false;
+input_constraints_flag = true;
+use_robust_input = true;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...

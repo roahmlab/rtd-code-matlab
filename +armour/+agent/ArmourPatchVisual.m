@@ -7,7 +7,6 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
     % make_oval
     % make_ellipsoid_for_patch
     % make_cylinder_for_patch
-    % check_if_plot_is_available - This is probably a major hog!
     
     properties
         arm_info armour.agent.ArmourAgentInfo = armour.agent.ArmourAgentInfo.empty()
@@ -103,7 +102,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
     methods
         function create_baselink_plot_patch_data(self)
             % create baselink cone for plotting
-            [faces,vertices] = make_cuboid_for_patch(0.025, 0.025, 0.025, [0;0;0]);
+            [faces,vertices] = rtd.functional.geometry.make_cuboid_for_patch(0.025, 0.025, 0.025, [0;0;0]);
             
             % save
             self.link_plot_data.baselink_faces = faces;
@@ -128,23 +127,23 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
                 % create link based on link type
                 switch self.arm_info.links(l_idx).shape
                     case 'box'
-                        [faces, vertices] = make_box(link) ;
+                        [faces, vertices] = rtd.functional.geometry.make_box(link) ;
                     case 'oval'
-                        [faces, vertices] = make_oval(link) ;
+                        [faces, vertices] = rtd.functional.geometry.make_oval(link) ;
                     case 'cuboid'
                         % create box for link that is slightly shorter than
                         % the actual volume of the box for prettiness
                         % purposes
                         % l(1) = l(1) - 0.045 ;
-                        [faces,vertices] = make_cuboid_for_patch(link) ;
+                        [faces,vertices] = rtd.functional.geometry.make_cuboid_for_patch(link) ;
                     case 'ellipsoid'
                         % remember that the link sizes specify the
                         % diameters of the link in each dimension
                         link = link./2 ;
-                        [faces,vertices] = make_ellipsoid_for_patch(link(1),link(2),link(3),zeros(3,1),6) ;
+                        [faces,vertices] = rtd.functional.geometry.make_ellipsoid_for_patch(link(1),link(2),link(3),zeros(3,1),6) ;
                     case 'cylinder'
                         % l = (length, radius, (not used))
-                        [faces,vertices] = make_cylinder_for_patch(link(2)/2,link(1),10,true,true) ;
+                        [faces,vertices] = rtd.functional.geometry.make_cylinder_for_patch(link(2)/2,link(1),10,true,true) ;
                         R = axang2rotm([0 1 0 pi/2]) ;
                         vertices = (R*vertices')' ;
                     otherwise
@@ -183,7 +182,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
             BF = self.link_plot_data.baselink_faces ;
             BV = self.link_plot_data.baselink_vertices ;
             
-            if check_if_plot_is_available(self,'baselink')
+            if self.isPlotDataValid('baselink')
                 self.plot_data.baselink.Faces = BF ;
                 self.plot_data.baselink.Vertices = BV ;
             else
@@ -204,7 +203,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
                 @(R, vert, T){(R * vert.' + T).'}, ...
                 R, self.link_plot_data.link_vertices, T);
             
-            if check_if_plot_is_available(self,'links')
+            if self.isPlotDataValid('links')
                 for idx = 1:self.arm_info.n_links_and_joints
                     self.plot_data.links(idx).Faces = self.link_plot_data.link_faces{idx} ;
                     self.plot_data.links(idx).Vertices = link_verts{idx} ;

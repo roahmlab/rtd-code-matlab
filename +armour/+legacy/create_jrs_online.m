@@ -15,7 +15,7 @@ function [Q_des, Qd_des, Qdd_des, Q, Qd, Qd_a, Qdd_a, R_des, R_t_des, R, R_t, jr
 % copied into legacy subpackage of armour in rtd-code repository from
 % commit df7cc3e and adapted
 %
-import armour.legacy.pz_roahm.*
+import armour.pz_roahm.*
 import armour.legacy.*
 
 %% setup
@@ -241,7 +241,7 @@ jrs_info.g_k_bernstein = bernstein_final_range;
 end
 
 function B = remove_dependence_and_compress(A, k_id)
-import armour.legacy.pz_roahm.*
+import armour.pz_roahm.*
 	k_id_idx = (A.id == k_id);
 	k_slc_idx = (A.expMat(k_id_idx, :) ~= 0 & all(A.expMat(~k_id_idx, :) == 0, 1)); % should only be one!
 	if length(find(k_slc_idx)) > 1
@@ -252,7 +252,7 @@ import armour.legacy.pz_roahm.*
 end
 
 function B = remove_dependence_and_compress_mat(A, k_id)
-import armour.legacy.pz_roahm.*
+import armour.pz_roahm.*
 	k_id_idx = (A.id == k_id);
 	k_slc_idx = (A.expMat(k_id_idx, :) ~= 0 & all(A.expMat(~k_id_idx, :) == 0, 1)); % should only be one!
 % 	if length(find(k_slc_idx)) > 1

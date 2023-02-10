@@ -2,7 +2,6 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
     
     % Torque dynamics with optional measurement noise
     % Leftover Old Dependencies
-    % match_trajectory
     % rnea_mass
     % rnea_coriolis
     % rnea_gravity
@@ -188,10 +187,7 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             
             % Add measurement noise if desired
             if self.measurement_noise.points > 0
-                [noise_pos, noise_vel] ...
-                    = match_trajectories(t ...
-                    , self.measurement_noise.time, self.measurement_noise.pos ...
-                    , self.measurement_noise.time, self.measurement_noise.vel, 'linear'); % linearly interpolate noise
+                [noise_pos, noise_vel] = self.get_measurement_noise(t);
                 q = q + noise_pos;
                 qd = qd + noise_vel;
             end
@@ -218,6 +214,24 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             g = armour.legacy.dynamics.rnea_gravity(q, params);
         end
         
+        % Get the noise
+        function [noise_pos, noise_vel] =  get_measurement_noise(self, t_vec)
+            if self.measurement_noise.points == 0
+                noise_pos = 0;
+                noise_vel = 0;
+            elseif self.measurement_noise.points == 1
+                noise_pos = repmat(self.measurement_noise.pos, 1, length(t_vec));
+                noise_vel = repmat(self.measurement_noise.vel, 1, length(t_vec));
+            else
+                noise_pos = interp1(self.measurement_noise.time, ...
+                                self.measurement_noise.pos.', ...
+                                t_vec).';
+                noise_vel = interp1(self.measurement_noise.time, ...
+                                self.measurement_noise.vel.', ...
+                                t_vec).';
+            end
+        end
+
         % add measurement noise
         % make into a new class for interpolated process noise
         function generate_measurement_noise(self, t_span)

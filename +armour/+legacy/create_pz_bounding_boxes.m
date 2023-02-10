@@ -1,7 +1,7 @@
 function [link_poly_zonotopes, link_sizes, mesh] = create_pz_bounding_boxes(robot)
 % takes in a robot
 % creates overapproximating PZ bounding box for each body of the robot.
-import armour.legacy.pz_roahm.*
+import armour.pz_roahm.*
 
 for i = 1:robot.NumBodies
     bounds = zeros(3, 2);

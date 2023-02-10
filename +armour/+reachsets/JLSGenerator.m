@@ -57,10 +57,10 @@ classdef JLSGenerator < rtd.planner.reachsets.ReachSetGenerator
                     dq_lim_tmp = remove_dependence(dq_lim_tmp, jrsInstance.k_id(end));
                     q_buf = sum(abs(q_lim_tmp.Grest));
                     dq_buf = sum(abs(dq_lim_tmp.Grest));
-                    q_ub{i, 1}{j, 1} = armour.legacy.pz_roahm.polyZonotope_ROAHM(q_lim_tmp.c + q_buf, q_lim_tmp.G, [], q_lim_tmp.expMat, q_lim_tmp.id) - joint_state_limits(2, j);
-                    q_lb{i, 1}{j, 1} = -1*armour.legacy.pz_roahm.polyZonotope_ROAHM(q_lim_tmp.c + q_buf, q_lim_tmp.G, [], q_lim_tmp.expMat, q_lim_tmp.id) + joint_state_limits(1, j);
-                    dq_ub{i, 1}{j, 1} = armour.legacy.pz_roahm.polyZonotope_ROAHM(dq_lim_tmp.c + dq_buf, dq_lim_tmp.G, [], dq_lim_tmp.expMat, dq_lim_tmp.id) - joint_speed_limits(2, j);
-                    dq_lb{i, 1}{j, 1} = -1*armour.legacy.pz_roahm.polyZonotope_ROAHM(dq_lim_tmp.c + dq_buf, dq_lim_tmp.G, [], dq_lim_tmp.expMat, dq_lim_tmp.id) + joint_speed_limits(1, j);
+                    q_ub{i, 1}{j, 1} = armour.pz_roahm.polyZonotope_ROAHM(q_lim_tmp.c + q_buf, q_lim_tmp.G, [], q_lim_tmp.expMat, q_lim_tmp.id) - joint_state_limits(2, j);
+                    q_lb{i, 1}{j, 1} = -1*armour.pz_roahm.polyZonotope_ROAHM(q_lim_tmp.c + q_buf, q_lim_tmp.G, [], q_lim_tmp.expMat, q_lim_tmp.id) + joint_state_limits(1, j);
+                    dq_ub{i, 1}{j, 1} = armour.pz_roahm.polyZonotope_ROAHM(dq_lim_tmp.c + dq_buf, dq_lim_tmp.G, [], dq_lim_tmp.expMat, dq_lim_tmp.id) - joint_speed_limits(2, j);
+                    dq_lb{i, 1}{j, 1} = -1*armour.pz_roahm.polyZonotope_ROAHM(dq_lim_tmp.c + dq_buf, dq_lim_tmp.G, [], dq_lim_tmp.expMat, dq_lim_tmp.id) + joint_speed_limits(1, j);
                 end
             end
             

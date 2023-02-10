@@ -1,5 +1,5 @@
 function [R_out, p_out] = pzfk(R_in, robot_params)
-import armour.legacy.pz_roahm.*
+import armour.pz_roahm.*
 % pass in PZ rotation matrices and robot parameters
 % output frame transforms from body frame to world frame for each body
 

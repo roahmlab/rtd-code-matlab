@@ -234,7 +234,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             end
             
             % update if needed
-            if ~check_if_plot_is_available(self,'links')
+            if ~self.isPlotDataValid('links')
                 n_links = self.arm_agent.info.n_links_and_joints;
                 link_array = gobjects(1, n_links);
                 for idx = 1:n_links

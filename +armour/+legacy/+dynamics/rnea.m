@@ -1,5 +1,4 @@
 function [u, f, n] = rnea(q, qd, q_aux_d, qdd, use_gravity, robot_params)
-import armour.legacy.dyn_utils.*
     %% Robot parameters
     % link masses
     mass = robot_params.mass;

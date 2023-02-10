@@ -75,7 +75,6 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                 end
             % if it's not, check for and add to collision or visual
             else
-                self.obstacles = [self.obstacles, box_obstacle_zonotope('center', object.state.state, 'side_lengths', object.info.side_lengths)];
                 if ~isempty(options.collision)
                     self.collision_system.addObjects(static=options.collision);
                 end
@@ -110,7 +109,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             % add the agent
             self.add_object(agent, isentity=true, collision=agent.collision, visual=agent.visual);
 
-%             % Create the base obstacles
+            % Create the base obstacles
 %             base_creation_buffer = 0.025;
 %             face_color = [0.5 0.5 0.5];
 %             edge_color = [0 0 0];
@@ -184,9 +183,11 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                 t_cur = toc(start_tic);
                 while randomizing && t_cur <= timeout
                     % create center, side lengths
-                    center = rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
+                    center = ...
+                        rtd.random.deprecation.rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
                                          world_bounds(2,:) - obstacle_size_range(2)/2 );
-                    side_lengths = rand_range(obstacle_size_range(1),...
+                    side_lengths = ...
+                        rtd.random.deprecation.rand_range(obstacle_size_range(1),...
                                               obstacle_size_range(2),...
                                               [],[],...
                                               1, 3); % 3 is the dim of the world in this case

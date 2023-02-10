@@ -4,7 +4,6 @@ classdef BoxObstacleZonotope < rtd.util.mixins.NamedClass & handle
     % Leftover Old Dependencies
     % make_cuboid_for_patch
     % make_box
-    % check_if_plot_is_available - This is probably a major hog!
     
     properties
         box_info rtd.entity.box_obstacle.BoxObstacleInfo = rtd.entity.box_obstacle.BoxObstacleInfo.empty()
