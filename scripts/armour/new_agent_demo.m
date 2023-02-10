@@ -5,6 +5,7 @@ clear ; clc; close all;
 verbosity = 'DEBUG';
 
 %%% for agent
+% agent_urdf = 'fetch_arm_new_dumbbell.urdf';
 agent_urdf = 'kinova_without_gripper.urdf';
 
 add_uncertainty_to = 'all'; % choose 'all', 'link', or 'none'
@@ -17,7 +18,7 @@ visualize_cad = true;
 % Add noise to the dynamics
 component_options.dynamics.measurement_noise_points = 0;
 component_options.dynamics.log_controller = true;
-component_options.controller.use_true_params_for_robust = false;
+component_options.controller.use_true_params_for_robust = true;
 
 %% Setup the info
 robot = importrobot(agent_urdf);
@@ -48,10 +49,14 @@ if visualize_cad
     camlight
 end
 
+controller = [];
+% controller = 'armour.agent.ArmourMexController';
+
 % Create
 agent = armour.ArmourAgent(agent_info, visual=visual, ...
                 component_options=component_options, ...
-                component_logLevelOverride=verbosity);
+                component_logLevelOverride=verbosity, ...
+                controller=controller);
 
 %% Demo section of copy-ability
 % A.visual.plot()
@@ -96,8 +101,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = true;
-use_robust_input = true;
+input_constraints_flag = false;
+use_robust_input = false;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...

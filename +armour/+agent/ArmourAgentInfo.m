@@ -96,9 +96,6 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             if isempty(options.joint_torque_limits)
                 error("Must pass in joint_torque_limits externally!")
             end
-            if isempty(options.transmission_inertia)
-                error("Must pass in transmission_inertia externally!")
-            end
             
             % Fill in our other dependent parameters
             self.robot.Gravity = options.gravity;
@@ -162,7 +159,12 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             % The ???? section
             % assuming serial kinematic chain!
             self.kinematic_chain = [0:self.n_links_and_joints-1; 1:self.n_links_and_joints];
-            self.transmission_inertia = options.transmission_inertia;
+            if ~isempty(options.transmission_inertia)
+                self.transmission_inertia = options.transmission_inertia;
+            else
+                warning("transmission_inertia not provided. Assuming zeros.")
+                self.transmission_inertia = zeros(1,self.n_links_and_joints);
+            end
             
             % figure out the maximum length and reach of the arm
             % based on axis limits

@@ -15,13 +15,14 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
     
     % Extra properties we define
     properties
-        LLC_wrapped robot_arm_LLC = uarmtd_robust_CBF_LLC.empty()
-        
         ultimate_bound double
         ultimate_bound_position double
         ultimate_bound_velocity double
-        alpha_constant double
+
         Kr double
+        alpha_constant double
+        V_max double
+        r_norm_threshold double
         
         trajectories = {}
     end
@@ -32,8 +33,9 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             options.use_true_params_for_robust = false;
             options.use_disturbance_norm = true;
             options.Kr = 10;
-            options.V_max = 3.1e-7;
             options.alpha_constant = 1;
+            options.V_max = 3.1e-7;
+            options.r_norm_threshold = 0;
             options.verboseLevel = 'INFO';
             options.name = '';
         end
@@ -48,8 +50,9 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 options.use_true_params_for_robust
                 options.use_disturbance_norm
                 options.Kr
-                options.V_max
                 options.alpha_constant
+                options.V_max
+                options.r_norm_threshold
                 options.verboseLevel
                 options.name
             end
@@ -70,8 +73,9 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 options.use_true_params_for_robust
                 options.use_disturbance_norm
                 options.Kr
-                options.V_max
                 options.alpha_constant
+                options.V_max
+                options.r_norm_threshold
                 options.verboseLevel
                 options.name
             end
@@ -83,46 +87,26 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             % Set up verbose output
             self.name = options.name;
             self.set_vdisplevel(options.verboseLevel);
+
+            % flatten out pertinent properties
+            self.Kr = options.Kr;
+            self.alpha_constant = options.alpha_constant;
+            self.V_max = options.V_max;
+            self.r_norm_threshold = options.r_norm_threshold;
             
-            % Create the LLC with the options
-            self.LLC_wrapped = uarmtd_robust_CBF_LLC( ...
-                'use_true_params_for_robust',options.use_true_params_for_robust, ...
-                'use_disturbance_norm', options.use_disturbance_norm, ...
-                'Kr', options.Kr, ...
-                'V_max', options.V_max, ...
-                'alpha_constant', options.alpha_constant, ...
-                'if_use_mex_controller', true);
-            
-            % Because we want to simplify, recreate the wrapped setup
-            % function and merge info out
-            % low_level_controller
-            self.LLC_wrapped.n_agent_states = self.robot_state.n_states;
-            self.LLC_wrapped.n_agent_inputs = self.n_inputs;
-            % robot_arm_LLC
-            self.LLC_wrapped.arm_dimension = self.robot_info.dimension;
-            self.LLC_wrapped.arm_n_links_and_joints = self.robot_info.n_links_and_joints;
-            self.LLC_wrapped.arm_joint_state_indices = self.robot_state.position_indices;
-            self.LLC_wrapped.arm_joint_speed_indices = self.robot_state.velocity_indices;
-            % uarmtd_robust_CBF_LLC
+            % Compute ultimate bounds
             if isprop(self.robot_info, 'M_min_eigenvalue')
-                self.LLC_wrapped.ultimate_bound = sqrt(2*self.LLC_wrapped.V_max/self.robot_info.M_min_eigenvalue);
-                self.LLC_wrapped.ultimate_bound_position = (1/self.LLC_wrapped.Kr)*self.LLC_wrapped.ultimate_bound;
-                self.LLC_wrapped.ultimate_bound_velocity = 2*self.LLC_wrapped.ultimate_bound;
-                self.vdisp(sprintf('Computed ultimate bound of %.3f', self.LLC_wrapped.ultimate_bound), 'GENERAL');
+                self.ultimate_bound = sqrt(2*self.V_max/self.robot_info.M_min_eigenvalue);
+                self.ultimate_bound_position = (1/self.Kr)*self.ultimate_bound;
+                self.ultimate_bound_velocity = 2*self.ultimate_bound;
+                self.vdisp(sprintf('Computed ultimate bound of %.3f', self.ultimate_bound), 'GENERAL');
             else
                 warning('No minimum eigenvalue of agent mass matrix specified, can not compute ultimate bound');
             end
             
-            % flatten out pertinent properties
-            self.ultimate_bound = self.LLC_wrapped.ultimate_bound;
-            self.ultimate_bound_position = self.LLC_wrapped.ultimate_bound_position;
-            self.ultimate_bound_velocity = self.LLC_wrapped.ultimate_bound_velocity;
-            self.alpha_constant = self.LLC_wrapped.alpha_constant;
-            self.Kr = self.LLC_wrapped.Kr;
-            
             % Create the initial trajectory
-            a = armour.trajectory.ZeroHoldArmTrajectory(self.robot_state.get_state);
-            self.trajectories = {a};
+            initial_traj = armour.trajectory.ZeroHoldArmTrajectory(self.robot_state.get_state);
+            self.trajectories = {initial_traj};
         end
             
         
@@ -137,23 +121,135 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             end
         end
         
-        function [u, tau, v, true_disturbance, true_V, r] = getControlInputs(self, t, z_meas)
+        function [u, info] = getControlInputs(self, t, z_meas, options)
+            arguments
+                self armour.agent.ArmourController
+                t
+                z_meas
+                options.doMoreLogging = false
+            end
+
+            % get actual robot state
+            z = z_meas(:);
+            position = z(self.robot_state.position_indices);
+            velocity = z(self.robot_state.velocity_indices);
+
             % Prepare trajectory
             trajectory = self.trajectories{end};
             startTime = self.robot_state.get_state().time;
-            
-            % Create shims
-            planner_info_shim.desired_trajectory = {@(t)unwrap_traj(trajectory.getCommand(startTime + t))};
-            A_shim.joint_state_indices = self.robot_state.position_indices;
-            A_shim.joint_speed_indices = self.robot_state.velocity_indices;
-            A_shim.params = self.robot_info.params;
-            A_shim.n_states = self.robot_state.n_states;
-            
-            % Run the LLC
-            if nargout > 3
-                [u, tau, v, true_disturbance, true_V, r] = self.LLC_wrapped.get_control_inputs(A_shim, t, z_meas, planner_info_shim);
+            target = trajectory.getCommand(startTime + t);
+
+            % error terms
+            err = target.position - position;
+            d_err = target.velocity - velocity;
+
+            % modified reference trajectory
+            vel_ref = target.velocity + self.Kr * err;
+            acc_ref = target.acceleration + self.Kr * d_err;
+
+            r = d_err + self.Kr * err;
+
+            % Nominal controller
+            tau = self.rnea( ...
+                    position, velocity, ...
+                    vel_ref, acc_ref, ...
+                    true, self.robot_info.params.nominal);
+
+            % robust input
+            if norm(r) > self.r_norm_threshold
+                if self.instanceOptions.use_true_params_for_robust
+                    % calculate true disturbance
+                    disturbance = self.rnea( ...
+                            position, velocity, ...
+                            vel_ref, acc_ref, ...
+                            true, self.robot_info.params.true) - tau;
+
+                    % bounds on max disturbance
+                    if self.instanceOptions.use_disturbance_norm
+                        norm_rho = norm(disturbance);
+                    else
+                        rho = abs(r)'*abs(disturbance);
+                    end
+                    
+                    % compute true Lyapunov function
+                    V_tmp = self.rnea( ...
+                            position, zeros(self.robot_info.num_q, 1), ...
+                            zeros(self.robot_info.num_q, 1), r, ...
+                            false, self.robot_info.params.true);
+                    V = 0.5*r'*V_tmp;
+                else
+                    % calculate interval disturbance
+                    disturbance = self.rnea( ...
+                            position, velocity, ...
+                            vel_ref, acc_ref, ...
+                            true, self.robot_info.params.interval) - tau;
+                    
+                    % bounds on max disturbance
+                    if self.instanceOptions.use_disturbance_norm
+                        Phi_min = abs(infimum(disturbance));
+                        Phi_max = abs(supremum(disturbance));
+                        norm_rho = norm(max(Phi_min, Phi_max));
+                    else
+                        rho = supremum(abs(r)'*abs(disturbance));
+                    end
+                    
+                    % compute interval Lyapunov function
+                    V_tmp = self.rnea( ...
+                            position, zeros(self.robot_info.num_q, 1), ...
+                            zeros(self.robot_info.num_q, 1), r, ...
+                            false, self.robot_info.params.interval);
+                    V_int = 0.5*r'*V_tmp;
+                    V = supremum(V_int);
+                end
+                
+                % assemble input
+                h = -V + self.V_max; % value of CBF function
+
+                if self.instanceOptions.use_disturbance_norm
+                    lambda = max(0, (-self.alpha_constant * h)/norm(r)^2 + norm_rho/norm(r)); % coefficient on r
+                else
+                    lambda = max(0, (-self.alpha_constant * h + rho)/norm(r)^2);
+                end
+
+                v = lambda*r; % positive here! because u = tau + v in this code instead of tau - v
             else
-                [u, tau, v, true_disturbance] = self.LLC_wrapped.get_control_inputs(A_shim, t, z_meas, planner_info_shim);
+                v = zeros(size(r));
+                V = 0;
+                if ~self.instanceOptions.use_true_params_for_robust
+                    V_int = interval(0, 0);
+                    disturbance = interval(0, 0);                    
+                end
+            end
+    
+            % combine nominal and robust inputs
+            u = tau + v;
+
+            % Info
+            info.nominal_input = tau;
+            info.robust_input = v;
+
+            % output more for logging if desired
+            if options.doMoreLogging
+                if ~self.instanceOptions.use_true_params_for_robust
+                    true_disturbance = self.rnea(position, velocity, vel_ref, acc_ref, true, self.robot_info.params.true) - tau;
+                    true_V_tmp = self.rnea(position, zeros(self.robot_info.num_q, 1), zeros(self.robot_info.num_q, 1), r, false, self.robot_info.params.true);
+                    true_V = 0.5*r'*true_V_tmp;
+                    int_V = V_int;
+                    int_disturbance = disturbance;
+                else
+                    if norm(r) <= self.r_norm_threshold
+                        disturbance = self.rnea(position, velocity, vel_ref, acc_ref, true, self.robot_info.params.true) - tau;
+                    end
+                    true_disturbance = disturbance;
+                    true_V = V;
+                    int_V = V;
+                    int_disturbance = disturbance;
+                end
+                info.disturbance = true_disturbance;
+                info.lyapunov = true_V;
+                info.r = r;
+                info.int_disturbance = int_disturbance;
+                info.int_lyapunov = int_V;
             end
         end
         
@@ -220,13 +316,11 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 self.vdisp('No ultimate bound exceeded', 'INFO');
             end
         end
-        
-    end
-end
 
-% Utility function
-function [q, qd, qdd] = unwrap_traj(res)
-    q = res.q_des;
-    qd = res.q_dot_des;
-    qdd = res.q_ddot_des;
+        % create a masked rnea call to handle transmission inertia
+        function [u, f, n] = rnea(self, q, qd, q_aux_d, qdd, use_gravity, robot_params)
+            [u, f, n] = armour.legacy.dynamics.rnea(q, qd, q_aux_d, qdd, use_gravity, robot_params);
+            u = u(:) + qdd(:) .* self.robot_info.transmission_inertia(:);
+        end
+    end
 end
