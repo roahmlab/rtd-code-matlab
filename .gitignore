@@ -32,3 +32,7 @@ octave-workspace
 
 # Sphinx build docs
 _build/
+
+# tar.gz for coinhsl
+*.tar.gz
+*.tgz

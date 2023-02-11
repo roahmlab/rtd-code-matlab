@@ -1,0 +1,13 @@
+# Common required apt dependencies
+build-essential
+gcc
+g++
+gfortran
+git
+patch
+wget
+pkg-config
+liblapack-dev
+libblas-dev
+libmetis-dev
+apt-utils

@@ -32,7 +32,7 @@ classdef UUID < handle
             % from this mixin. It will generate and associate a UUID to
             % the `uuid` property of this class.
             %
-            self.uuid = char(matlab.lang.internal.uuid());
+            self.uuid = rtd.functional.uuid();
         end
     end
 end

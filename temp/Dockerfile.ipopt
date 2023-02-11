@@ -1,0 +1,55 @@
+# Build
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+
+# Settings for apt
+ENV DEBIAN_FROTNEND="noninteractive" TZ="Etc/UTC"
+
+# =========== Basic Configuration ======================================================
+# Update the system
+RUN apt-get -y update \
+    && apt-get install --no-install-recommends -y \
+       build-essential gcc g++ gfortran git patch wget \
+       pkg-config liblapack-dev libblas-dev libmetis-dev \
+       apt-utils \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
+
+# ======== Start IPOPT installation ====================================================
+# Retrieve and copy all the dependencies needed by Ipopt
+ARG IPOPTDIR=/tmp/ipopt
+ARG IPOPTVER=3.14.10
+ARG IPOPTINSTALL=/opt/ipopt
+ARG HSLINSTALL=/opt/hsl
+
+WORKDIR /tmp
+RUN wget https://github.com/coin-or/Ipopt/archive/refs/tags/releases/${IPOPTVER}.tar.gz
+RUN tar xvf ./${IPOPTVER}.tar.gz && mv Ipopt-releases-${IPOPTVER} ${IPOPTDIR}
+
+# Prerequisites for Ipopt
+# HSL
+WORKDIR ${IPOPTDIR}
+RUN git clone --depth 1 --branch releases/2.2.1 https://github.com/coin-or-tools/ThirdParty-HSL.git
+WORKDIR ${IPOPTDIR}/ThirdParty-HSL
+COPY coinhsl.tar.gz coinhsl.tar.gz
+RUN tar xvf ./coinhsl.tar.gz && mv $(ls -d coinhsl*/) coinhsl
+RUN ./configure --prefix=${HSLINSTALL} \
+    && make \
+    && make install
+RUN find ${HSLINSTALL}/lib/libcoinhsl.* | xargs -I{} echo {} {} | sed "s/coin//2" | xargs -n 2 ln -s
+RUN ln -s ${HSLINSTALL}/lib/pkgconfig/coinhsl.pc ${HSLINSTALL}/lib/pkgconfig/hsl.pc
+
+# Configure and compile Ipopt
+WORKDIR ${IPOPTDIR}
+RUN mkdir build
+WORKDIR ${IPOPTDIR}/build
+RUN ../configure --prefix=${IPOPTINSTALL} \
+    && make \
+    && make install
+
+# Update environment variables
+ENV IPOPT_HOME=${IPOPTINSTALL}
+ENV LD_LIBRARY_PATH=${IPOPT_HOME}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+ENV HSL_HOME=${HSLINSTALL}
+ENV LD_LIBRARY_PATH=${HSL_HOME}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
