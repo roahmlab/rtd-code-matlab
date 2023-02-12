@@ -2,6 +2,7 @@ import socket
 import json
 import subprocess
 import sys
+import threading
 
 HOST = "0.0.0.0"
 PORT = 65535
@@ -29,14 +30,16 @@ def readPacket(connection):
         return None
     return json.loads(message)
 
-uuid = ''
-pid = None
+uuids = {}
+uuidlock = threading.Lock()
+
+#pid = None
 
 def list2str(data):
     return ' '.join('{}'.format(k) for k in data)
 
-def returnResult(connection):
-    with open("armour.out", "r") as f:
+def returnResult(connection, planner_id):
+    with open(f"buffer/{planner_id}.out", "r") as f:
         data = list(f)
     data = [float(entry) for entry in data]
     result = {}
@@ -46,13 +49,15 @@ def returnResult(connection):
     connection.send(bytes(message, 'utf-8'))
 
 def requestHandler(request, data, connection):
-    global uuid, pid
+    global uuids, uuidlock
     if request == 'robot_setup':
-        uuid = data['planner_id']
+        with uuidlock:
+            uuids[data['planner_id']] = None
 
     if request == 'plan_trajectory':
         inputs = data['inputs']
-        with open("armour.in", "w") as f:
+        uuid = data['planner_id']
+        with open(f"buffer/{uuid}.in", "w") as f:
             f.write(list2str(inputs['q_0']) + '\n')
             f.write(list2str(inputs['q_dot_0']) + '\n')
             f.write(list2str(inputs['q_ddot_0']) + '\n')
@@ -60,32 +65,40 @@ def requestHandler(request, data, connection):
             f.write(str(inputs['num_obs']) + '\n')
             for _, vals in inputs['obs'].items():
                 f.write(list2str(vals) + '\n')
-        pid = subprocess.Popen(['./armour'])
+        pid = subprocess.Popen(['./armour', uuid])
+        with uuidlock:
+            uuids[data['planner_id']] = pid
 
     if request == 'request_result':
+        #with uuidlock:
+        pid = uuids[data['planner_id']]
         if pid is not None:
             if pid.poll() == 0:
-                returnResult(connection)
+                returnResult(connection, data['planner_id'])
             else:
                 connection.send(b'{}')
 
+def connectionHandler(connection, address):
+    with connection:
+        print(f"Connected by {address}")
+        # main server loop
+        while True:
+            print(f"Awaiting message from {address}")
+            message = readPacket(connection)
+            if message is None:
+                break
+            print("Handling", message['request'])
+            #print(message['data'])
+            requestHandler(message['request'], message['data'], connection)
+
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     sock.bind((HOST, PORT))
-    print("Awaiting connection")
     while True:
+        print("Awaiting connection")
         sock.listen()
         connection, address = sock.accept()
-        with connection:
-            print(f"Connected by {address}")
-            # main server loop
-            while True:
-                print("Awaiting message")
-                message = readPacket(connection)
-                if message is None:
-                    break
-                #print(message['request'])
-                print(message['data'])
-                requestHandler(message['request'], message['data'], connection)
+        threading.Thread(target = connectionHandler, args=(connection, address)).start()
         uuid = ''
         pid = None
 

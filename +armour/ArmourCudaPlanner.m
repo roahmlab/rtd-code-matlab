@@ -15,7 +15,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
             options.server_address = '127.0.0.1';
             options.server_port = 65535;
             options.connect_timeout = 5;
-            options.packet_timeout = 0.2;
+            options.packet_timeout = 0.1;
             options.verboseLevel = 'DEBUG';
         end
     end
@@ -200,9 +200,13 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                         duration = toc(start_time);
                     end
                 end
-                result = self.connected_socket.read();
-                 if ~isempty(result)
-                    result = jsondecode(char(result));
+                res = self.connected_socket.read();
+                if ~isempty(res)
+                    try
+                        result = jsondecode(char(res));
+                    catch
+                        char(res);
+                    end
                 end
             end     
         end
@@ -258,6 +262,9 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                         error("BAD RESPONSE FROM SERVICE")
                     end
                 catch ME
+                    % MATLAB:networklib:tcpclient:writeFailed
+                    % MATLAB:networklib:tcpclient:readFailed
+                    % MATLAB:networklib:tcpclient:connectTerminated
                     disp(ME)
                 end
             end

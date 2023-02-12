@@ -173,7 +173,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             % start.
 
             % Create the random obstacles
-            n_obstacles = 3;
+            n_obstacles = 0;
             obstacle_size_range = [0.01 0.5] ; % [min, max] side length
             creation_buffer = 0.05;
             world_bounds = [self.agent.info.reach_limits(1:2:6); self.agent.info.reach_limits(2:2:6)];

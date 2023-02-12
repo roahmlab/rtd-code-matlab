@@ -1,14 +1,14 @@
 #include "NLPclass.h"
 #include "BufferPath.h"
 
-const std::string inputfilename = pathname + "armour.in";
-const std::string outputfilename1 = pathname + "armour.out";
-const std::string outputfilename2 = pathname + "armour_joint_position_center.out";
-const std::string outputfilename3 = pathname + "armour_joint_position_radius.out";
-const std::string outputfilename4 = pathname + "armour_control_input_radius.out";
-const std::string outputfilename5 = pathname + "armour_constraints.out";
+const std::string inputext = ".in";
+const std::string outputext1 = ".out";
+const std::string outputext2 = "_joint_position_center.out";
+const std::string outputext3 = "_joint_position_radius.out";
+const std::string outputext4 = "_control_input_radius.out";
+const std::string outputext5 = "_constraints.out";
 
-int main() {
+int main(int argc, char **argv) {
 /*
 Section I:
     Parse input
@@ -32,8 +32,15 @@ Section I:
     //                                                                             0.75382,   0.51895,  0.4731, 0.030969, 0, 0, 0,  0.22312, 0, 0, 0,  0.22981,
     //                                                                             0.75382,   0.51895,  0.4731, 0.030969, 0, 0, 0,  0.22312, 0, 0, 0,  0.22981};
 
+    // Parse input
+    if(argc != 2) {
+        WARNING_PRINT("        CUDA & C++: Missing input argument !\n");
+        throw;
+    }
+    std::string filename = std::string(argv[1]);
+
     // declare this first and make sure we always have a new output
-    std::ofstream outputstream1(outputfilename1);
+    std::ofstream outputstream1(pathname + filename + outputext1);
 
     Eigen::VectorXd q0(NUM_FACTORS); q0.setZero();
     Eigen::VectorXd qd0(NUM_FACTORS); qd0.setZero();
@@ -43,7 +50,7 @@ Section I:
     int num_obstacles = 0;
     double obstacles[MAX_OBSTACLE_NUM * (MAX_OBSTACLE_GENERATOR_NUM + 1) * 3] = {0.0};
 
-    std::ifstream inputstream(inputfilename);
+    std::ifstream inputstream(pathname + filename + inputext);
     if (!inputstream.is_open()) {
         WARNING_PRINT("        CUDA & C++: Error reading input files !\n");
         outputstream1 << -1;
@@ -287,7 +294,7 @@ Section IV:
     outputstream1.close();
 
     // output FRS and other information, you can comment them if they are unnecessary
-    std::ofstream outputstream2(outputfilename2);
+    std::ofstream outputstream2(pathname + filename + outputext2);
     outputstream2 << std::setprecision(10);
     for (int i = 0; i < NUM_TIME_STEPS; i++) {
         for (int j = 0; j < NUM_JOINTS; j++) {
@@ -299,7 +306,7 @@ Section IV:
     }
     outputstream2.close();
 
-    std::ofstream outputstream3(outputfilename3);
+    std::ofstream outputstream3(pathname + filename + outputext3);
     outputstream3 << std::setprecision(10);
     for (int i = 0; i < NUM_TIME_STEPS; i++) {
         for (int j = 0; j < NUM_JOINTS; j++) {
@@ -313,7 +320,7 @@ Section IV:
     }
     outputstream3.close();
 
-    std::ofstream outputstream4(outputfilename4);
+    std::ofstream outputstream4(pathname + filename + outputext4);
     outputstream4 << std::setprecision(10);
     for (int i = 0; i < NUM_TIME_STEPS; i++) {
         for (int j = 0; j < NUM_FACTORS; j++) {
@@ -323,7 +330,7 @@ Section IV:
     }
     outputstream4.close();
 
-    std::ofstream outputstream5(outputfilename5);
+    std::ofstream outputstream5(pathname + filename + outputext5);
     outputstream5 << std::setprecision(6);
     for (int i = 0; i < mynlp->constraint_number; i++) {
         outputstream5 << mynlp->g_copy[i] << '\n';

@@ -89,8 +89,9 @@ sim.visual_system.enable_camlight = visualize_cad;
 sim.visual_system.redraw();
 %sim.run(max_steps=1);
 
+close 1
 disp("press enter to continue")
-pause
+%pause
 
 %% Interface of Planner should improve
 trajOptProps = rtd.planner.trajopt.TrajOptProps;

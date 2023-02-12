@@ -1,2 +1,2 @@
 #include <string>
-const std::string pathname = "/armour/";
+const std::string pathname = "/armour/buffer/";
