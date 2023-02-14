@@ -13,7 +13,7 @@ links_with_uncertainty = {'dumbbell_link'}; % if add_uncertainty_to = 'link', sp
 uncertain_mass_range = [0.97, 1.03];
 
 % If this flag is true, we use the ArmourCadPatchVisual component instead
-visualize_cad = true;
+visualize_cad = false;
 
 % Add noise to the dynamics
 component_options.dynamics.measurement_noise_points = 0;
@@ -89,7 +89,7 @@ sim.visual_system.enable_camlight = visualize_cad;
 sim.visual_system.redraw();
 %sim.run(max_steps=1);
 
-close 1
+%close 1
 disp("press enter to continue")
 %pause
 
@@ -120,6 +120,7 @@ planner = armour.ArmourCudaPlanner( ...
 
 %% HLP stuff to migrate
 HLP = robot_arm_straight_line_HLP();
+world_info = struct;
 world_info.goal = sim.goal_system.goal_position;
 agent_info = struct;
 agent_info.n_states = sim.agent.state.n_states;
@@ -158,7 +159,6 @@ pausing = false;
 %     sim.run(max_steps=1);
 %     pause(0.1)
 % end
-
 cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
 sim.run(max_steps=100, pre_step_callback={cb});
 

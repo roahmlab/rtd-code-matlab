@@ -94,6 +94,7 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
                 self.figure_handle = figure('Name',[self.name, ' - ', self.classname]);
                 view(3);
                 set(self.figure_handle,'KeyPressFcn',@self.set_pause);
+                set(self.figure_handle,'GraphicsSmoothing','off') 
             end
         end    
         
@@ -155,14 +156,18 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             self.vdisp('Running visualization!', 'DEBUG');
             
             % set the active figure
-            set(0, 'CurrentFigure', self.figure_handle)
-
-            % plot each of the times requested
-            for t_plot = t_vec
-                for obj = self.dynamic_objects
-                    obj.plot(time=t_plot)
+            try
+                set(0, 'CurrentFigure', self.figure_handle)
+    
+                % plot each of the times requested
+                for t_plot = t_vec
+                    for obj = self.dynamic_objects
+                        obj.plot(time=t_plot)
+                    end
+                    pause(self.draw_time)
                 end
-                pause(self.draw_time)
+            catch
+                % If reopen on close is enabled
             end
             
             % Save the time change
@@ -202,7 +207,8 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             for obj = self.dynamic_objects
                 obj.plot(time=time)
             end
-            pause(self.draw_time)
+            drawnow limitrate
+            %pause(self.draw_time)
         end
         
         function animate(self, options)
@@ -233,7 +239,8 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
                 if pause_time < 0
                     self.vdisp(['Warning, animation lagging by ', num2str(-pause_time), 's!'], 'WARN');
                 end
-                pause(max(pause_time, 1e-8));
+                drawnow
+                pause(max(pause_time, 0));
                 for obj = self.dynamic_objects
                     obj.plot(time=t_plot)
                 end

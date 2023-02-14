@@ -169,13 +169,20 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                 [randomizing, pairs] = self.collision_system.checkCollisionObject(proposal_obj);
                 t_cur = toc(start_tic);
             end
+%             self.agent.state.reset(initial_position = [0,-pi/2,0,0,0,0,0]);
             % This is captured by the goal generator if we don't set anything as the
             % start.
 
             % Create the random obstacles
-            n_obstacles = 0;
+            n_obstacles = 3;
             obstacle_size_range = [0.01 0.5] ; % [min, max] side length
             creation_buffer = 0.05;
+%             centers = [-0.0584, 0.1813, 0.4391;
+%                         0.5333, -0.2291, 0.2884;
+%                         0.2826, 0.5121, 0.2953];
+%             side_lengthss = [0.3915, 0.0572, 0.1350;
+%                             0.1760, 0.3089, 0.1013;
+%                             0.1545, 0.2983, 0.0352];
             world_bounds = [self.agent.info.reach_limits(1:2:6); self.agent.info.reach_limits(2:2:6)];
             for obs_num = 1:n_obstacles
                 randomizing = true;
@@ -192,6 +199,8 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                                               [],[],...
                                               1, 3); % 3 is the dim of the world in this case
                     % Create obstacle
+%                     center = centers(:,obs_num);
+%                     side_lengths = side_lengthss(obs_num,:);
                     optionsStruct = struct;
                     optionsStruct.component_options.info.creation_buffer = creation_buffer;
                     prop_obs = rtd.entity.BoxObstacle.makeBox(center, side_lengths, optionsStruct);
@@ -209,6 +218,9 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
 
             % Create and add the goal
             self.goal_system = armour.deprecation.RandomArmConfigurationGoal(self.collision_system, self.agent);
+%             goal_position = [2.19112372555967;0.393795848789382;-2.08886547149797;-1.94078143810946;-1.82357815033695;-1.80997964933365;2.12483409695310];
+%             self.goal_system.reset();
+%             self.goal_system.createGoal(goal_position);
             self.goal_system.reset();
             self.goal_system.createGoal();
             self.visual_system.addObjects(static=self.goal_system);

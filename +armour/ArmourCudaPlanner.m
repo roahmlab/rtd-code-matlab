@@ -3,11 +3,32 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
         server_address
         server_port
 
-        connected_socket
+        trajOptProps
+        robot
 
-        errored = false
+        connected_socket
+        socket_fn
+        connection_lost = false
 
         trajectory_factory
+        endian_transformer
+
+        read_timeout = false
+    end
+
+    properties (Dependent)
+        read_available_or_timeout (1,1) logical
+    end
+
+    methods
+        function setTimeoutState(self, state)
+            self.read_timeout = state;
+        end
+        function tf = get.read_available_or_timeout(self)
+            tf = self.read_timeout ...
+                || (~isempty(self.connected_socket) ...
+                    && self.connected_socket.NumBytesAvailable > 0);
+        end
     end
     
     methods (Static)
@@ -15,7 +36,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
             options.server_address = '127.0.0.1';
             options.server_port = 65535;
             options.connect_timeout = 5;
-            options.packet_timeout = 0.1;
+            options.packet_timeout = 0.5;
             options.verboseLevel = 'DEBUG';
         end
     end
@@ -42,6 +63,17 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 options.verboseLevel (1,1) rtd.util.types.LogLevel
             end
             
+            self.trajOptProps = trajOptProps;
+            self.robot = robot;
+
+            % Endian transformer is a NOP to start
+            self.endian_transformer = @(x)x;
+            test_endian = typecast(uint16(1),'uint8');
+            % If we are little endian, make endian_transformer swap
+            if test_endian(1)
+                self.endian_transformer = @(x)swapbytes(x);
+            end
+
             % Get complete options
             options = self.mergeoptions(options);
             
@@ -50,14 +82,14 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
 
             % Attempt to connect to the server
             self.vdisp('Attempting to connect to the CUDA planner server.')
-            self.connected_socket = tcpclient(options.server_address, options.server_port, ...
-                "ConnectTimeout", options.connect_timeout, ...
-                "Timeout", options.packet_timeout);
-
             % Configure our connection
+            self.socket_fn = @() tcpclient(options.server_address, options.server_port, ...
+                "ConnectTimeout", options.connect_timeout, ...
+                "Timeout", options.packet_timeout, ...
+                "EnableTransferDelay", false);
             if ~self.initializeConnection(trajOptProps, robot)
                 self.closeConnection()
-                error("FAILED")
+                error("FAILED TO CONNNECT")
             end
 
             self.trajectory_factory = armour.trajectory.ArmTrajectoryFactory(trajOptProps, 'bernstein');
@@ -83,15 +115,22 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 temp = reshape(worldState.obstacles(i).Z, [1,size(worldState.obstacles(i).Z,1) * size(worldState.obstacles(i).Z,2)]);
                 inputs.obs.(['obs' num2str(i)]) = temp;
             end
+            start_time = tic;
             plan_id = self.startPlan(inputs);
             [success, info] = self.requestPlan(plan_id);
             
             trajectory = [];
             if success
-                while isempty(fields(info))
+                while ~strcmp(info.result, 'plan_complete')
                     [success, info] = self.requestPlan(plan_id);
                     if ~success
-                        error("failed!")
+                        error("Plan request failed! Check connection quality or timeout!")
+                    end
+                    if strcmp(info.result, 'plan_failed')
+                        error("Remote planning call failed!")
+                    end
+                    if strcmp(info.result, 'request_error')
+                        warning("Encountered bad data in buffer, retrying request!")
                     end
                 end
                 if ~isempty(info.parameters)
@@ -112,10 +151,12 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                     trajectory = self.trajectory_factory.createTrajectory(robotState, jrsInstance=jrs);
                     trajectory.setParameters(info.parameters);
                 end
+                self.vdisp("Remote planner time: " + string(info.time/1000),"INFO");
+                self.vdisp("Full planning call time: " + string(toc(start_time)),"INFO");
             end
         end
 
-        function delete(self)
+        function delete(self)g
             if ~isempty(self.connected_socket)
                 self.closeConnection();
             end
@@ -126,7 +167,11 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
         function success = initializeConnection(self, trajOptProps, robot)
             % Send robot_setup packet
             robot_setup.planner_id = self.uuid;
+
+            % Setup and send
+            self.connected_socket = self.socket_fn();
             success = self.sendRequest('robot_setup', robot_setup);
+            self.connection_lost = ~success;
         end
 
         function closeConnection(self)
@@ -144,7 +189,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 options.request_constraints (1,1) logical = false
                 options.request_joint_frs (1,1) logical = false
                 options.request_input_frs (1,1) logical = false
-                options.reinitialize_if_disconnected (1,1) logical = false
+                options.reinitialize_if_disconnected (1,1) logical = true
             end
             % Setup all the information for planning
             plan_info.id = rtd.functional.uuid;
@@ -166,9 +211,15 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
 
             if self.sendRequest('plan_trajectory', plan_info)
                 plan_uuid = plan_info.id;
-            elseif self.errored && options.reinitialize_if_disconnected
+            elseif self.connection_lost && options.reinitialize_if_disconnected
                 self.vdisp("Attempting reconnect", "WARN");
-                error("I LIED")
+%                 error("I LIED")
+                if self.initializeConnection(self.trajOptProps, self.robot)
+                    extra_options = namedargs2cell(options);
+                    plan_uuid = self.startPlan(inputs, extra_options{:});
+                else
+                    error("Reconnect failed!");
+                end
             else
                 plan_uuid = [];
             end
@@ -180,35 +231,85 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 plan_uuid (1,:) char
                 options.clear (1,1) logical = true
                 options.request_type = 'ALL'
+                options.request_timeout = 0.4
                 options.block (1,1) logical = true
-                options.block_timeout (1,1) double = 5
+                options.block_timeout (1,1) double = 1
             end
             request.plan_id = plan_uuid;
             request.planner_id = self.uuid;
             request.type = options.request_type;
+            request.timeout = options.request_timeout;
             request.clear = options.clear;
 
-            result = [];
+            result = struct;
             success = false;
             if self.sendRequest('request_result', request)
                 success = true;
-                if options.block
-                    start_time = tic;
-                    duration = toc(start_time);
-                    while self.connected_socket.NumBytesAvailable == 0 && duration < options.block_timeout
-                        pause(0.01);
-                        duration = toc(start_time);
-                    end
-                end
-                res = self.connected_socket.read();
+                result.result = 'request_error';
+                res = self.readSocket(block=options.block, block_timeout=options.block_timeout);
                 if ~isempty(res)
                     try
-                        result = jsondecode(char(res));
+                        result = self.processMessage(res);
                     catch
-                        char(res);
+%                         result.result = 'request_error';
                     end
                 end
-            end     
+            end
+        end
+
+        function msg = processMessage(self, message)
+            msg = struct;
+            if length(message) < 6
+                error("BAD MESSAGE")
+                return
+            end
+            
+            msg_len_chk = computeMsgLenChk(message(1:3));
+
+            if any(msg_len_chk ~= message(4:5))
+                error("BAD MESSAGE")
+                return
+            end
+
+            msg_len = [0, message(1:3)];
+            msg_len = typecast(uint8(msg_len), 'uint32');
+            msg_len = self.endian_transformer(msg_len);
+
+            try
+                msg_prop = message(6:5+msg_len);
+                msg_chk = message(6+msg_len);
+            catch
+                error("BAD MESSAGE")
+                return
+            end
+            
+            if computeMsgChk(msg_prop) ~= msg_chk
+                error("BAD MESSAGE")
+                return
+            end
+
+            msg = jsondecode(char(msg_prop));
+        end
+
+        function read_out = readSocket(self, options)
+            arguments
+                self armour.ArmourCudaPlanner
+                options.block = false
+                options.block_timeout = self.instanceOptions.packet_timeout
+            end
+            if options.block
+                if ~isempty(options.block_timeout)
+                    self.read_timeout = false;
+                    read_timer = timer('TimerFcn', @(h,e)self.setTimeoutState(true), 'StartDelay', options.block_timeout);
+                    start(read_timer)
+                end
+                waitfor(self,'read_available_or_timeout',true);
+                try stop(read_timer); catch; end
+                % The following is needed to ensure the class destructor
+                % actually runs
+                try delete(read_timer); catch; end
+            end
+            read_out = self.connected_socket.read();
         end
 
         function success = stopPlan(self, plan_uuid)
@@ -216,7 +317,11 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 self armour.ArmourCudaPlanner
                 plan_uuid (1,:) char
             end
-            
+            % Setup all the information for planning
+            plan_info.id = plan_uuid;
+            plan_info.planner_id = self.uuid;
+
+            success = self.sendRequest('stop_plan', plan_info);
         end
 
         function success = sendRequest(self, message_type, struct_data, options)
@@ -234,15 +339,21 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
             message = jsonencode(packet);
 
             % Checksum
-            checksum = char(mod(sum(message), 256));
+            checksum = computeMsgChk(message);
 
             % encode a uint32 length for the number of bytes to read.
-            message_length = length(message);
-            if message_length > 256^4
+            % we're only gonna save uint24 though (matlab has no type for
+            % that)
+            message_length = uint32(length(message));
+            if message_length > 256^3
                 error("TOO LONG")
             end
-            % big byteorder
-            length_string = char(flip(typecast(uint32(message_length), 'uint8')));
+            % big endian byteorder
+            length_string = typecast(self.endian_transformer(message_length), 'uint8');
+            length_string = length_string(2:end);
+            length_chksum = computeMsgLenChk(length_string);
+
+            length_string = char([length_string, length_chksum]);
 
             % Combine message
             message = [length_string, message, checksum];
@@ -251,8 +362,10 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
             % Send as many times as needed
             for i=1:options.retry_count
                 try
+                    self.connected_socket.flush();
                     self.connected_socket.write(message);
                     resp = self.connected_socket.read(3);
+%                     resp = self.readSocket(3, block=true);
                     if strcmp(char(resp),'OK!')
                         success = true;
                         break;
@@ -265,13 +378,43 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                     % MATLAB:networklib:tcpclient:writeFailed
                     % MATLAB:networklib:tcpclient:readFailed
                     % MATLAB:networklib:tcpclient:connectTerminated
-                    disp(ME)
+                    % MATLAB:class:InvalidHandle
+                    if strcmp(ME.identifier,'MATLAB:networklib:tcpclient:readFailed')
+                        % WARNING READ TIMED OUT, FLUSHING AND RESENDING
+                        self.connected_socket.flush();
+                    elseif strcmp(ME.identifier,'MATLAB:networklib:tcpclient:connectTerminated') ...
+                            || strcmp(ME.identifier,'MATLAB:class:InvalidHandle')
+                        warning("Connection to server lost!")
+                        self.connection_lost = true;
+                        self.connected_socket = [];
+                        break;
+                    elseif strcmp(ME.identifier, 'MATLAB:structRefFromNonStruct')
+                        warning("Invalid socket!")
+                    else
+                        disp(ME)
+                    end
                 end
             end
         end
 
+%         function message = readResponse(self)
+
+
         function errorfcn(self)
-            self.errored = true;
+            self.connection_lost = true;
         end
     end
+end
+
+function chksum = computeMsgChk(message)
+    chksum = char(mod(sum(message), 256));
+end
+
+function chksum = computeMsgLenChk(msg_len_str)
+    length_sum_chksum = uint8(mod(sum(msg_len_str), 256));
+    length_xor_chksum = uint8(255);
+    for elem=msg_len_str
+        length_xor_chksum = bitxor(length_xor_chksum, elem);
+    end
+    chksum = char([length_sum_chksum, length_xor_chksum]);
 end

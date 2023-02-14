@@ -136,7 +136,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
 
             % Prepare trajectory
             trajectory = self.trajectories{end};
-            startTime = self.robot_state.get_state().time;
+            startTime = trajectory.startState.time;
             target = trajectory.getCommand(startTime + t);
 
             % error terms
