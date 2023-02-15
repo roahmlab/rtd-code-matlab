@@ -156,7 +156,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
             end
         end
 
-        function delete(self)g
+        function delete(self)
             if ~isempty(self.connected_socket)
                 self.closeConnection();
             end
