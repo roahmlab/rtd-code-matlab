@@ -33,6 +33,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
         kinematic_chain
         reach_limits
         buffer_dist
+        transmission_inertia
         
         % Used for finding the ultimate bound (mass matrix)
         M_min_eigenvalue double
@@ -45,6 +46,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             options.gravity = [0 0 -9.81];
             options.joint_velocity_limits = [];
             options.joint_torque_limits = [];
+            options.transmission_inertia = [];
             options.buffer_dist = 0;
         end
     end
@@ -59,6 +61,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
                 options.gravity
                 options.joint_velocity_limits
                 options.joint_torque_limits
+                options.transmission_inertia
                 options.buffer_dist
             end
             self.mergeoptions(optionsStruct, options);
@@ -83,6 +86,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
                 options.gravity
                 options.joint_velocity_limits
                 options.joint_torque_limits
+                options.transmission_inertia
                 options.buffer_dist
             end
             options = self.mergeoptions(optionsStruct, options);
@@ -93,7 +97,6 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
                 error("Must pass in joint_torque_limits externally!")
             end
             
-            
             % Fill in our other dependent parameters
             self.robot.Gravity = options.gravity;
             self.n_links_and_joints = self.params.nominal.num_joints;
@@ -103,7 +106,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             
             % Flesh out the links from the robot
             link_shapes = repmat({'cuboid'}, 1, self.n_links_and_joints);
-            [link_poly_zonotopes, link_sizes, ~] = create_pz_bounding_boxes(self.robot);
+            [link_poly_zonotopes, link_sizes, ~] = armour.legacy.create_pz_bounding_boxes(self.robot);
             link_sizes = num2cell(link_sizes,1);
 
             % Store to the class links struct
@@ -156,6 +159,12 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             % The ???? section
             % assuming serial kinematic chain!
             self.kinematic_chain = [0:self.n_links_and_joints-1; 1:self.n_links_and_joints];
+            if ~isempty(options.transmission_inertia)
+                self.transmission_inertia = options.transmission_inertia;
+            else
+                warning("transmission_inertia not provided. Assuming zeros.")
+                self.transmission_inertia = zeros(1,self.n_links_and_joints);
+            end
             
             % figure out the maximum length and reach of the arm
             % based on axis limits

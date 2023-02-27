@@ -1,11 +1,6 @@
 classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     % A collection of useful function for arm robot kinematics
 
-    % Leftover Old Dependencies
-    % match_trajectories
-    % axis_angle_to_rotation_matrix_3D
-    % rotation_matrix_2D
-    % 
     % Notes:
     % Make ArmAgentInfo and have Armour extend it (or similar) (this uses
     % rigidbodytree, so make version that doesn't)
@@ -81,7 +76,7 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
                 end
                 
                 % interpolate the state for the corresponding time
-                j_vals = self.arm_state.get_state(t).q;% match_trajectories(t,self.arm_state.time,self.arm_state.position);
+                j_vals = self.arm_state.get_state(t).q;
             else
                 % assume a configuration was put in
                 q = time_or_config;
@@ -143,14 +138,16 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
                 switch self.arm_info.joints(idx).type
                     case 'revolute'
                         % get value of current joint
-                        j_idx = j_vals(self.arm_info.body_joint_index(idx)) ;
+                        joint_rot = j_vals(self.arm_info.body_joint_index(idx)) ;
                         if dim == 3
                             % rotation matrix of current link
-                            axis_pred = self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3)*R_pred*self.arm_info.joints(idx).axes;
-                            R_succ = axis_angle_to_rotation_matrix_3D([axis_pred', j_idx])*self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3)*R_pred ;
+                            axis_pred = self.arm_info.joints(idx).axes;
+                            R_succ = R_pred*self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3)*axang2rotm([axis_pred', joint_rot]);
                         else
                             % rotation matrix of current link
-                            R_succ = rotation_matrix_2D(j_idx)*R_pred ;
+                            rotation = [cos(joint_rot) -sin(joint_rot);
+                                        sin(joint_rot) cos(joint_rot)];
+                            R_succ = rotation*R_pred ;
                         end
                         
                         % create translation
@@ -160,7 +157,7 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
                         error('Prismatic joints are not yet supported!')
                     case 'fixed'
                         if dim == 3
-                            R_succ = self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3)*R_pred ;
+                            R_succ = R_pred*self.arm_info.robot.Bodies{idx}.Joint.JointToParentTransform(1:3, 1:3);
                         else
                             % rotation matrix of current link assumed same as predecessor
                             R_succ = R_pred ;

@@ -75,7 +75,6 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                 end
             % if it's not, check for and add to collision or visual
             else
-                self.obstacles = [self.obstacles, box_obstacle_zonotope('center', object.state.state, 'side_lengths', object.info.side_lengths)];
                 if ~isempty(options.collision)
                     self.collision_system.addObjects(static=options.collision);
                 end
@@ -110,36 +109,36 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             % add the agent
             self.add_object(agent, isentity=true, collision=agent.collision, visual=agent.visual);
 
-            % Create the base obstacles
-            base_creation_buffer = 0.025;
-            face_color = [0.5 0.5 0.5];
-            edge_color = [0 0 0];
-
-            base_options.info.is_base_obstacle = true;
-            base_options.info.creation_buffer = base_creation_buffer;
-            base_options.visual.face_color = face_color;
-            base_options.visual.edge_color = edge_color;
-            optionsStruct.component_options = base_options;
-            base = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
-                                        2*[0.2794, 0.2794, 0.1778], ...
-                                        optionsStruct);
-            tower = rtd.entity.BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
-                                        2*[0.1016, 0.1651, 0.3312], ...
-                                        optionsStruct);
-            head = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
-                                        2*[0.1651, 0.1397, 0.0635], ...
-                                        optionsStruct);
-            % Floor
-            floor_color = [0.9, 0.9, 0.9];
-            optionsStruct.component_options.visual.face_color = floor_color;
-            floor = rtd.entity.BoxObstacle.makeBox([-0.0331;0;0.005], ...
-                                        2*[1.3598, 1.3598, 0.0025], ...
-                                        optionsStruct);
-
-            % Add them to the world
-            for obs = [base, tower, head, floor]
-                self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
-            end
+%             % Create the base obstacles
+%             base_creation_buffer = 0.025;
+%             face_color = [0.5 0.5 0.5];
+%             edge_color = [0 0 0];
+% 
+%             base_options.info.is_base_obstacle = true;
+%             base_options.info.creation_buffer = base_creation_buffer;
+%             base_options.visual.face_color = face_color;
+%             base_options.visual.edge_color = edge_color;
+%             optionsStruct.component_options = base_options;
+%             base = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
+%                                         2*[0.2794, 0.2794, 0.1778], ...
+%                                         optionsStruct);
+%             tower = rtd.entity.BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
+%                                         2*[0.1016, 0.1651, 0.3312], ...
+%                                         optionsStruct);
+%             head = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
+%                                         2*[0.1651, 0.1397, 0.0635], ...
+%                                         optionsStruct);
+%             % Floor
+%             floor_color = [0.9, 0.9, 0.9];
+%             optionsStruct.component_options.visual.face_color = floor_color;
+%             floor = rtd.entity.BoxObstacle.makeBox([-0.0331;0;0.005], ...
+%                                         2*[1.3598, 1.3598, 0.0025], ...
+%                                         optionsStruct);
+% 
+%             % Add them to the world
+%             for obs = [base, tower, head, floor]
+%                 self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
+%             end
             
             % reset the log
             % For other simulations, you might want to validate keys and
@@ -170,13 +169,20 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                 [randomizing, pairs] = self.collision_system.checkCollisionObject(proposal_obj);
                 t_cur = toc(start_tic);
             end
+%             self.agent.state.reset(initial_position = [0,-pi/2,0,0,0,0,0]);
             % This is captured by the goal generator if we don't set anything as the
             % start.
 
             % Create the random obstacles
-            n_obstacles = 10;
+            n_obstacles = 3;
             obstacle_size_range = [0.01 0.5] ; % [min, max] side length
             creation_buffer = 0.05;
+%             centers = [-0.0584, 0.1813, 0.4391;
+%                         0.5333, -0.2291, 0.2884;
+%                         0.2826, 0.5121, 0.2953];
+%             side_lengthss = [0.3915, 0.0572, 0.1350;
+%                             0.1760, 0.3089, 0.1013;
+%                             0.1545, 0.2983, 0.0352];
             world_bounds = [self.agent.info.reach_limits(1:2:6); self.agent.info.reach_limits(2:2:6)];
             for obs_num = 1:n_obstacles
                 randomizing = true;
@@ -184,13 +190,17 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
                 t_cur = toc(start_tic);
                 while randomizing && t_cur <= timeout
                     % create center, side lengths
-                    center = rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
+                    center = ...
+                        rtd.random.deprecation.rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
                                          world_bounds(2,:) - obstacle_size_range(2)/2 );
-                    side_lengths = rand_range(obstacle_size_range(1),...
+                    side_lengths = ...
+                        rtd.random.deprecation.rand_range(obstacle_size_range(1),...
                                               obstacle_size_range(2),...
                                               [],[],...
                                               1, 3); % 3 is the dim of the world in this case
                     % Create obstacle
+%                     center = centers(:,obs_num);
+%                     side_lengths = side_lengthss(obs_num,:);
                     optionsStruct = struct;
                     optionsStruct.component_options.info.creation_buffer = creation_buffer;
                     prop_obs = rtd.entity.BoxObstacle.makeBox(center, side_lengths, optionsStruct);
@@ -208,6 +218,9 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
 
             % Create and add the goal
             self.goal_system = armour.deprecation.RandomArmConfigurationGoal(self.collision_system, self.agent);
+%             goal_position = [2.19112372555967;0.393795848789382;-2.08886547149797;-1.94078143810946;-1.82357815033695;-1.80997964933365;2.12483409695310];
+%             self.goal_system.reset();
+%             self.goal_system.createGoal(goal_position);
             self.goal_system.reset();
             self.goal_system.createGoal();
             self.visual_system.addObjects(static=self.goal_system);

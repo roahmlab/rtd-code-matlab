@@ -563,7 +563,7 @@ classdef uarmtd_planner_wrapped_comparison < robot_arm_generic_planner
             end
 
             if P.random_init
-                initial_guess = rand_range(lb, ub);
+                initial_guess = rtd.random.deprecation.rand_range(lb, ub);
             else
                 initial_guess = lb*0.0;
             end

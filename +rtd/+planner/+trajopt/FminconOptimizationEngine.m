@@ -78,8 +78,9 @@ classdef FminconOptimizationEngine < rtd.planner.trajopt.OptimizationEngine
             % Generate random values if requested, otherwise zeros for any
             % thing not in our initial guess.
             if self.trajOptProps.randomInit
-                initial_extra = rand_range(lb(end-n_remainder+1:end), ...
-                                           ub(end-n_remainder+1:end));
+                initial_extra = rtd.random.deprecation.rand_range( ...
+                                        lb(end-n_remainder+1:end), ...
+                                        ub(end-n_remainder+1:end));
             else
                 initial_extra = zeros(n_remainder, 1);
             end
@@ -121,9 +122,4 @@ classdef FminconOptimizationEngine < rtd.planner.trajopt.OptimizationEngine
             stop = elapsed > self.trajOptProps.timeoutTime;
         end
     end
-end
-
-% utility to generate a random range
-function n = rand_range(lo,hi)
-    n = (hi-lo).*rand(size(hi)) + lo ;
 end

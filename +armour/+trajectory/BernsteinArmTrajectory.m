@@ -87,17 +87,18 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             out = self.jrsInstance.output_range;
             in = self.jrsInstance.input_range;
             q_goal = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            q_goal = self.startState.q + q_goal;
 
             n_q = self.jrsInstance.n_q;
             self.alpha = zeros(n_q, 6);
             for j = 1:n_q  % Modified to use matrix instead of cells
-                beta = match_deg5_bernstein_coefficients({...
+                beta = armour.legacy.match_deg5_bernstein_coefficients({...
                     self.startState.position(j); ...
                     self.startState.velocity(j); ...
                     self.startState.acceleration(j); ...
                     q_goal(j); ...
-                    0; 0});
-                self.alpha(j,:) = cell2mat(bernstein_to_poly(beta, 5));
+                    0; 0}, self.trajOptProps.horizonTime);
+                self.alpha(j,:) = cell2mat(armour.legacy.bernstein_to_poly(beta, 5));
             end
             
             % Precompute end position
@@ -138,8 +139,8 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             % trajectory times.
             t_size = length(t_shifted);
             horizon_mask = t_shifted < self.trajOptProps.horizonTime;
-            t_masked = t_shifted(horizon_mask);
-            t_masked_size = length(t_masked);
+            t_masked_scaled = t_shifted(horizon_mask) / self.trajOptProps.horizonTime;
+            t_masked_size = length(t_masked_scaled);
             n_q = self.jrsInstance.n_q;
 
             % Original implementation adapted
@@ -150,14 +151,14 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             for j = 1:n_q
                 for coeff_idx = 0:5
                     q_des(j,:) = q_des(j,:) + ...
-                        self.alpha(j,coeff_idx+1) * t_masked.^coeff_idx;
+                        self.alpha(j,coeff_idx+1) * t_masked_scaled.^coeff_idx;
                     if coeff_idx > 0
                         q_dot_des(j,:) = q_dot_des(j,:) + ...
-                            coeff_idx * self.alpha(j,coeff_idx+1) * t_masked.^(coeff_idx-1);
+                            coeff_idx * self.alpha(j,coeff_idx+1) * t_masked_scaled.^(coeff_idx-1);
                     end
                     if coeff_idx > 1
                         q_ddot_des(j,:) = q_ddot_des(j,:) + ...
-                            (coeff_idx) * (coeff_idx-1) * self.alpha(j,coeff_idx+1) * t_masked.^(coeff_idx-2);
+                            (coeff_idx) * (coeff_idx-1) * self.alpha(j,coeff_idx+1) * t_masked_scaled.^(coeff_idx-2);
                     end
                 end
             end
@@ -174,8 +175,8 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             vel_idx = pos_idx + n_q;
             acc_idx = vel_idx + n_q;
             state(pos_idx,horizon_mask) = q_des;
-            state(vel_idx,horizon_mask) = q_dot_des;
-            state(acc_idx,horizon_mask) = q_ddot_des;
+            state(vel_idx,horizon_mask) = q_dot_des / self.trajOptProps.horizonTime;
+            state(acc_idx,horizon_mask) = q_ddot_des / self.trajOptProps.horizonTime^2;
 
             % Update all states times after the horizon time
             state(pos_idx,~horizon_mask) = repmat(self.q_end, 1, t_size-t_masked_size);

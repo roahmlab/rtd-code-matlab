@@ -1,0 +1,9 @@
+# Common required apt dependencies
+#gcc
+#liblapack-dev
+#libblas-dev
+#libmetis-dev
+libgomp1
+liblapack3
+libblas3
+libmetis5

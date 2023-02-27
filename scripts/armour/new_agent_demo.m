@@ -5,37 +5,40 @@ clear ; clc; close all;
 verbosity = 'DEBUG';
 
 %%% for agent
-agent_urdf = 'fetch_arm_new_dumbbell.urdf';
+% agent_urdf = 'fetch_arm_new_dumbbell.urdf';
+agent_urdf = 'kinova_without_gripper.urdf';
 
-add_uncertainty_to = 'link'; % choose 'all', 'link', or 'none'
+add_uncertainty_to = 'all'; % choose 'all', 'link', or 'none'
 links_with_uncertainty = {'dumbbell_link'}; % if add_uncertainty_to = 'link', specify links here.
 uncertain_mass_range = [0.97, 1.03];
 
 % If this flag is true, we use the ArmourCadPatchVisual component instead
-visualize_cad = true;
+visualize_cad = false;
 
 % Add noise to the dynamics
-component_options.dynamics.measurement_noise_points = 11;
+component_options.dynamics.measurement_noise_points = 0;
 component_options.dynamics.log_controller = true;
-component_options.controller.use_true_params_for_robust = true;
+component_options.controller.use_true_params_for_robust = false;
 
 %% Setup the info
 robot = importrobot(agent_urdf);
 robot.DataFormat = 'col';
 robot.Gravity = [0 0 -9.81];
-params = load_robot_params(robot, ...
+params = armour.legacy.dynamics.load_robot_params(robot, ...
                            'add_uncertainty_to', add_uncertainty_to, ...
                            'links_with_uncertainty', links_with_uncertainty,...
                            'uncertain_mass_range', uncertain_mass_range);
-vel_limits = [-1.256, -1.454, -1.571, -1.521, -1.571, -2.268, -2.268;
-               1.256,  1.454,  1.571,  1.521,  1.571,  2.268,  2.268]; % matlab doesn't import these from urdf
-input_limits = [-33.82, -131.76, -76.94, -66.18, -29.35, -25.70, -7.36;
-                 33.82,  131.76,  76.94,  66.18,  29.35,  25.70,  7.36]; % matlab doesn't import these from urdf
-M_min_eigenvalue = 0.0017;
+vel_limits = [-1.3963, -1.3963, -1.3963, -1.3963, -1.2218, -1.2218, -1.2218;
+                       1.3963,  1.3963,  1.3963,  1.3963,  1.2218,  1.2218,  1.2218]; % matlab doesn't import these from urdf so hard code into class
+input_limits = [-56.7, -56.7, -56.7, -56.7, -29.4, -29.4, -29.4;
+                       56.7,  56.7,  56.7,  56.7,  29.4,  29.4,  29.4]; % matlab doesn't import these from urdf so hard code into class
+transmision_inertia = [8.02999999999999936 11.99620246153036440 9.00254278617515169 11.58064393167063599 8.46650409179141228 8.85370693737424297 8.85873036646853151]; % matlab doesn't import these from urdf so hard code into class
+M_min_eigenvalue = 5.095620491878957; % matlab doesn't import these from urdf so hard code into class
 
 agent_info = armour.agent.ArmourAgentInfo(robot, params, ...
                 joint_velocity_limits=vel_limits, ...
                 joint_torque_limits=input_limits, ...
+                transmission_inertia=transmision_inertia, ...
                 M_min_eigenvalue=M_min_eigenvalue);
 
 % Visualization?
@@ -46,10 +49,14 @@ if visualize_cad
     camlight
 end
 
+%controller = [];
+controller = 'armour.agent.ArmourMexController';
+
 % Create
 agent = armour.ArmourAgent(agent_info, visual=visual, ...
                 component_options=component_options, ...
-                component_logLevelOverride=verbosity);
+                component_logLevelOverride=verbosity, ...
+                controller=controller);
 
 %% Demo section of copy-ability
 % A.visual.plot()
@@ -82,8 +89,9 @@ sim.visual_system.enable_camlight = visualize_cad;
 sim.visual_system.redraw();
 %sim.run(max_steps=1);
 
+%close 1
 disp("press enter to continue")
-pause
+%pause
 
 %% Interface of Planner should improve
 trajOptProps = rtd.planner.trajopt.TrajOptProps;
@@ -94,8 +102,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = false;
-use_robust_input = false;
+input_constraints_flag = true;
+use_robust_input = true;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...
@@ -103,11 +111,16 @@ planner = armour.ArmourPlanner( ...
         input_constraints_flag=input_constraints_flag,...
         use_robust_input=use_robust_input,...
         smooth_obs=smooth_obs, ...
-        traj_type="piecewise", ...
+        traj_type="bernstein", ...
+        verboseLevel='DEBUG');
+
+planner = armour.ArmourCudaPlanner( ...
+        trajOptProps, sim.agent, ...
         verboseLevel='DEBUG');
 
 %% HLP stuff to migrate
 HLP = robot_arm_straight_line_HLP();
+world_info = struct;
 world_info.goal = sim.goal_system.goal_position;
 agent_info = struct;
 agent_info.n_states = sim.agent.state.n_states;
@@ -146,7 +159,6 @@ pausing = false;
 %     sim.run(max_steps=1);
 %     pause(0.1)
 % end
-
 cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
 sim.run(max_steps=100, pre_step_callback={cb});
 

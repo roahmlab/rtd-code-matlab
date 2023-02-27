@@ -18,7 +18,7 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
     end
     methods
         function self = FOInstance( ...
-                    robotInfo, R_w, p_w, FO, jrsInstance, smooth_obs ...
+                    robotInfo, R_w, p_w, FO, jrsInstance, smooth_obs, obs_frs_combs ...
                 )
             self.robotInfo = robotInfo;
             self.R_w = R_w;
@@ -32,8 +32,7 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
             % self.output_range = jrsInstance.output_range;
             
             % initialize combinations (for obstacle avoidance constraints)
-            self.obs_frs_combs.maxcombs = 200;
-            self.obs_frs_combs.combs = generate_combinations_upto(200);
+            self.obs_frs_combs = obs_frs_combs;
         end
         
         % Handles the obstacle-frs pair or similar to generate the
@@ -57,7 +56,7 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
                         
                         % first, check if constraint is necessary
                         O_buf = [worldState.obstacles(o).Z, self.FO{i, 1}{j, 1}.G, self.FO{i, 1}{j, 1}.Grest];
-                        [A_obs, b_obs] =  polytope_PH(O_buf, self.obs_frs_combs); % get polytope form
+                        [A_obs, b_obs] = armour.pz_roahm.polytope_PH(O_buf, self.obs_frs_combs); % get polytope form
                         if ~(all(A_obs*self.FO{i, 1}{j, 1}.c - b_obs <= 0, 1))
                             continue;
                         end
@@ -69,10 +68,10 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
                         % now create constraint
                         FO_buf = self.FO{i, 1}{j, 1}.Grest; % will buffer by non-sliceable gens
                         O_buf = [worldState.obstacles(o).Z, FO_buf]; % describes buffered obstacle zonotope
-                        [A_obs, b_obs] = polytope_PH(O_buf, self.obs_frs_combs); % get polytope form
+                        [A_obs, b_obs] = armour.pz_roahm.polytope_PH(O_buf, self.obs_frs_combs); % get polytope form
 
                         % constraint PZ:
-                        FO_tmp = polyZonotope_ROAHM(self.FO{i, 1}{j, 1}.c, self.FO{i, 1}{j, 1}.G, [], self.FO{i, 1}{j, 1}.expMat, self.FO{i, 1}{j, 1}.id);
+                        FO_tmp = armour.pz_roahm.polyZonotope_ROAHM(self.FO{i, 1}{j, 1}.c, self.FO{i, 1}{j, 1}.G, [], self.FO{i, 1}{j, 1}.expMat, self.FO{i, 1}{j, 1}.id);
                         obs_constraint_pz = A_obs*FO_tmp - b_obs;
 
                         % turn into function

@@ -44,16 +44,16 @@ classdef BoxPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamicObj
             
             switch dim
                 case 2
-                    [F,V] = make_box(side_len,center) ;
-                    [~,V_buff] = make_box(buff_side_len,center) ;
+                    [F,V] = rtd.functional.geometry.make_box(side_len,center) ;
+                    [~,V_buff] = rtd.functional.geometry.make_box(buff_side_len,center) ;
                     
                     % Expand dims here for compat with Patch3d
                     zero_col = zeros(size(V,1),1);
                     V = [V, zero_col];
                     V_buff = [V_buff, zero_col];
                 case 3
-                    [~,V] = make_cuboid_for_patch(side_len(1),side_len(2),side_len(3),center) ;
-                    [~,V_buff] = make_cuboid_for_patch(buff_side_len(1),buff_side_len(2),buff_side_len(3),center) ;
+                    [~,V] = rtd.functional.geometry.make_cuboid_for_patch(side_len(1),side_len(2),side_len(3),center) ;
+                    [~,V_buff] = rtd.functional.geometry.make_cuboid_for_patch(buff_side_len(1),buff_side_len(2),buff_side_len(3),center) ;
                     F = convhull(V);
             end
             

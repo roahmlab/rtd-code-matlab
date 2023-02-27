@@ -1,7 +1,7 @@
 Introduction
 ============
 
-The current version of the rewritten codebase you are looking at is v0.0.3. It is subject to
+The current version of the rewritten codebase you are looking at is v0.1.0. It is subject to
 significant changes in the near futures which may need code rewrites. This MATLAB implementation
 supports r2021b and later. 
 
