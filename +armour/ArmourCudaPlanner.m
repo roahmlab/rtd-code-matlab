@@ -55,7 +55,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
         function self = ArmourCudaPlanner(trajOptProps, robot, options)
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
-                robot armour.ArmourAgent
+                robot (1,1) armour.ArmourAgent
                 options.server_address (1,:) {mustBeTextScalar}
                 options.server_port (1,1) uint32
                 options.connect_timeout (1,1) double
@@ -149,6 +149,31 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
     
                     trajectory = self.trajectory_factory.createTrajectory(robotState, jrsInstance=jrs);
                     trajectory.setParameters(info.parameters);
+
+                    link_frs_center = str2num(info.requested_data.joint_position_center);
+                    link_frs_generators = str2num(info.requested_data.joint_position_radius);
+                    control_input_radius = str2num(info.requested_data.control_input_radius);
+                    constraints_value = str2num(info.requested_data.constraints);
+                    contact_constraint_radii = str2num(info.requested_data.force_constraint_radius);
+                    wrench_radii = str2num(info.requested_data.wrench_values);
+
+                    link_frs_vertices = cell(7,1);
+                    for tid = 1:10:128
+                        for j = 1:7
+                            c = link_frs_center((tid-1)*7+j, :)';
+                            g = link_frs_generators( ((tid-1)*7+j-1)*3+1 : ((tid-1)*7+j)*3, :);
+                            Z = zonotope(c, g);
+                            link_frs_vertices{j} = [link_frs_vertices{j}; vertices(Z)'];
+                        end
+                    end
+                    info = rmfield(info, 'requested_data');
+                    info.link_frs_center = link_frs_center;
+                    info.link_frs_generators = link_frs_generators;
+                    info.link_frs_vertices = link_frs_vertices;
+                    info.control_input_radius = control_input_radius;
+                    info.constraints_value = constraints_value;
+                    info.contact_constraint_radii = contact_constraint_radii;
+                    info.wrench_radii = wrench_radii;
                 end
                 self.vdisp("Remote planner time: " + string(info.time/1000),"INFO");
                 self.vdisp("Full planning call time: " + string(toc(start_time)),"INFO");
@@ -229,7 +254,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 self armour.ArmourCudaPlanner
                 plan_uuid (1,:) char
                 options.clear (1,1) logical = true
-                options.request_type = 'ALL'
+                options.request_type = ["ALL"]
                 options.request_timeout = 0.4
                 options.block (1,1) logical = true
                 options.block_timeout (1,1) double = 1
@@ -250,7 +275,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                     try
                         result = self.processMessage(res);
                     catch
-%                         result.result = 'request_error';
+                        self.connected_socket.flush();
                     end
                 end
             end
@@ -258,10 +283,10 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
 
         function msg = processMessage(self, message)
             msg = struct;
-            if length(message) < 6
-                error("BAD MESSAGE")
-                return
-            end
+%             if length(message) < 6
+%                 error("BAD MESSAGE")
+%                 return
+%             end
             
             msg_len_chk = computeMsgLenChk(message(1:3));
 
@@ -275,8 +300,10 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
             msg_len = self.endian_transformer(msg_len);
 
             try
-                msg_prop = message(6:5+msg_len);
-                msg_chk = message(6+msg_len);
+                % Try to read the rest of the message
+                msg_rest = self.connected_socket.read(msg_len+1);
+                msg_prop = msg_rest(1:end-1);
+                msg_chk = msg_rest(end);
             catch
                 error("BAD MESSAGE")
                 return
@@ -295,6 +322,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 self armour.ArmourCudaPlanner
                 options.block = false
                 options.block_timeout = self.instanceOptions.packet_timeout
+                options.num_bytes = 5
             end
             if options.block
                 if ~isempty(options.block_timeout)
@@ -308,7 +336,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                 % actually runs
                 try delete(read_timer); catch; end
             end
-            read_out = self.connected_socket.read();
+            read_out = self.connected_socket.read(options.num_bytes);
         end
 
         function success = stopPlan(self, plan_uuid)

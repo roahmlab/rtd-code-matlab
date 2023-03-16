@@ -3,11 +3,14 @@ import json
 import subprocess
 import sys
 import threading
+import os
 
 HOST = "0.0.0.0"
 PORT = 65535
 ACK_MSG = bytes('OK!', 'utf-8')
 RESEND_MSG = bytes('BAD', 'utf-8')
+NUM_THREADS = '4'
+ALL_TYPES = ['joint_position_center', 'joint_position_radius', 'control_input_radius', 'constraints', 'wrench_values', 'force_constraint_radius']
 
 def computeMsgChk(message_bytes : bytes):
     return (sum(message_bytes) % 256).to_bytes(1, byteorder='big')
@@ -92,7 +95,7 @@ def sendMessage(connection, message):
     connection.send(msg_len_bytes + msg_len_chk + message + msg_chk)
     return True
 
-def returnResult(connection, planner_id):
+def returnResult(connection, planner_id, request_types):
     with open(f"buffer/{planner_id}.out", "r") as f:
         data = list(f)
     data = [float(entry) for entry in data]
@@ -102,6 +105,17 @@ def returnResult(connection, planner_id):
     result['time'] = data[-1]
     if len(result['parameters']) == 1:
         result['parameters'] = []
+
+    if len(request_types):
+        if not isinstance(request_types, list):
+            request_types = [request_types]
+        result['requested_data'] = {}
+    if 'ALL' in request_types:
+        request_types = ALL_TYPES
+    for request in request_types:
+        with open(f"buffer/{planner_id}.{request}", "r") as f:
+            result['requested_data'][request] = f.read()
+
     message = json.dumps(result)
     if not sendMessage(connection, message):
         sendMessage(connection, '{"result":"plan_failed"}')
@@ -123,7 +137,8 @@ def requestHandler(request, data, connection):
             f.write(str(inputs['num_obs']) + '\n')
             for _, vals in inputs['obs'].items():
                 f.write(list2str(vals) + '\n')
-        pid = subprocess.Popen(['./armour', uuid])
+        my_env = {**os.environ, 'OMP_NUM_THREADS': NUM_THREADS}
+        pid = subprocess.Popen(['./armour', uuid], env=my_env)
         with uuidlock:
             uuids[data['planner_id']] = pid
 
@@ -134,7 +149,7 @@ def requestHandler(request, data, connection):
         if pid is not None:
             try:
                 if pid.wait(timeout) == 0:
-                    returnResult(connection, data['planner_id'])
+                    returnResult(connection, data['planner_id'], data.get('type',[]))
                 else:
                     sendMessage(connection,'{"result":"plan_failed"}')
             except:

@@ -250,6 +250,14 @@ classdef uarmtd_planner_wrapper < robot_arm_generic_planner
                         P.vdisp('Unable to find new trajectory!',3)
                         k_opt = nan;
                     end
+
+                    link_frs_center = info.link_frs_center;
+                    link_frs_generators = info.link_frs_generators;
+                    link_frs_vertices = info.link_frs_vertices;
+                    control_input_radius = info.control_input_radius;
+                    constraints_value = info.constraints_value;
+                    contact_constraint_radii = info.contact_constraint_radii;
+                    wrench_radii = info.wrench_radii;
 %     
 %                     if terminal_output == 0
 %                         % read FRS information if needed
@@ -425,33 +433,33 @@ classdef uarmtd_planner_wrapper < robot_arm_generic_planner
             P.info.q_dot_0 = [P.info.q_dot_0, {q_dot_0}] ;
             P.info.k_opt = [P.info.k_opt, {k_opt}] ;
 
-%             P.info.contact_constraint_radii = [P.info.contact_constraint_radii {contact_constraint_radii}];
-%             P.info.wrench_radii = [P.info.wrench_radii {wrench_radii}];
-%             P.info.constraints_value = [P.info.constraints_value {constraints_value}];
+            P.info.contact_constraint_radii = [P.info.contact_constraint_radii {contact_constraint_radii}];
+            P.info.wrench_radii = [P.info.wrench_radii {wrench_radii}];
+            P.info.constraints_value = [P.info.constraints_value {constraints_value}];
 
 
-%             if P.save_FO_zono_flag
-%                 if ~P.use_cuda
-%                     for i = 1:P.jrs_info.n_t
-%                         for j = 1:P.agent_info.params.pz_nominal.num_bodies
-%                             FO_zono{i}{j} = zonotope(FO{i}{j});
-%                             if trajopt_failed
-%                                 % no safe slice
-%                                 sliced_FO_zono{i}{j} = [];
-%                             else
-%                                 % slice and save
-%                                 fully_sliceable_tmp = polyZonotope_ROAHM(FO{i}{j}.c, FO{i}{j}.G, [], FO{i}{j}.expMat, FO{i}{j}.id);
-%                                 sliced_FO_zono{i}{j} = zonotope([slice(fully_sliceable_tmp, k_opt), FO{i}{j}.Grest]);
-%                             end
-%                         end
-%                     end
-%                     P.info.FO_zono = [P.info.FO_zono, {FO_zono}];
-%                     P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {sliced_FO_zono}];
-%                 else
-% %                     P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {[joint_frs_center, joint_frs_radius]}];
-%                     P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {link_frs_vertices}]; % disable recording for now
-%                 end
-%             end
+            if P.save_FO_zono_flag
+                if ~P.use_cuda
+                    for i = 1:P.jrs_info.n_t
+                        for j = 1:P.agent_info.params.pz_nominal.num_bodies
+                            FO_zono{i}{j} = zonotope(FO{i}{j});
+                            if trajopt_failed
+                                % no safe slice
+                                sliced_FO_zono{i}{j} = [];
+                            else
+                                % slice and save
+                                fully_sliceable_tmp = polyZonotope_ROAHM(FO{i}{j}.c, FO{i}{j}.G, [], FO{i}{j}.expMat, FO{i}{j}.id);
+                                sliced_FO_zono{i}{j} = zonotope([slice(fully_sliceable_tmp, k_opt), FO{i}{j}.Grest]);
+                            end
+                        end
+                    end
+                    P.info.FO_zono = [P.info.FO_zono, {FO_zono}];
+                    P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {sliced_FO_zono}];
+                else
+%                     P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {[joint_frs_center, joint_frs_radius]}];
+                    P.info.sliced_FO_zono = [P.info.sliced_FO_zono, {link_frs_vertices}]; % disable recording for now
+                end
+            end
 
             % create outputs:
             T = 0:P.time_discretization:P.t_stop ;
