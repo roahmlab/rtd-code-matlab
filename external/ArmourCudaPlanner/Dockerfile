@@ -57,7 +57,7 @@ WORKDIR ${IPOPTDIR}
 RUN git clone --depth 1 --branch releases/2.2.1 https://github.com/coin-or-tools/ThirdParty-HSL.git
 WORKDIR ${IPOPTDIR}/ThirdParty-HSL
 COPY ${HSLFILE} ${HSLFILE}
-RUN tar xvf ./${HSLFILE} && mv $(ls -d coinhsl*/) coinhsl
+RUN tar xvf ./${HSLFILE} && if [ ! -d "coinhsl" ]; then mv $(ls -d coinhsl*/) coinhsl; fi
 RUN ./configure --prefix=${HSLINSTALL} \
     && make \
     && make install
@@ -104,8 +104,7 @@ RUN wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz \
 COPY src/* ./
 #RUN ./compile.sh
 #RUN nvcc -o armour_main armour_main.cu NLPclass.cu CollisionChecking.cu Dynamics.cu Trajectory.cu PZsparse.cu -Xcompiler -fopenmp -std=c++14 -O2 -I/usr/local/include -I/opt/ipopt/include/coin-or -L/usr/local/lib -L/usr/lib -L/opt/ipopt/lib -lipopt -lquadmath -lstdc++ -ldl -lm -lc -lgomp
-#RUN nvcc -o armour_main armour_main.cu NLPclass.cu CollisionChecking.cu Dynamics.cu Trajectory.cu PZsparse.cu -Xcompiler -fopenmp -std=c++14 -O2 -I./ -I/usr/local/include -I/opt/ipopt/include/coin-or -L/usr/local/lib -L/usr/lib -L/opt/ipopt/lib -lipopt -lquadmath -lstdc++ -ldl -lm -lc -lgomp
-RUN nvcc -o armour_main rtd_force_main_v2.cu NLPclass.cu CollisionChecking.cu Dynamics.cu Trajectory.cu PZsparse.cu -Xcompiler -fopenmp -std=c++14 -O2 -I./ -I/usr/local/include -I/opt/ipopt/include/coin-or -L/usr/local/lib -L/usr/lib -L/opt/ipopt/lib -lipopt -lquadmath -lstdc++ -ldl -lm -lc -lgomp
+RUN nvcc -o armour_main armour_main.cu NLPclass.cu CollisionChecking.cu Dynamics.cu Trajectory.cu PZsparse.cu -Xcompiler -fopenmp -std=c++14 -O2 -I./ -I/usr/local/include -I/opt/ipopt/include/coin-or -L/usr/local/lib -L/usr/lib -L/opt/ipopt/lib -lipopt -lquadmath -lstdc++ -ldl -lm -lc -lgomp
 
 # prepare to export
 RUN tar -cvzf transfer.tar.gz ${IPOPT_HOME} ${HSL_HOME} armour_main
