@@ -4,7 +4,7 @@
 NAME="armour-cuda-planner"
 USE_UNIQUE=true
 ADD_UNAME=true
-IMAGE=rtd-code/armour_cuda_planner:latest
+IMAGE=rtd-code/armour_force_cuda_planner:latest
 PORT=65535
 
 if $USE_UNIQUE;then
