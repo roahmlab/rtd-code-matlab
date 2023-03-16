@@ -158,7 +158,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
                     wrench_radii = str2num(info.requested_data.wrench_values);
 
                     link_frs_vertices = cell(7,1);
-                    for tid = 1:10:128
+                    for tid = 1:10:100
                         for j = 1:7
                             c = link_frs_center((tid-1)*7+j, :)';
                             g = link_frs_generators( ((tid-1)*7+j-1)*3+1 : ((tid-1)*7+j)*3, :);
