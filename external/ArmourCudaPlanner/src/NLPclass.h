@@ -10,7 +10,7 @@ using namespace Ipopt;
 
 class armtd_NLP: public TNLP
 {
-public: 
+public:
     /** Default constructor */
     armtd_NLP();
 
@@ -24,7 +24,9 @@ public:
         const BezierCurve* desired_trajectory_input,
         KinematicsDynamics* kinematics_dynamics_result_input,
         const Eigen::MatrixXd* torque_radius_input,
-        Obstacles* obstacles_input
+        Obstacles* obstacles_input,
+        double u_s_input,
+        double surf_rad_input
     );
 
     /**@name Overloaded from TNLP */
@@ -59,6 +61,11 @@ public:
         Index   m,
         bool    init_lambda,
         Number* lambda
+    );
+
+    virtual void compute(
+        bool new_x,
+        const Number* x
     );
 
     /** Method to return the objective value */
@@ -135,7 +142,7 @@ public:
     );
     //@}
 
-    double t_plan = 1.0;
+    double t_plan = DURATION;
 
     double solution[NUM_FACTORS];
 
@@ -150,11 +157,20 @@ public:
     Eigen::Vector3d link_sliced_center[NUM_TIME_STEPS * NUM_JOINTS];
     Eigen::Vector3d dk_link_sliced_center[NUM_TIME_STEPS * NUM_JOINTS * NUM_FACTORS];
 
+    // force constraint specific
+    
+    Eigen::MatrixXd force_value_center = Eigen::MatrixXd(3,NUM_TIME_STEPS);
+    Eigen::MatrixXd force_value_radii = Eigen::MatrixXd(3,NUM_TIME_STEPS);
+    Eigen::MatrixXd moment_value_center = Eigen::MatrixXd(3,NUM_TIME_STEPS);
+    Eigen::MatrixXd moment_value_radii = Eigen::MatrixXd(3,NUM_TIME_STEPS);
+
+    double force_constraint_ub[3*NUM_TIME_STEPS];
+    double force_constraint_lb[3*NUM_TIME_STEPS];
+    double force_constraint_gradient[3*NUM_TIME_STEPS*NUM_FACTORS];
+
 private:
     /**@name Methods to block default compiler methods.
-    *
-    * The compiler automatically generates the following three methods.
-    *  Since the default compiler implementation is generally not what
+    *kinematics_dynamics_results generally not what
     *  you want (for all but the most simple classes), we usually
     *  put the declarations of these methods in the private section
     *  and never implement them. This prevents the compiler from
@@ -179,6 +195,10 @@ private:
     const Eigen::MatrixXd* torque_radius = nullptr;
 
     Obstacles* obstacles = nullptr;
+
+    double u_s = 0; // is this correct or needed?
+
+    double surf_rad = 0; // is this correct or needed?
 
     //@}
 };

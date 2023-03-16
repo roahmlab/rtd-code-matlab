@@ -97,31 +97,31 @@ public:
 
 // helper functions
 // q0, qd0, qdd0, k here are scalars since all joints are using the same Bezier curve representation
-double q_des_func(double q0, double qd0, double qdd0, double k, double t);
+double q_des_func(double q0, double Tqd0, double TTqdd0, double k, double t);
 
-double qd_des_func(double q0, double qd0, double qdd0, double k, double t);
+double qd_des_func(double q0, double Tqd0, double TTqdd0, double k, double t);
 
-double qdd_des_func(double q0, double qd0, double qdd0, double k, double t);
+double qdd_des_func(double q0, double Tqd0, double TTqdd0, double k, double t);
 
 // derivative of the second extrema of q_des (when qd_des = 0) w.r.t k 
-double q_des_extrema2_k_derivative(double q0, double qd0, double qdd0, double k);
+double q_des_extrema2_k_derivative(double q0, double Tqd0, double TTqdd0, double k);
 
 // derivative of the third extrema of q_des (when qd_des = 0) w.r.t k 
-double q_des_extrema3_k_derivative(double q0, double qd0, double qdd0, double k);
+double q_des_extrema3_k_derivative(double q0, double Tqd0, double TTqdd0, double k);
 
-// derivative of the second extrema of qd_des (when qd_des = 0) w.r.t k 
-double qd_des_extrema2_k_derivative(double q0, double qd0, double qdd0, double k);
+// derivative of the second extrema of qd_des (when qdd_des = 0) w.r.t k 
+double qd_des_extrema2_k_derivative(double q0, double Tqd0, double TTqdd0, double k);
 
-// derivative of the third extrema of qd_des (when qd_des = 0) w.r.t k 
-double qd_des_extrema3_k_derivative(double q0, double qd0, double qdd0, double k);
+// derivative of the third extrema of qd_des (when qdd_des = 0) w.r.t k 
+double qd_des_extrema3_k_derivative(double q0, double Tqd0, double TTqdd0, double k);
 
 // k-independent part of q_des
-double q_des_k_indep(double q0, double qd0, double qdd0, double t);
+double q_des_k_indep(double q0, double Tqd0, double TTqdd0, double t);
 
 // k-independent part of qd_des
-double qd_des_k_indep(double q0, double qd0, double qdd0, double t);
+double qd_des_k_indep(double q0, double Tqd0, double TTqdd0, double t);
 
 // k-independent part of qdd_des
-double qdd_des_k_indep(double q0, double qd0, double qdd0, double t);
+double qdd_des_k_indep(double q0, double Tqd0, double TTqdd0, double t);
 
 #endif

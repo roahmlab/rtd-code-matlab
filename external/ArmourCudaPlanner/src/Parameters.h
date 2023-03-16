@@ -3,23 +3,25 @@
 
 // #include "FetchInfo.h"
 // #include "KinovaInfo.h"
-#include "KinovaWithoutGripperInfo.h"
+// #include "KinovaWithoutGripperInfo.h"
+// #include "KinovaForceInfo.h"
+#include "KinovaFixedGripperInfo.h"
+
+// #define DEBUG_MODE true
 
 // Parameters for PZsparse.h:
-    // monomials with a coefficient smaller than this number will be reduced
+    // monomials with a coefficient smaller than this number will be reduced (should be close to V_m magnitude)
     #define SIMPLIFY_THRESHOLD 1e-4
 
 // Parameters for Trajectories.h:
-    // duration of the Bezier curve
+    // Duration of the Bezier Curve
     #define DURATION 2.0
 
     // number of time steps (This should be an EVEN number!!!)
-    #define NUM_TIME_STEPS 128
+    #define NUM_TIME_STEPS 100
 
     // range of parameters (size of generators in PZ).
-    // const double k_range[NUM_FACTORS] = { M_PI / 24, M_PI / 24, M_PI / 24, M_PI / 24, M_PI / 24, M_PI / 24, M_PI / 30 }; // (radian)
-    const double k_range[NUM_FACTORS] = { M_PI / 48, M_PI / 48, M_PI / 48, M_PI / 48, M_PI / 48, M_PI / 48, M_PI / 60 }; // (radian)
-    // const double k_range[NUM_FACTORS] = { M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 96 }; // (radian)
+    const double k_range[NUM_FACTORS] = { M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72, M_PI / 72 }; // (radian)
 
 // Parameters for CollisionChecking.h:
     // maximum number of obstacles (used for memory pre-allocation)
@@ -35,23 +37,32 @@
     #define NUM_THREADS 32
 
     // threshold for collision avoidance constraint considered to be violated (unit: meter)
-    #define COLLISION_AVOIDANCE_CONSTRAINT_VIOLATION_THRESHOLD -1e-4
+    #define COLLISION_AVOIDANCE_CONSTRAINT_VIOLATION_THRESHOLD 1e-4
 
     // threshold for input constraint considered to be violated (unit: Newton * meter)
-    #define TORQUE_INPUT_CONSTRAINT_VIOLATION_THRESHOLD 1e-2
+    #define TORQUE_INPUT_CONSTRAINT_VIOLATION_THRESHOLD 1e-4
+
+    // threshold for separation constraint (unit: Newton)
+    #define SEPARATION_CONSTRAINT_VIOLATION_THRESHOLD 1e-6
+
+    // threshold for slipping constraint violation (unit: Newton) // squared?
+    #define SLIPPING_CONSTRAINT_VIOLATION_THRESHOLD 1e-6
+
+    // threshold for tipping constraint violation (unit: meter) // squared?
+    #define TIPPING_CONSTRAINT_VIOLATION_THRESHOLD 1e-6
 
     // scale the cost function value so that it could converge faster (be careful with it!)
     #define COST_FUNCTION_OPTIMALITY_SCALE 10.0
 
 // Parameters for armour_main.cpp
-    #define IPOPT_OPTIMIZATION_TOLERANCE 1e-6
+    #define IPOPT_OPTIMIZATION_TOLERANCE 1e-4
 
-    #define IPOPT_MAX_CPU_TIME 14.0
+    #define IPOPT_MAX_CPU_TIME 10 // 14.0
 
     #define IPOPT_PRINT_LEVEL 0
 
     #define IPOPT_MU_STRATEGY "adaptive"
 
-    #define IPOPT_LINEAR_SOLVER "ma27"
+    #define IPOPT_LINEAR_SOLVER "ma97"
 
 #endif

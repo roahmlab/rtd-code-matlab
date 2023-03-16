@@ -36,3 +36,6 @@ _build/
 # tar.gz for coinhsl
 *.tar.gz
 *.tgz
+
+# ignore vscode
+.vscode/

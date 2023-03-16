@@ -76,7 +76,7 @@ uuidlock = threading.Lock()
 #pid = None
 
 def list2str(data):
-    return ' '.join('{}'.format(k) for k in data)
+    return ' '.join('{:.10f}'.format(k) for k in data)
 
 def sendMessage(connection, message):
     message = bytes(message, 'utf-8')
@@ -100,6 +100,8 @@ def returnResult(connection, planner_id):
     result['result'] = 'plan_complete'
     result['parameters'] = data[:-1]
     result['time'] = data[-1]
+    if len(result['parameters']) == 1:
+        result['parameters'] = []
     message = json.dumps(result)
     if not sendMessage(connection, message):
         sendMessage(connection, '{"result":"plan_failed"}')

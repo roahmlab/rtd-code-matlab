@@ -14,6 +14,10 @@ KinematicsDynamics::KinematicsDynamics(BezierCurve* traj_input) {
     I_uncertain_arr = PZsparseArray(NUM_JOINTS, 1);
     u_nom = PZsparseArray(NUM_FACTORS, NUM_TIME_STEPS);
     u_nom_int = PZsparseArray(NUM_FACTORS, NUM_TIME_STEPS);
+    f_c_int = PZsparseArray(1,NUM_TIME_STEPS);
+    n_c_int = PZsparseArray(1,NUM_TIME_STEPS);
+    f_c_nom = PZsparseArray(1,NUM_TIME_STEPS);
+    n_c_nom = PZsparseArray(1,NUM_TIME_STEPS);
     r = PZsparseArray(NUM_FACTORS, 1);
     Mr = PZsparseArray(NUM_FACTORS, NUM_TIME_STEPS);
 
@@ -75,7 +79,8 @@ KinematicsDynamics::KinematicsDynamics(BezierCurve* traj_input) {
 void KinematicsDynamics::fk(uint t_ind) {
     PZsparse FK_R = PZsparse(0, 0, 0); // identity matrix
     PZsparse FK_T(3, 1);
-    
+    int j = 0;
+
     for (int i = 0; i < NUM_JOINTS; i++) {
         PZsparse P(trans_matrix(i, 0));
         
@@ -90,6 +95,8 @@ void KinematicsDynamics::rnea(uint t_ind,
                               PZsparseArray& mass_arr,
                               PZsparseArray& I_arr,
                               PZsparseArray& u,
+                              PZsparseArray& f_c,
+                              PZsparseArray& n_c,
                               bool setGravity) {
     PZsparse w(3, 1);
     PZsparse wdot(3, 1);
@@ -137,6 +144,14 @@ void KinematicsDynamics::rnea(uint t_ind,
         }
         else { // fixed joints
             // line 16
+
+            // PZsparse test1 = (linear_acc 
+            //                                      + cross(wdot, trans_matrix(i, 0)) 
+            //                                      + cross(w, cross(w_aux, trans_matrix(i, 0))));
+            // cout << "PZ1" << endl << test1 << endl;
+            // PZsparse test2 = traj->R_t(i, t_ind);
+            // cout << "PZ2" << endl << test2 << endl;
+            
             linear_acc = traj->R_t(i, t_ind) * (linear_acc 
                                                  + cross(wdot, trans_matrix(i, 0)) 
                                                  + cross(w, cross(w_aux, trans_matrix(i, 0))));
@@ -182,6 +197,14 @@ void KinematicsDynamics::rnea(uint t_ind,
             u(i, t_ind) = u(i, t_ind) + damping[i] * traj->qd_des(i, t_ind);
 
             // friction is directly cut on the torque limits
+        }
+
+        if (i == NUM_JOINTS - 1) {
+            f_c(0,t_ind) = f; // not sure how to assign these
+            n_c(0,t_ind) = n; // not sure how to assign these
+            // note: should change this at some point to be 
+            // specifically for a specified list of contact 
+            // joints and not just the last joint.
         }
     }
 }

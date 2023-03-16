@@ -33,9 +33,11 @@ public:
     double* dev_link_c = nullptr;
     double* dev_grad_link_c = nullptr;
 
-	Obstacles(const double* obstacles_inp, const int num_obstacles_inp);
+    Obstacles();
 
 	~Obstacles();
+
+    void initialize(const double* obstacles_inp, const int num_obstacles_inp);
 
 	void initializeHyperPlane(const Eigen::Matrix<double, 3, 3 + 3>* link_independent_generators);
 

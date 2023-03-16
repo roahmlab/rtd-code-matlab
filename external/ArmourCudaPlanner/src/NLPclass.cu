@@ -22,7 +22,9 @@ bool armtd_NLP::set_parameters(
     const BezierCurve* desired_trajectory_input,
     KinematicsDynamics* kinematics_dynamics_result_input,
     const Eigen::MatrixXd* torque_radius_input,
-    Obstacles* obstacles_input
+    Obstacles* obstacles_input,
+    double u_s_input,
+    double surf_rad_input
  ) 
  {
     q_des = q_des_input;
@@ -31,8 +33,11 @@ bool armtd_NLP::set_parameters(
     kinematics_dynamics_result = kinematics_dynamics_result_input;
     torque_radius = torque_radius_input;
     obstacles = obstacles_input;
+    u_s = u_s_input;
+    surf_rad = surf_rad_input;
 
     constraint_number = NUM_FACTORS * NUM_TIME_STEPS +
+                        3*NUM_TIME_STEPS +
                         NUM_JOINTS * NUM_TIME_STEPS * obstacles->num_obstacles + 
                         NUM_FACTORS * 4;
 
@@ -102,9 +107,33 @@ bool armtd_NLP::get_bounds_info(
             g_u[i * NUM_FACTORS + j] = torque_limits[j] - (*torque_radius)(j, i);
         }
     }    
+    Index offset = NUM_FACTORS * NUM_TIME_STEPS;
+
+    //     separation constraint
+    // upper bound should be zero and lower bound should be -inf
+    for( Index i = offset; i < offset + NUM_TIME_STEPS; i++){
+        g_l[i] = -1e19;
+        g_u[i] = 0;
+    }
+    offset += NUM_TIME_STEPS;
+
+    //     slipping constraint
+    // upper bound should be zero and lower bound should be -inf for the reformulated constraint (not the normal friction law?)
+    for( Index i = offset; i < offset + NUM_TIME_STEPS; i++){
+        g_l[i] = -1e19;
+        g_u[i] = 0;
+    }
+    offset += NUM_TIME_STEPS;
+
+    //     tipping constraint
+    // upper bound should be zero and lower bound should be -inf for the reformulated constraint
+    for( Index i = offset; i < offset + NUM_TIME_STEPS; i++){
+        g_l[i] = -1e19;
+        g_u[i] = 0;
+    }
+    offset += NUM_TIME_STEPS;
 
     // collision avoidance constraints
-    Index offset = NUM_FACTORS * NUM_TIME_STEPS;
     for( Index i = offset; i < offset + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles; i++ ) {
         g_l[i] = -1e19;
         g_u[i] = 0;
@@ -180,6 +209,340 @@ bool armtd_NLP::get_starting_point(
 }
 // [TNLP_get_starting_point]
 
+void armtd_NLP::compute(
+    bool new_x,
+    const Number* x
+){
+
+    // check if a new x is passed in
+    if (new_x){
+        // timing
+        // auto start_compute = std::chrono::high_resolution_clock::now();
+
+        // update values
+
+        // compute the constraint values
+
+        // Contact Force Constraints
+        Index i;
+        #pragma omp parallel for shared(kinematics_dynamics_result, x, link_sliced_center) private(i) schedule(static, NUM_TIME_STEPS / NUM_THREADS)
+        for(i = 0; i<NUM_TIME_STEPS; i++){
+
+            for (int m = 0; m < 3; m++) {
+                MatrixXInt res1 = kinematics_dynamics_result -> f_c_int(i)(m,0).slice(x);
+                force_value_center(m,i) = getCenter(res1(0));
+                force_value_radii(m,i) = getRadius(res1(0));
+                MatrixXInt res2 = kinematics_dynamics_result -> n_c_int(i)(m,0).slice(x);
+                moment_value_center(m,i) = getCenter(res2(0));
+                moment_value_radii(m,i) = getRadius(res2(0));
+            }
+
+            // Extract the force PZs, slice, and get the centers and radii
+            MatrixXInt f_c_x = kinematics_dynamics_result -> f_c_int(i)(0,0).slice(x);
+            Number f_c_x_center = getCenter(f_c_x(0));
+            Number f_c_x_radius = getRadius(f_c_x(0));
+
+            MatrixXInt f_c_y = kinematics_dynamics_result -> f_c_int(i)(1,0).slice(x);
+            Number f_c_y_center = getCenter(f_c_y(0));
+            Number f_c_y_radius = getRadius(f_c_y(0));
+
+            MatrixXInt f_c_z = kinematics_dynamics_result -> f_c_int(i)(2,0).slice(x);
+            Number f_c_z_center = getCenter(f_c_z(0));
+            Number f_c_z_radius = getRadius(f_c_z(0));
+
+            // Extract the moment PZs
+            MatrixXInt n_c_x = kinematics_dynamics_result -> n_c_int(i)(0,0).slice(x);
+            Number n_c_x_center = getCenter(n_c_x(0));
+            Number n_c_x_radius = getRadius(n_c_x(0));
+
+            MatrixXInt n_c_y = kinematics_dynamics_result -> n_c_int(i)(1,0).slice(x);
+            Number n_c_y_center = getCenter(n_c_y(0));
+            Number n_c_y_radius = getRadius(n_c_y(0));
+
+            MatrixXInt n_c_z = kinematics_dynamics_result -> n_c_int(i)(2,0).slice(x);
+            Number n_c_z_center = getCenter(n_c_z(0));
+            Number n_c_z_radius = getRadius(n_c_z(0));
+
+            // compute the numerator of the ZMP point equation
+            Eigen::MatrixXd norm_vec(3,1);
+            norm_vec << 0,0,1;
+            PZsparse ZMP_top = cross(norm_vec,kinematics_dynamics_result->n_c_int(i));
+            // extract the x, y and z components, slice by the parameters, then get the centers and radii of independent generators
+            // x-component
+            MatrixXInt ZMP_top_x = ZMP_top(0,0).slice(x); // ->?
+            Number ZMP_top_x_center = getCenter(ZMP_top_x(0));
+            Number ZMP_top_x_radius = getRadius(ZMP_top_x(0));
+            // y-component
+            MatrixXInt ZMP_top_y = ZMP_top(1,0).slice(x); // ->?
+            Number ZMP_top_y_center = getCenter(ZMP_top_y(0));
+            Number ZMP_top_y_radius = getRadius(ZMP_top_y(0));
+            // z-component (for verification, this should be zero always.)
+            MatrixXInt ZMP_top_z = ZMP_top(2,0).slice(x); // ->?
+            Number ZMP_top_z_center = getCenter(ZMP_top_z(0));
+            Number ZMP_top_z_radius = getRadius(ZMP_top_z(0));
+
+            // compute the denominator of the ZMP point equation
+            MatrixXInt ZMP_bottom = kinematics_dynamics_result->f_c_int(i)(2,0).slice(x);
+            Number ZMP_bottom_center = getCenter(ZMP_bottom(0));
+            Number ZMP_bottom_radius = getRadius(ZMP_bottom(0));
+
+
+            // constraints
+
+            // Separation constraint
+            force_constraint_ub[i] = -1*f_c_z_center + f_c_z_radius;
+            force_constraint_lb[i] = -1*f_c_z_center - f_c_z_radius;
+
+            Index idx_offset2 = NUM_TIME_STEPS;
+
+            // slipping constraint
+            if ( (f_c_x_center >= 0) && (f_c_y_center >= 0) && (f_c_z_center >= 0) ){
+                // Note: double check that the center/radius is a number that can be squared
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 2: y negative
+            else if ( (f_c_x_center >= 0) && (f_c_y_center <= 0) && (f_c_z_center >= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 3: z negative
+            else if ( (f_c_x_center >= 0) && (f_c_y_center >= 0) && (f_c_z_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 4: y and z negative
+            else if ( (f_c_x_center >= 0) && (f_c_y_center <= 0) && (f_c_z_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 5: x negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center >= 0) && (f_c_z_center >= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 6: x and y negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center <= 0) && (f_c_z_center >= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 7: x and z negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center >= 0) && (f_c_z_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+            // condition 8: x and y and z negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center <= 0) && (f_c_z_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(f_c_x_center,2) - 2*f_c_x_radius*f_c_x_center + pow(f_c_x_radius,2) + pow(f_c_y_center,2) - 2*f_c_y_radius*f_c_y_center + pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) + 2*f_c_z_radius*f_c_z_center - pow(f_c_z_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(f_c_x_center,2) + 2*f_c_x_radius*f_c_x_center - pow(f_c_x_radius,2) + pow(f_c_y_center,2) + 2*f_c_y_radius*f_c_y_center - pow(f_c_y_radius,2) - pow(u_s,2) * ( pow(f_c_z_center,2) - 2*f_c_z_radius*f_c_z_center + pow(f_c_z_radius,2)); // checked signs
+
+            }
+
+            idx_offset2 += NUM_TIME_STEPS;
+            // tipping constraint
+
+            // condition 1: all positive
+            if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center >= 0) ){
+                // Note: double check that the center/radius is a number that can be squared
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 2: y negative
+            else if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center >= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 3: z negative
+            else if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 4: y and z negative
+            else if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 5: x negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center >= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 6: x and y negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center >= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 7: x and z negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+            // condition 8: x and y and z negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center <= 0) ) {
+                force_constraint_ub[i+idx_offset2] = pow(ZMP_top_x_center,2) - 2*ZMP_top_x_radius*ZMP_top_x_center + pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) - 2*ZMP_top_y_radius*ZMP_top_y_center + pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) + 2*ZMP_bottom_radius*ZMP_bottom_center - pow(ZMP_bottom_radius,2)); // checked signs
+                force_constraint_lb[i+idx_offset2] = pow(ZMP_top_x_center,2) + 2*ZMP_top_x_radius*ZMP_top_x_center - pow(ZMP_top_x_radius,2) + pow(ZMP_top_y_center,2) + 2*ZMP_top_y_radius*ZMP_top_y_center - pow(ZMP_top_y_radius,2) - pow(surf_rad,2) * ( pow(ZMP_bottom_center,2) - 2*ZMP_bottom_radius*ZMP_bottom_center + pow(ZMP_bottom_radius,2)); // checked signs
+
+            }
+
+
+            // calculate the gradient of the constraints
+
+            // to do: check the index offsets and clean up code and add public variable to store the gradient values
+            // to do: remove duplicate code from other functions and properly access and assign these variables in those functions
+
+            // Contact Force Constraints
+
+            // gradients
+            // storage for the gradients
+            Number f_c_x_grad[NUM_FACTORS];
+            Number f_c_y_grad[NUM_FACTORS];
+            Number f_c_z_grad[NUM_FACTORS];
+            Number ZMP_top_x_grad[NUM_FACTORS];
+            Number ZMP_top_y_grad[NUM_FACTORS];
+            Number ZMP_bottom_grad[NUM_FACTORS];
+            // calculate the gradients
+            kinematics_dynamics_result->f_c_int(i)(0,0).slice(f_c_x_grad, x);
+            kinematics_dynamics_result->f_c_int(i)(1,0).slice(f_c_y_grad, x);
+            kinematics_dynamics_result->f_c_int(i)(2,0).slice(f_c_z_grad, x);
+            ZMP_top(0,0).slice(ZMP_top_x_grad, x);
+            ZMP_top(1,0).slice(ZMP_top_y_grad, x);
+            kinematics_dynamics_result->f_c_int(i)(2,0).slice(ZMP_bottom_grad, x); // same as f_c_z_grad?
+
+            // Separation constraint gradient
+            for (int j = 0;j<NUM_FACTORS;j++) {
+                force_constraint_gradient[i*NUM_FACTORS+j] = -1*f_c_z_grad[j];
+            }
+
+            Index grad_idx_offset = NUM_TIME_STEPS*NUM_FACTORS;
+            // Slipping Constraint
+            // calculate constraint gradient, depends on the signs of the centers like constraint itself does.
+            if ( (f_c_x_center >= 0) && (f_c_y_center >= 0) && (f_c_z_center >= 0) ){
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] + 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] + 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] - 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 2: y negative
+            else if ( (f_c_x_center >= 0) && (f_c_y_center <= 0) && (f_c_z_center >= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] + 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] - 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] - 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 3: z negative
+            else if ( (f_c_x_center >= 0) && (f_c_y_center >= 0) && (f_c_z_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] + 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] + 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] + 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 4: y and z negative
+            else if ( (f_c_x_center >= 0) && (f_c_y_center <= 0) && (f_c_z_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] + 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] - 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] + 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 5: x negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center >= 0) && (f_c_z_center >= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] - 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] + 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] - 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 6: x and y negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center <= 0) && (f_c_z_center >= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] - 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] - 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] - 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 7: x and z negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center >= 0) && (f_c_z_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] - 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] + 2*f_c_y_radius*f_c_y_grad[j] - pow(u_s,2) * ( 2*f_c_z_center*f_c_z_grad[j] + 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+            // condition 8: x and y and z negative
+            else if ( (f_c_x_center <= 0) && (f_c_y_center <= 0) && (f_c_z_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*f_c_x_center*f_c_x_grad[j] - 2*f_c_x_radius*f_c_x_grad[j] + 2*f_c_y_center*f_c_y_grad[j] - 2*f_c_y_radius*f_c_y_grad[j] - u_s*u_s * ( 2*f_c_z_center*f_c_z_grad[j] + 2*f_c_z_radius*f_c_z_grad[j] );
+                }
+            }
+
+            //    tipping constraint
+
+            grad_idx_offset += NUM_TIME_STEPS*NUM_FACTORS;
+            // calculate constraint gradient
+            if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center >= 0) ){
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] + 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] + 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] - 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 2: y negative
+            else if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center >= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] + 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] - 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] - 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 3: z negative
+            else if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] + 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] + 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] + 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 4: y and z negative
+            else if ( (ZMP_top_x_center >= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] + 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] - 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] + 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 5: x negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center >= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] - 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] + 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] - 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 6: x and y negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center >= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] - 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] - 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] - 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 7: x and z negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center >= 0) && (ZMP_bottom_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] - 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] + 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] + 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+            // condition 8: x and y and z negative
+            else if ( (ZMP_top_x_center <= 0) && (ZMP_top_y_center <= 0) && (ZMP_bottom_center <= 0) ) {
+                for (int j=0;j<NUM_FACTORS;j++) {
+                    force_constraint_gradient[i*NUM_FACTORS+grad_idx_offset+j] = 2*ZMP_top_x_center*ZMP_top_x_grad[j] - 2*ZMP_top_x_radius*ZMP_top_x_grad[j] + 2*ZMP_top_y_center*ZMP_top_y_grad[j] - 2*ZMP_top_y_radius*ZMP_top_y_grad[j] - pow(surf_rad,2) * ( 2*ZMP_bottom_center*ZMP_bottom_grad[j] + 2*ZMP_bottom_radius*ZMP_bottom_grad[j]);
+                }
+            }
+
+            
+        }
+        // auto stop_compute = std::chrono::high_resolution_clock::now();
+        // auto duration_compute = std::chrono::duration_cast<std::chrono::milliseconds>(stop_compute - start_compute);
+        // cout << "        Time Taken to Calculate Compute Function: " << duration_compute.count() << " milliseconds" << endl;
+
+    }
+    else{
+        // do not update values
+    }
+
+}
+
 // [TNLP_eval_f]
 // returns the value of the objective function
 bool armtd_NLP::eval_f(
@@ -193,14 +556,49 @@ bool armtd_NLP::eval_f(
        WARNING_PRINT("*** Error wrong value of n in eval_f!");
     }
 
+    // call compute function to update values if necessary
+    // cout << "Computing new_x from f function" << endl;
+    // auto start_new_x = std::chrono::high_resolution_clock::now();
+
+    compute(new_x,x);
+
+    // auto stop_new_x = std::chrono::high_resolution_clock::now();
+    // auto duration_new_x = std::chrono::duration_cast<std::chrono::milliseconds>(stop_new_x - start_new_x);
+    // cout << "        Time Taken to Calculate new_x from f grad: " << duration_new_x.count() << " milliseconds" << endl;
+
+    // auto start_nom = std::chrono::high_resolution_clock::now();
+
     // obj_value = sum((q_plan - q_des).^2);
     obj_value = 0; 
     for(Index i = 0; i < n; i++){
-        double q_plan = q_des_func(desired_trajectory->q0[i], desired_trajectory->qd0[i], desired_trajectory->qdd0[i], k_range[i] * x[i], t_plan);
-        obj_value += pow(q_plan - q_des[i], 2);
+        double q_plan = q_des_func(desired_trajectory->q0[i], desired_trajectory->qd0[i], desired_trajectory->qdd0[i], k_range[i] * x[i], t_plan); // Bohao question: why pass in t_plan here instead of duration?
+        obj_value += pow(q_des[i] - q_plan, 2);
     }
 
-    obj_value *= COST_FUNCTION_OPTIMALITY_SCALE;
+    obj_value *= COST_FUNCTION_OPTIMALITY_SCALE; // needs to change in the gradient as well
+
+    // auto stop_nom = std::chrono::high_resolution_clock::now();
+    // auto duration_nom = std::chrono::duration<long, std::nano>(stop_nom - start_nom);
+    // cout << "        Time for Evaluating Cost Nominal Term: " << duration_nom.count() << " nanoseconds" << endl;
+
+    // auto start_f = std::chrono::high_resolution_clock::now();
+
+    // // new cost term
+    // // loop to pull out slip constraint values
+    // for(Index i=0; i<NUM_TIME_STEPS;i++){
+    //     // offset by NUM_TIME_STEPS to move past the separation constraint
+    //     obj_value += force_constraint_ub[i+NUM_TIME_STEPS];
+    // }
+
+    // auto stop_f = std::chrono::high_resolution_clock::now();
+    // auto duration_f = std::chrono::duration<long, std::nano>(stop_f - start_f);
+    // cout << "        Time for Evaluating Cost Slip Term: " << duration_f.count() << " nanoseconds" << endl;
+
+    // for(Index i = 0; i < NUM_TIME_STEPS; i++){
+    //     obj_value += cost_slip_ub[i];
+    // }
+
+    
 
     return true;
 }
@@ -219,11 +617,43 @@ bool armtd_NLP::eval_grad_f(
         WARNING_PRINT("*** Error wrong value of n in eval_grad_f!");
     }
 
+    // call compute to update if new_x
+    // cout << "Computing new_x from f grad function" << endl;
+    // auto start_new_x = std::chrono::high_resolution_clock::now();
+
+    compute(new_x,x);
+
+    // auto stop_new_x = std::chrono::high_resolution_clock::now();
+    // auto duration_new_x = std::chrono::duration_cast<std::chrono::milliseconds>(stop_new_x - start_new_x);
+    // cout << "        Time Taken to Calculate new_x from f grad: " << duration_new_x.count() << " milliseconds" << endl;
+
+
     for(Index i = 0; i < n; i++){
-        double q_plan = q_des_func(desired_trajectory->q0[i], desired_trajectory->qd0[i], desired_trajectory->qdd0[i], k_range[i] * x[i], t_plan);
+
+        // values is 7x1
+        // sum for each time step resulting in 7x1
+        // add each element to corresponding element of grad_f?
+
+        double q_plan = q_des_func(desired_trajectory->q0[i], desired_trajectory->qd0[i], desired_trajectory->qdd0[i], k_range[i] * x[i], t_plan); // Bohao question: why pass in t_plan here instead of duration?
         double dk_q_plan = pow(t_plan,3) * (6 * pow(t_plan,2) - 15 * t_plan + 10);
         grad_f[i] = (2 * (q_plan - q_des[i]) * dk_q_plan * k_range[i]) * COST_FUNCTION_OPTIMALITY_SCALE;
     }
+
+    // auto start_grad = std::chrono::high_resolution_clock::now();
+
+    // new cost term gradient
+    Index offset = NUM_TIME_STEPS*NUM_FACTORS; // offset to pass over separation constraint
+    for(Index i=0; i<NUM_TIME_STEPS;i++){
+        // sum cost_grad_slip and grad_f column-wise
+        for(Index j = 0; j < n; j++){
+            // grad_f[j] += cost_grad_slip[i];
+            grad_f[j] += force_constraint_gradient[i*NUM_FACTORS+offset+j];
+        }
+    }
+
+    // auto stop_grad = std::chrono::high_resolution_clock::now();
+    // auto duration_grad = std::chrono::duration<long, std::nano>(stop_grad - start_grad);
+    // cout << "        Time for Evaluating Cost Gradient Slip Term: " << duration_grad.count() << " nanoseconds" << endl;
 
     return true;
 }
@@ -246,6 +676,11 @@ bool armtd_NLP::eval_g(
         WARNING_PRINT("*** Error wrong value of m in eval_g!");
     }
 
+    // cout << "Computing new_x from g function" << endl;
+    compute(new_x,x);
+
+    // auto start_g = std::chrono::high_resolution_clock::now();
+
     Index i;
     #pragma omp parallel for shared(kinematics_dynamics_result, x, g, link_sliced_center) private(i) schedule(static, NUM_TIME_STEPS / NUM_THREADS)
     for(i = 0; i < NUM_TIME_STEPS; i++) {
@@ -260,12 +695,32 @@ bool armtd_NLP::eval_g(
         }
     }
 
+    // Part 2. force constraints
+    // offset by the number of input constraints NUM_TIME_STEPS*NUM_FACTORS
+    for(Index i=0; i<3*NUM_TIME_STEPS;i++){
+        g[i+NUM_TIME_STEPS*NUM_FACTORS] = force_constraint_ub[i];
+    }
+
+    // // For loop to iterate
+    // for(int j=0; j<NUM_FACTORS;j++){
+    //     cout << x[j] << ", ";
+    // }
+    // cout << "\n";
+    // int out_index = NUM_FACTORS*NUM_TIME_STEPS + NUM_TIME_STEPS;
+    // for(int i=0; i<NUM_TIME_STEPS;i++){
+    //     cout << g[i+out_index] << "\n";
+    // }
+
     // Part 3. check collision between joint position reachable set and obstacles (in gpu)
-    obstacles->linkFRSConstraints(link_sliced_center, nullptr, g + NUM_TIME_STEPS * NUM_FACTORS, nullptr);
+    obstacles->linkFRSConstraints(link_sliced_center, nullptr, g + NUM_FACTORS*NUM_TIME_STEPS + 3*NUM_TIME_STEPS, nullptr);
 
     // Part 4. (position & velocity) state limit constraints
-    desired_trajectory->returnJointPositionExtremum(g + NUM_TIME_STEPS * NUM_FACTORS + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles, x);
-    desired_trajectory->returnJointVelocityExtremum(g + NUM_TIME_STEPS * NUM_FACTORS + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles + NUM_FACTORS * 2, x);
+    desired_trajectory->returnJointPositionExtremum(g + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles + NUM_FACTORS*NUM_TIME_STEPS + 3*NUM_TIME_STEPS, x);
+    desired_trajectory->returnJointVelocityExtremum(g + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles + NUM_FACTORS * 2 + NUM_FACTORS*NUM_TIME_STEPS + 3*NUM_TIME_STEPS, x);
+
+    // auto stop_g = std::chrono::high_resolution_clock::now();
+    // auto duration_g = std::chrono::duration_cast<std::chrono::milliseconds>(stop_g - start_g);
+    // cout << "        Time Taken to Calculate Eval g Function: " << duration_g.count() << " milliseconds" << endl;
 
     return true;
 }
@@ -291,7 +746,12 @@ bool armtd_NLP::eval_jac_g(
     if(m != constraint_number){
         WARNING_PRINT("*** Error wrong value of m in eval_g!");
     }
-        
+
+    // cout << "Computing new_x from g grad function" << endl;
+    compute(new_x,x); // could this move into the else of the if statement below?
+
+    // auto start_g_grad = std::chrono::high_resolution_clock::now();
+
     if( values == NULL ) {
        // return the structure of the Jacobian
        // this particular Jacobian is dense
@@ -316,13 +776,24 @@ bool armtd_NLP::eval_jac_g(
             }
         }
 
+        
+        // Part 2. force constraints
+        // offset by number of input constraint gradient terms: NUM_TIME_STEPS*NUM_FACTORS*NUM_FACTORS
+        for(Index i=0; i<3*NUM_TIME_STEPS*NUM_FACTORS;i++){
+            values[i+NUM_TIME_STEPS*NUM_FACTORS*NUM_FACTORS] = force_constraint_gradient[i];
+        }
+
         // Part 3. check collision between joint position reachable set and obstacles (in gpu)
-        obstacles->linkFRSConstraints(link_sliced_center, dk_link_sliced_center, nullptr, values + NUM_TIME_STEPS * NUM_FACTORS * NUM_FACTORS);
+        obstacles->linkFRSConstraints(link_sliced_center, dk_link_sliced_center, nullptr, values + (NUM_TIME_STEPS * NUM_FACTORS + 3*NUM_TIME_STEPS) * NUM_FACTORS);
 
         // Part 4. (position & velocity) state limit constraints
-        desired_trajectory->returnJointPositionExtremumGradient(values + (NUM_TIME_STEPS * NUM_FACTORS + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles) * NUM_FACTORS, x);
-        desired_trajectory->returnJointVelocityExtremumGradient(values + (NUM_TIME_STEPS * NUM_FACTORS + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles + NUM_FACTORS * 2) * NUM_FACTORS, x);
+        desired_trajectory->returnJointPositionExtremumGradient(values + (NUM_TIME_STEPS * NUM_FACTORS + 3 * NUM_TIME_STEPS + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles) * NUM_FACTORS, x);
+        desired_trajectory->returnJointVelocityExtremumGradient(values + (NUM_TIME_STEPS * NUM_FACTORS + 3 * NUM_TIME_STEPS + NUM_TIME_STEPS * NUM_JOINTS * obstacles->num_obstacles + NUM_FACTORS * 2) * NUM_FACTORS, x);
     }
+
+    // auto stop_g_grad = std::chrono::high_resolution_clock::now();
+    // auto duration_g_grad = std::chrono::duration_cast<std::chrono::milliseconds>(stop_g_grad - start_g_grad);
+    // cout << "        Time Taken to Calculate Eval g Grad Function: " << duration_g_grad.count() << " milliseconds" << endl;
 
     return true;
 }
@@ -395,6 +866,35 @@ void armtd_NLP::finalize_solution(
 
     // collision avoidance constraints
     Index offset = NUM_FACTORS * NUM_TIME_STEPS;
+    for( Index i = offset; i < offset + NUM_TIME_STEPS; i++) {
+        // separation constraint
+        // bool sep_constraint = (g_copy[i] > SEPARATION_CONSTRAINT_VIOLATION_THRESHOLD);
+        // cout << sep_constraint << endl;
+        if(g_copy[i] > SEPARATION_CONSTRAINT_VIOLATION_THRESHOLD) {
+            feasible = false;
+            double t_violation = i - offset;
+            cout << "        CUDA & C++: Ipopt: Separation constraint violated at time interval: " << t_violation << " with value: " << g_copy[i] << "\n";
+            return;
+        }
+        // slipping constraint
+        if(g_copy[i+NUM_TIME_STEPS] > SLIPPING_CONSTRAINT_VIOLATION_THRESHOLD){
+            feasible = false;
+            double t_violation = i - offset;
+            cout << "        CUDA & C++: Ipopt: Slipping constraint violated at time interval: " << t_violation << " with value: " << g_copy[i+NUM_TIME_STEPS] << " \n";
+            return;
+        }
+        // tipping constraint
+        if(g_copy[i+2*NUM_TIME_STEPS] > TIPPING_CONSTRAINT_VIOLATION_THRESHOLD){
+            feasible = false;
+            double t_violation = i - offset;
+            cout << "        CUDA & C++: Ipopt: Tipping constraint violated at time interval: " << t_violation << " with value: " << g_copy[i+2*NUM_TIME_STEPS] << " \n";
+            return;
+        }
+    }
+    offset +=  NUM_TIME_STEPS*3;
+
+
+
     for( Index i = 0; i < NUM_JOINTS; i++ ) {
         for( Index j = 0; j < NUM_TIME_STEPS; j++ ) {
             for( Index h = 0; h < obstacles->num_obstacles; h++ ) {
