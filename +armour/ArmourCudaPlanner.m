@@ -55,7 +55,7 @@ classdef ArmourCudaPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options & 
         function self = ArmourCudaPlanner(trajOptProps, robot, options)
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
-                robot (1,1) armour.ArmourAgent
+                robot armour.ArmourAgent
                 options.server_address (1,:) {mustBeTextScalar}
                 options.server_port (1,1) uint32
                 options.connect_timeout (1,1) double
