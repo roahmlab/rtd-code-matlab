@@ -94,11 +94,13 @@ classdef BoxAgent < rtd.sim.world.WorldEntity & handle
                 options.start_time(1,1) double = 0;
                 options.end_time(1,1) double = self.visual.box_state.time(end)
                 options.speed(1,1) double = 1
-                options.fps(1,1) double = 5
+                options.fps(1,1) double = 30
+                options.xlim(2,1) double = [-5 5]
+                options.ylim(2,1) double = [-5 5]
             end
             step_time = 1./options.fps;
             for t = options.start_time:options.speed*step_time:options.end_time
-                self.plot(time=t);
+                self.plot(time=t, xlim=options.xlim, ylim=options.ylim);
                 pause(step_time);
             end
         end
