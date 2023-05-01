@@ -31,7 +31,7 @@ Can be found under scripts/armour/tasks
 > - `plot_at_time(time)`: same as above
 
 ## Usage
-*Note: make sure that you add "rtd-code-architecture-base" to path in the workspace*
+*Note: make sure that you add "rtd-code-architecture-base" to path in the workspace and rehash*
 
 To use the BoxAgent, first create the BoxAgentInfo, GenericEntityState, and BoxAgentVisual objects. 
 Initialize GenericEntityState with ntates=2 if not so already by default.
@@ -42,4 +42,4 @@ Finally, you can animate the defined movement of the agent using the `animate()`
 By default it will animate at 30fps, 1second per 1t. 
 You can also plot at a single moment in time using the `plot()` method under BoxAgent. 
 
-There is a demo file `box2d_agent` for an example of the BoxAgent.
+There is a demo file `box2d_agent.m` for an example of the BoxAgent.

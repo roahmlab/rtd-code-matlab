@@ -4,11 +4,11 @@ clear ; clc; close all;
 
 %% create agent
 
-agentinfo = BoxAgentInfo(width=2, height=1, color=[170/255 107/255 220/255]);
+agentinfo = demos.box2d.BoxAgentInfo(width=2, height=1, color=[170/255 107/255 220/255]);
 agentstate = rtd.entity.components.GenericEntityState(agentinfo, n_states=2); % give it two states (x_pos, y_pos)
-agentvisual = BoxAgentVisual(agentinfo, agentstate, face_opacity=0.8);
+agentvisual = demos.box2d.BoxAgentVisual(agentinfo, agentstate, face_opacity=0.8);
 
-boxagent = BoxAgent(info=agentinfo, state=agentstate, visual=agentvisual);
+boxagent = demos.box2d.BoxAgent(info=agentinfo, state=agentstate, visual=agentvisual);
 %disp(boxagent);
 
 %% add states (i.e., move agent around)

@@ -1,6 +1,6 @@
 classdef BoxAgent < rtd.sim.world.WorldEntity & handle
     properties
-        info = BoxAgentInfo.empty()
+        info = demos.box2d.BoxAgentInfo.empty()
         state = rtd.entity.components.GenericEntityState.empty()
         visual
     end
@@ -9,9 +9,9 @@ classdef BoxAgent < rtd.sim.world.WorldEntity & handle
     methods(Static)
         function options = defaultoptions()
             options = rtd.sim.world.WorldEntity.baseoptions();
-            components.info = 'BoxAgentInfo';
+            components.info = 'demos.box2d.BoxAgentInfo';
             components.state = 'rtd.entity.components.GenericEntityState';
-            components.visual = 'BoxAgentVisual';
+            components.visual = 'demos.box2d.BoxAgentVisual';
             options.components = components;
         end
     end
@@ -32,7 +32,7 @@ classdef BoxAgent < rtd.sim.world.WorldEntity & handle
 
             % initialize info
             if ~isempty(components.info)
-                options.component_options.BoxAgentInfo = components.info.instanceOptions;
+                options.component_options.demos.box2d.BoxAgentInfo = components.info.instanceOptions;
                 self.construct_component('info', options=components.info.instanceOptions);
             else
                 self.construct_component('info');
@@ -46,7 +46,7 @@ classdef BoxAgent < rtd.sim.world.WorldEntity & handle
             end
             % initialize visual
             if ~isempty(components.visual)
-                options.component_options.BoxAgentVisual = components.visual.instanceOptions;
+                options.component_options.demos.box2d.BoxAgentVisual = components.visual.instanceOptions;
                 self.construct_component('visual', self.info, self.state, components.visual.instanceOptions);
             else
                 self.construct_component('visual', self.info, self.state);

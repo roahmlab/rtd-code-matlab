@@ -1,6 +1,6 @@
 classdef BoxAgentVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.util.mixins.NamedClass & rtd.util.mixins.Options & handle
     properties
-        box_info BoxAgentInfo = BoxAgentInfo.empty()
+        box_info demos.box2d.BoxAgentInfo = demos.box2d.BoxAgentInfo.empty()
         box_state rtd.entity.components.GenericEntityState = rtd.entity.components.GenericEntityState.empty()
         
         patch_style(1,1) struct
@@ -29,7 +29,7 @@ classdef BoxAgentVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
     methods
         function self = BoxAgentVisual(box_info,box_state_component,optionsStruct,options)
             arguments
-                box_info BoxAgentInfo
+                box_info demos.box2d.BoxAgentInfo
                 box_state_component rtd.entity.components.GenericEntityState
                 optionsStruct struct = struct()
                 options.face_opacity
