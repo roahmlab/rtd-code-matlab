@@ -19,10 +19,14 @@ boxagent.state.commit_state_data(5, [-2; 1]);   % (-2, 1) at t=7
 boxagent.state.commit_state_data(2, [-4; -1]);  % (-4,-1) at t=9
 boxagent.state.commit_state_data(3, [4; 3]);    % (4,  3) at t=12
 boxagent.state.commit_state_data(2, [2; 0]);    % (2,  0) at t=14
-t = 0:pi/20:2*pi;
-for i = t
+for i = 0:pi/20:2*pi
     boxagent.state.commit_state_data(0.25, [3*cos(i); 3*sin(i)]);
 end
+boxagent.state.get_state()
 
-%% animate agent
-boxagent.animate(fps=30, speed=4);
+%% set up visual system and animate
+vs = rtd.sim.systems.patch_visual.PatchVisualSystem(dynamic_objects=boxagent.visual);
+xlim([-5 5])
+ylim([-5 5])
+view(2)
+vs.updateVisual(24.25);   % aniamte the first 24.25 t

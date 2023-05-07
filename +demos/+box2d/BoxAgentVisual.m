@@ -105,7 +105,8 @@ classdef BoxAgentVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
                 options.time(1,1) double = self.box_state.time(end)
             end
             
-            % Get the position
+            % Get the position         
+            self.box_state.get_state(0)
             state = self.box_state.get_state(options.time);
             
             % Shift the patch points
