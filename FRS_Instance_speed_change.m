@@ -8,7 +8,7 @@ classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance & re
         
         % properties carried over from the original implementation
         sliceable %info about the slicing, dimension to slice along,x,y,h dimensions --> p_u
-        slicedinfo %result of slice operation, sliced values along x,y,h dimension, sum along each dimension
+        %slicedinfo %result of slice operation, sliced values along x,y,h dimension, sum along each dimension
         zonoSliceInfo %o/p of sliced operation & vector of sliceable values
         Vehrs %a single reachable set consisting of xy center points, heading, zono gen x,y,h, no of gen of each zono, zonoslice info for each zono, t and others
         %frsSelectInfo %info of specific frs, maneuver type, index, if frs is mirrored
@@ -18,10 +18,10 @@ classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance & re
 
     methods
         function self = FRS_Instance_speed_change( ...
-                    sliceable,sliceableinfo,zonoSLiceInfo,Vehrs,frsMega,frsTotal ...
+                    sliceable,sliceableinfo,zonoSLiceInfo,Vehrs,frsMega,frsTotal,brakeidx1,brakeidx2 ...
                 )
             self.sliceable = sliceable;
-            self.slicedinfo = sliceableinfo;
+            %self.slicedinfo = sliceableinfo;
             self.zonoSliceInfo = zonoSLiceInfo;
             self.Vehrs = Vehrs;
             %self.frsSelectInfo = frsSelectInfo;
@@ -40,7 +40,7 @@ classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance & re
             vehrs = self.Vehrs;
             %check if the speed is btw the max and min speed
             speed_constraint = @(x) speedConstraint(x,sliceable,vehrs);%check with z0vel
-            
+            nlconFunction = @(x) deal(speed_constraint(x), []); %to have multiple instances.
     
         end
 
@@ -61,6 +61,7 @@ classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance & re
         ceq = []; %equality constraint
         
         end
+
     end
 end 
     
