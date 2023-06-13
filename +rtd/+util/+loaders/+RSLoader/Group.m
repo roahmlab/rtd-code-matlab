@@ -9,7 +9,7 @@ classdef Group < matlab.mixin.Heterogeneous & handle
     end
     methods (Static, Sealed, Access = protected)
         function default_object = getDefaultScalarElement
-            default_object = loaders.RSLoader.GroupLoader;
+            default_object = rtd.util.loaders.RSLoader.GroupLoader;
         end
     end
 end

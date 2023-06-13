@@ -1,5 +1,5 @@
-classdef CollectionGroup < loaders.RSLoader.Group & handle
-    properties (Access=?loaders.RSLoader.Group)
+classdef CollectionGroup < rtd.util.loaders.RSLoader.Group & handle
+    properties (Access=?rtd.util.loaders.RSLoader.Group)
         loader
         info
         
@@ -150,7 +150,7 @@ classdef CollectionGroup < loaders.RSLoader.Group & handle
         function constructGroups(self)
             % Setup all the GroupLoaders
             all_groups = size(self.group_lookup_table, 1);
-            groups_arr(all_groups) = loaders.RSLoader.GroupLoader;
+            groups_arr(all_groups) = rtd.util.loaders.RSLoader.GroupLoader;
             [groups_arr.loader] = deal(self.loader);
             [groups_arr.parent] = deal(self);
             for i=1:all_groups
@@ -174,7 +174,7 @@ classdef CollectionGroup < loaders.RSLoader.Group & handle
                 % Lazy iterate over all groups for this... slow for now
                 % Current assumes all terminal groups. okay for now,
                 % rework later
-                self.search_set = loaders.RSLoader.StripeZonoGroup(self, search_set_name);
+                self.search_set = rtd.util.loaders.RSLoader.StripeZonoGroup(self, search_set_name);
             end
         end
     end

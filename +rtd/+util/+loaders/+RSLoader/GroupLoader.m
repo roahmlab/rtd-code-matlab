@@ -1,4 +1,4 @@
-classdef GroupLoader < loaders.RSLoader.Group & handle
+classdef GroupLoader < rtd.util.loaders.RSLoader.Group & handle
     properties
         loader
         parent
@@ -7,7 +7,7 @@ classdef GroupLoader < loaders.RSLoader.Group & handle
     methods
         function group = construct(self)
             arguments
-                self (1,1) loaders.RSLoader.GroupLoader
+                self (1,1) rtd.util.loaders.RSLoader.GroupLoader
             end
             
             if isempty(self.loader) || isempty(self.parent) || isempty(self.indices)
@@ -17,7 +17,7 @@ classdef GroupLoader < loaders.RSLoader.Group & handle
             % If we have a collection group
             if self.indices(1) > 0
                 info = self.parent.info.Groups(self.indices(1));
-                group = loaders.RSLoader.CollectionGroup(self.loader, info);
+                group = rtd.util.loaders.RSLoader.CollectionGroup(self.loader, info);
                 return
             end
             
@@ -33,7 +33,7 @@ classdef GroupLoader < loaders.RSLoader.Group & handle
             switch type_id
                 % If we have a zonotope terminal group
                 case 0
-                    group = loaders.RSLoader.ZonoGroup(self.loader, self.parent, -self.indices(1));
+                    group = rtd.util.loaders.RSLoader.ZonoGroup(self.loader, self.parent, -self.indices(1));
 
                 % If we have the polynomial zonotope terminal group
                 case 1

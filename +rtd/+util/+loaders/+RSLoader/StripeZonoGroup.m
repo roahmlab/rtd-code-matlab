@@ -1,4 +1,4 @@
-classdef StripeZonoGroup < loaders.RSLoader.Group & handle
+classdef StripeZonoGroup < rtd.util.loaders.RSLoader.Group & handle
     properties (Access=protected)
         zonos
     end
@@ -22,7 +22,7 @@ classdef StripeZonoGroup < loaders.RSLoader.Group & handle
         
         function zonos = getZonos(self, idx)
             arguments
-                self loaders.RSLoader.StripeZonoGroup
+                self rtd.util.loaders.RSLoader.StripeZonoGroup
                 idx (:,1) double = []
             end
             

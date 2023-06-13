@@ -1,4 +1,4 @@
-classdef RSLoader < loaders.RSLoader.CollectionGroup & loaders.RSLoader.DataLoader & handle
+classdef RSLoader < rtd.util.loaders.RSLoader.CollectionGroup & rtd.util.loaders.RSLoader.DataLoader & handle
     % First draft code
     properties
         do_caching = false
@@ -21,7 +21,7 @@ classdef RSLoader < loaders.RSLoader.CollectionGroup & loaders.RSLoader.DataLoad
             dummystruct.do_caching = false;
             dummystruct.preload_data = false;
             dummystruct.preload_meta = false;
-            self = self@loaders.RSLoader.CollectionGroup(dummystruct, h5info(filename));
+            self = self@rtd.util.loaders.RSLoader.CollectionGroup(dummystruct, h5info(filename));
             self.loader = self;
             % This is a gross hack
             
@@ -36,7 +36,7 @@ classdef RSLoader < loaders.RSLoader.CollectionGroup & loaders.RSLoader.DataLoad
 
         function data = get_data(self, group_path, start_idx, end_idx)
             arguments
-                self loaders.RSLoader
+                self rtd.util.loaders.RSLoader
                 group_path {mustBeTextScalar}
                 start_idx (1,2) double
                 end_idx (1,2) double

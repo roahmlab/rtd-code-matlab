@@ -1,4 +1,4 @@
-classdef ZonoGroup < loaders.RSLoader.Group & handle
+classdef ZonoGroup < rtd.util.loaders.RSLoader.Group & handle
 
     properties
         attributes
@@ -55,7 +55,7 @@ classdef ZonoGroup < loaders.RSLoader.Group & handle
         
         function zonos = getZonos(self, idx)
             arguments
-                self loaders.RSLoader.ZonoGroup
+                self rtd.util.loaders.RSLoader.ZonoGroup
                 idx (:,1) double = (1:self.attributes.num_sets)-1
             end
             
@@ -124,7 +124,7 @@ classdef ZonoGroup < loaders.RSLoader.Group & handle
         
         function rawdata = get_data(self, range)
             arguments
-                self loaders.RSLoader.ZonoGroup
+                self rtd.util.loaders.RSLoader.ZonoGroup
                 range (1,2) double = [self.attributes.indices(1) self.attributes.indices(end)]
             end
             
