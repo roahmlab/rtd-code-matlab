@@ -13,9 +13,9 @@ classdef RSLoader < loaders.RSLoader.CollectionGroup & loaders.RSLoader.DataLoad
         function self = RSLoader(filename, options)
             arguments
                 filename {mustBeFile}
-                options.do_caching (1,1) logical = false
+                options.do_caching (1,1) logical = true
                 options.preload_data (1,1) logical = false
-                options.preload_meta (1,1) logical = true
+                options.preload_meta (1,1) logical = false
             end
             % This is a gross hack
             dummystruct.do_caching = false;
@@ -27,8 +27,8 @@ classdef RSLoader < loaders.RSLoader.CollectionGroup & loaders.RSLoader.DataLoad
             
             % Finish
             self.do_caching = options.do_caching; % TODO
-            self.preload_data = options.preload_data; % TODO
-            self.preload_meta = options.preload_meta; % TODO
+            self.preload_data = options.preload_data;
+            self.preload_meta = options.preload_meta || options.preload_data; % TODO
 
             self.load();
             self.constructGroups();
