@@ -1,30 +1,75 @@
 
-%different structs
-% CostFcnInfo = struct();
-% CostAndDerivs = struct();
+clear all;
+clc;
 
-%call the functions here
+%% Testing of cost function
 
+% Dummy variables
+vehrs = struct();
+vehrs.slc_infos_{1} = struct('Slice', @(u,v,r) struct('x_sliced_sum_', 1, 'y_sliced_sum_', 2, 'h_sliced_sum_', 3, 'slc_x_', 4, 'slc_y_', 5, 'slc_h_', 6, 'slc_val_', 7));
+vehrs.slc_infos_{2} = struct('Slice', @(u,v,r) struct('x_sliced_sum_', 8, 'y_sliced_sum_', 9, 'h_sliced_sum_', 10, 'slc_x_', 11, 'slc_y_', 12, 'slc_h_', 13, 'slc_val_', 14));
+vehrs.xy_centers_{1} = 10;
+vehrs.xy_centers_{2} = 20;
+vehrs.slc_infos_{3} = struct('Slice', @(u,v,r) struct('x_sliced_sum_', 1, 'y_sliced_sum_', 2, 'h_sliced_sum_', 3, 'slc_x_', 4, 'slc_y_', 5, 'slc_h_', 6, 'slc_val_', 7));
+vehrs.slc_infos_{4} = struct('Slice', @(u,v,r) struct('x_sliced_sum_', 8, 'y_sliced_sum_', 9, 'h_sliced_sum_', 10, 'slc_x_', 11, 'slc_y_', 12, 'slc_h_', 13, 'slc_val_', 14));
+vehrs.xy_centers_{3} = 10;
+vehrs.xy_centers_{4} = 20;
+vehrs.slc_infos_{5} = struct('Slice', @(u,v,r) struct('x_sliced_sum_', 1, 'y_sliced_sum_', 2, 'h_sliced_sum_', 3, 'slc_x_', 4, 'slc_y_', 5, 'slc_h_', 6, 'slc_val_', 7));
+vehrs.slc_infos_{6} = struct('Slice', @(u,v,r) struct('x_sliced_sum_', 8, 'y_sliced_sum_', 9, 'h_sliced_sum_', 10, 'slc_x_', 11, 'slc_y_', 12, 'slc_h_', 13, 'slc_val_', 14));
+vehrs.xy_centers_{5} = 10;
+vehrs.xy_centers_{6} = 20;
+
+desired_idx = 2;
+state_u = 0;
+state_v = 0;
+state_r = 0;
+x_des = 0;
+y_des = 0;
+h_des = 0;
+k = 0;
+k_min = 0;
+k_max = 1;
+eval_opt = true;
+
+%cost function
+gen_cost = GenCostFcn(vehrs, desired_idx, state_u, state_v, state_r, x_des, y_des, h_des);
+% Call ComputeDeltaY
+delta_y = ComputeDeltaY(gen_cost, k, k_min, k_max);
+
+% Call ComputeDeltaH
+delta_h = ComputeDeltaH(gen_cost, k, k_min, k_max);
+
+% Call ComputeCosts
+costs = ComputeCosts(gen_cost, k, k_min, k_max, eval_opt);
 
 %% Generate cost function
 
 function generate = GenCostFcn(vehrs,desired_idx,state_u,state_v,state_r,x_des,y_des,h_des)
     generate = struct();
     slc = vehrs.slc_infos_{desired_idx}.Slice(state_u,state_v,state_r);
-    print('[LAN] Desired Idx: ',desired_idx);
-    c_x = vehrs.xy_centers_{desired_idx *2 +0} +slc.x_sliced_sum_;%assuming slc has x_sliced_sum_
-    c_y = vehrs.xy_centers_{desired_idx *2 +1} +slc.y_sliced_sum_;
-    c_h = vehrs.xy_centers_{desired_idx} +slc.h_sliced_sum_;
-    generate.c_x_ = c_x;
-    generate.c_y_ = c_y;
-    generate.c_h_ = ToAngle(c_h);
-    generate.g_x_ = slc.slc_x_;
-    generate.g_y_ = slc.slc_y_;
-    generate.g_h_ = slc.slc_h_;
-    generate.g_k_ = slc.slc_val_;
-    generate.x_des_ = x_des;
-    generate.y_des_ = y_des;
-    generate.h_des_ = h_des;
+    disp(['[LAN] Desired Idx: ', num2str(desired_idx)]);
+    num_centers = numel(vehrs.xy_centers_);
+
+
+    if desired_idx >= 1 && desired_idx <= num_centers/2
+        c_x = vehrs.xy_centers_{desired_idx *2 +0} +slc.x_sliced_sum_;%assuming slc has x_sliced_sum_
+        c_y = vehrs.xy_centers_{desired_idx *2 +1} +slc.y_sliced_sum_;
+        c_h = vehrs.xy_centers_{desired_idx} +slc.h_sliced_sum_;
+        generate.c_x_ = c_x;
+        generate.c_y_ = c_y;
+        generate.c_h_ = ToAngle(c_h);
+        % generate.c_k_ = slc.center_slc_val_;
+        generate.c_k_ = 1;
+        generate.g_x_ = slc.slc_x_;
+        generate.g_y_ = slc.slc_y_;
+        generate.g_h_ = slc.slc_h_;
+        generate.g_k_ = slc.slc_val_;
+        generate.x_des_ = x_des;
+        generate.y_des_ = y_des;
+        generate.h_des_ = h_des;
+    else
+        print('Desired index out of range')
+    end    
 
 end
 %% Compute Delta Y function
