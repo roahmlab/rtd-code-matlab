@@ -1,6 +1,6 @@
 
 
-classdef Trajectory < Consts
+classdef Trajectory < rtd.planner.trajectory.Trajectory
     properties
         t_min
         au
@@ -10,32 +10,145 @@ classdef Trajectory < Consts
         u0_goal
         manu_type
         t0_offset
+        
+        
     end
+
+    properties (Constant)
+        kUReallySlow = 0.5
+        kTpkDir = 1.5
+        kTpk = 3.0
+        kAMax = 1.5
+        kTbrk = 2
+        vectorized = true;
+    end
+
+   
 
     methods
         function obj = Trajectory (au,ay,u0_goal,manu_type,u0,t0_offset,h0)
-            if nargin < 5
-                u0 = 0.0;
+             
+            obj.t_min = 0.0;    
+            if nargin > 0
+                setParameters(obj, au, ay, u0_goal, manu_type, u0, t0_offset, h0);
             end
-    
-            if nargin < 6
-                t0_offset = 0.0;
+            time = 0.0;
+            % command = getCommand(obj,time);
+            
+        end
+
+        function setParameters(traj, au, ay, u0_goal, manu_type, u0, t0_offset, h0)
+            traj.au = au;
+            traj.ay = ay;
+            traj.u0_goal = u0_goal;
+            traj.manu_type = manu_type;
+            
+            if nargin > 5
+                traj.u0 = u0;
             end
-    
-            if nargin < 7
-                h0 = 0.0;
+            
+            if nargin > 6
+                traj.t0_offset = t0_offset;
             end
+            
+            if nargin > 7
+                traj.h0 = h0;
+            end
+        end
+
+        %  function value = vectorized(obj)
+        %     % Implement the property logic here
+        %     value = 0;% Your implementation goes here
+        % end
     
-            obj.t_min = 0.0;
-            obj.au = max(au,0.5);
-            obj.ay = ay;
-            obj.u0_goal = u0_goal;
-            obj.manu_type = manu_type;
-            obj.u0 = u0;
-            obj.t0_offset = t0_offset;
-            obj.h0 = h0;
+        function value = EvalAt (obj,t)
+            t = max(t,obj.t_min);
+            ud = obj.Ud(t);
+            vd = obj.Vd(t);
+            rd = obj.Rd(t);
+            ud_dot = obj.UdDot(t);
+            vd_dot = obj.VdDot(t);
+            rd_dot = obj.RdDot(t);
+            hd = obj.Hd(t);
+            value = struct('ud',ud,'vd',vd,'rd',rd,'ud_dot',ud_dot,'vd_dot',vd_dot,'rd_dot',rd_dot,'hd',hd);
         end
     
+        function maxTime = MaxTrajTime(obj)
+            maxTime = obj.TEvalMax();
+        end
+    
+        function isValid = HasValidType(obj)
+            isValid = obj.IsValid(obj.manu_type);
+        end
+        
+        function command = getCommand(self, time)
+            arguments
+                self Trajectory
+                time(1,:) double
+            end
+        
+            % Do a parameter check and time check, and throw if anything is
+            % invalid.
+            self.validate(true);
+            t_shifted = time - self.startState.time;
+            if t_shifted < 0
+                ME = MException('Trajectory:InvalidTrajectory', ...
+                    'Invalid time provided to Trajectory');
+                throw(ME)
+            end
+        
+            % Perform the necessary calculations using the provided parameters
+            ud = self.Ud(t_shifted);
+            vd = self.Vd(t_shifted);
+            rd = self.Rd(t_shifted);
+            ud_dot = self.UdDot(t_shifted);
+            vd_dot = self.VdDot(t_shifted);
+            rd_dot = self.RdDot(t_shifted);
+            hd = self.Hd(t_shifted);
+        
+            % Generate the output.
+            command = struct('ud', ud, 'vd', vd, 'rd', rd, 'ud_dot', ud_dot, 'vd_dot', vd_dot, 'rd_dot', rd_dot, 'hd', hd);
+        end
+        
+
+        function valid = validate(self, throwOnError)
+            arguments
+                self rtd.planner.trajectory.Trajectory
+                throwOnError(1,1) logical = false
+            end
+            
+            % Check if trajectoryParams, trajOptProps, and startState are empty
+            valid = ~isempty(self.trajectoryParams) && ~isempty(self.trajOptProps) && ~isempty(self.startState);
+            
+            % Additional validation logic specific to the Trajectory class
+            
+            % Throw error if invalid and throwOnError is true
+            if ~valid && throwOnError
+                errMsg = MException('Trajectory:InvalidTrajectory', 'The trajectory object is not fully parameterized!');
+                throw(errMsg);
+            end
+        end
+
+        
+       
+    end
+
+    %% All Private methods
+
+    methods(Access=private)
+        function cti = ComputeInfo(obj)
+            cti.delta_spd = max(obj.au - RtdConsts.kUReallySlow, 0);
+            if(obj.OneHump())
+                 cti.t_to_use = RtdConsts.kTpkDir; 
+            else
+                 cti.t_to_use = RtdConsts.kTpk;
+            end
+            
+            cti.tbrk1 = cti.delta_spd / RtdConsts.kAMax;
+            cti.tbrk2 = 1.0;
+            cti.t_eval_max = cti.t_to_use + cti.tbrk1 + cti.tbrk2;
+        end
+
         function ud = Ud(obj, t)
             if t <= obj.T1Max()
                 ud = ((obj.au - obj.u0) / obj.TToUse()) * t + obj.u0;
@@ -61,27 +174,7 @@ classdef Trajectory < Consts
                 rd = 0.0;
             end
         end
-    
-        function value = EvalAt (obj,t)
-            t = max(t,obj.t_min);
-            ud = obj.Ud(t);
-            vd = obj.Vd(t);
-            rd = obj.Rd(t);
-            ud_dot = obj.UdDot(t);
-            vd_dot = obj.VdDot(t);
-            rd_dot = obj.RdDot(t);
-            hd = obj.Hd(t);
-            value = struct('ud',ud,'vd',vd,'rd',rd,'ud_dot',ud_dot,'vd_dot',vd_dot,'rd_dot',rd_dot,'hd',hd);
-        end
-    
-        function maxTime = MaxTrajTime(obj)
-            maxTime = obj.TEvalMax();
-        end
-    
-        function isValid = HasValidType(obj)
-            isValid = obj.IsValid(obj.manu_type);
-        end
-    
+
         function hd = Hd(obj, t)
             % Compute hd at time t
             % TODO +h0
@@ -119,7 +212,40 @@ classdef Trajectory < Consts
             rddot = delta / obj.kFiniteDiffTime;
         end
 
-        %def to angle function here
+    
+        function t_brk1 = TBrk1(obj)
+            t_brk1 = obj.ComputeInfo().tbrk1;
+        end
+        
+        function t_brk2 = TBrk2(obj)
+            t_brk2 = obj.ComputeInfo().tbrk2;
+        end
+        
+        function t_to_use = TToUse(obj)
+            t_to_use = obj.ComputeInfo().t_to_use;
+        end
+        
+        function delta_spd = DeltaSpd(obj)
+            delta_spd = obj.ComputeInfo().delta_spd;
+        end
+        
+        function t_eval_max = TEvalMax(obj)
+            t_eval_max = obj.ComputeInfo().t_eval_max;
+        end
+        
+        function t1_max = T1Max(obj)
+            t1_max = obj.TToUse();
+        end
+        
+        function t2_max = T2Max(obj)
+            t2_max = obj.T1Max() + obj.TBrk1();
+        end
+        
+        function t3_max = T3Max(obj)
+            t3_max = obj.T2Max() + obj.TBrk2();
+        end
+        
+         %def to angle function here
         function angle_ = ToAngle(theta)
             if(~(isfinite(theta)))
                 angle_ = 0;
@@ -195,56 +321,10 @@ classdef Trajectory < Consts
         function sq = Square(x)
             sq = x*x;
         end
-    end
-
-    methods(Access=private)
-        function cti = ComputeInfo(obj)
-            cti.delta_spd = max(obj.au - RtdConsts.kUReallySlow, 0);
-            if(obj.OneHump())
-                 cti.t_to_use = RtdConsts.kTpkDir; 
-            else
-                 cti.t_to_use = RtdConsts.kTpk;
-            end
-            
-            cti.tbrk1 = cti.delta_spd / RtdConsts.kAMax;
-            cti.tbrk2 = 1.0;
-            cti.t_eval_max = cti.t_to_use + cti.tbrk1 + cti.tbrk2;
-        end
-    
-        function t_brk1 = TBrk1(obj)
-            t_brk1 = obj.ComputeInfo().tbrk1;
-        end
-        
-        function t_brk2 = TBrk2(obj)
-            t_brk2 = obj.ComputeInfo().tbrk2;
-        end
-        
-        function t_to_use = TToUse(obj)
-            t_to_use = obj.ComputeInfo().t_to_use;
-        end
-        
-        function delta_spd = DeltaSpd(obj)
-            delta_spd = obj.ComputeInfo().delta_spd;
-        end
-        
-        function t_eval_max = TEvalMax(obj)
-            t_eval_max = obj.ComputeInfo().t_eval_max;
-        end
-        
-        function t1_max = T1Max(obj)
-            t1_max = obj.TToUse();
-        end
-        
-        function t2_max = T2Max(obj)
-            t2_max = obj.T1Max() + obj.TBrk1();
-        end
-        
-        function t3_max = T3Max(obj)
-            t3_max = obj.T2Max() + obj.TBrk2();
-        end
-
 
     end
+
+    %% Calls the trajectory function 
 
     methods (Static)
         function traj = CreateTrajectory(au, ay, u0_goal, manu_type, u0, t0_offset, h0)
@@ -257,7 +337,22 @@ classdef Trajectory < Consts
             if nargin < 7
                 h0 = 0.0;
             end
-            traj = Trajectory(au, ay, u0_goal, manu_type, u0, t0_offset, h0);
+            
+            % Create an instance of the Trajectory class
+            traj = Trajectory();
+            
+            % Set the trajectory parameters
+            traj.trajectoryParams = 0; % Specify the trajectory parameters here
+            
+            % Set the trajectory optimization properties
+            traj.trajOptProps = 0; % Specify the trajectory optimization properties here
+            
+            % Set the start state
+            traj.startState = 0; % Specify the start state here
+            
+            % Call the setParameters method
+            traj.setParameters(au, ay, u0_goal, manu_type, u0, t0_offset, h0);
+        
         end
     end
 
