@@ -1,6 +1,6 @@
 
 
-classdef FRS_Instance_speed_change
+classdef FRS_Instance_speed_change 
     properties
         
         Vehrs 
@@ -8,10 +8,12 @@ classdef FRS_Instance_speed_change
     end
 
     methods
-        function self = test2_FRS_Instance_speed_change(Vehrs)
+        function self = FRS_Instance_speed_change(Vehrs)
             
+            %passing values to self
             self.Vehrs = Vehrs;
-            self.constraints = [];
+            self.constraints = struct;
+
             Agent = agent();%dummy values for testing only
             agent_info = Agent.get_agent_info();
             W = dynamic_car_world('start_line', 5, 'bounds', [-5 5 0 12], 'N_obstacles', 2);%passing dummy variables
@@ -95,7 +97,7 @@ classdef FRS_Instance_speed_change
             num_out_zono_gens = numel(zono.generatorLength) + 2;
             
             if size(obs_info, 2) < 1 || num_out_zono_gens < 1
-                constraints = Constraints();
+                constraints = struct('delta_d_arr_', [], 'c_arr_', []);
                 return;
             end
             
@@ -130,8 +132,8 @@ classdef FRS_Instance_speed_change
                 end
             end
             
-            constraints.delta_d_arr_ = delta_d_arr;
-            constraints.c_arr_ = c_arr;
+            constraints = struct('delta_d_arr_', delta_d_arr, 'c_arr_', c_arr);
+       
        end
 
     end
