@@ -54,7 +54,7 @@ classdef ArmourMexController < armour.agent.ArmourController & rtd.util.MexWrapp
 
             % Prepare trajectory
             trajectory = self.trajectories{end};
-            startTime = trajectory.startState.time;
+            startTime = self.robot_state.get_state().time;
             target = trajectory.getCommand(startTime + t);
 
             % Get the control inputs from the mex controller
