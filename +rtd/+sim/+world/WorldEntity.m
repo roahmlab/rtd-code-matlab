@@ -35,7 +35,8 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
             option_struct = self.instanceOptions;
             if isfield(option_struct, 'component_options') ...
                     && isfield(option_struct.component_options, name)
-                component = feval(option_struct.components.(name), varargin{:}, option_struct.component_options.(name));
+                nvargs = namedargs2cell(option_struct.component_options.(name));
+                component = feval(option_struct.components.(name), varargin{:}, nvargs{:});
             else
                 component = feval(option_struct.components.(name), varargin{:});
             end
@@ -72,7 +73,7 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
                     options.component_options.(component_name{1}).verboseLog = options.component_logLevelOverride;
                     
                 end
-                self.(component_name{1}).reset(options.component_options.(component_name{1}));
+                self.(component_name{1}).reset(options=options.component_options.(component_name{1}));
             end
         end
 

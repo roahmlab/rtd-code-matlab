@@ -46,7 +46,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             arguments
                 arm_info armour.agent.ArmourAgentInfo
                 arm_state_component armour.agent.ArmourAgentState
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.use_true_params_for_robust
                 options.use_disturbance_norm
                 options.Kr
@@ -56,7 +56,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Set base variables
             self.robot_info = arm_info;
@@ -69,7 +69,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.use_true_params_for_robust
                 options.use_disturbance_norm
                 options.Kr
@@ -79,7 +79,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set component dependent variables
             self.n_inputs = self.robot_info.num_q;

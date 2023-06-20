@@ -34,13 +34,13 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             arguments
                 objects.static_objects (1,:) rtd.sim.systems.patch_visual.PatchVisualObject = rtd.sim.systems.patch_visual.PatchVisualObject.empty()
                 objects.dynamic_objects (1,:) rtd.sim.systems.patch_visual.PatchVisualObject = rtd.sim.systems.patch_visual.PatchVisualObject.empty()
-                optionsStruct.optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.enable_camlight
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct.optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Reset first
             self.reset()
@@ -52,13 +52,13 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.enable_camlight
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % if we're going to log, set it up
             %if options.log_collisions

@@ -27,13 +27,13 @@ classdef GenericEntityState < rtd.entity.components.BaseStateComponent & rtd.uti
         function self = GenericEntityState(entity_info, optionsStruct, options)
             arguments
                 entity_info rtd.entity.components.BaseInfoComponent
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_state
                 options.n_states
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Setup
             self.entity_info = entity_info;
@@ -45,13 +45,13 @@ classdef GenericEntityState < rtd.entity.components.BaseStateComponent & rtd.uti
         function reset(self, optionsStruct, options)
             arguments
                 self rtd.entity.components.GenericEntityState
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_state
                 options.n_states
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set up verbose output
             self.name = options.name;

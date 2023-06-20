@@ -35,13 +35,13 @@ classdef BoxObstacleInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
     methods
         function self = BoxObstacleInfo(optionsStruct, options)
             arguments
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.dimension
                 options.side_lengths
                 options.creation_buffer
                 options.is_base_obstacle
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % initialize
             self.reset();
@@ -51,13 +51,13 @@ classdef BoxObstacleInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.dimension
                 options.side_lengths
                 options.creation_buffer
                 options.is_base_obstacle
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Validate
             if isempty(options.dimension)

@@ -59,11 +59,11 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             arguments
                 center
                 side_lengths
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
             end
             component_options.info.side_lengths = side_lengths;
             component_options.state.initial_state = center;
-            box = rtd.entity.BoxObstacle(optionsStruct=optionsStruct, ...
+            box = rtd.entity.BoxObstacle(options=optionsStruct.options, ...
                               component_options=component_options);
         end
     end
@@ -77,7 +77,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
                 components.collision = []
                 components.visual = []
                 components.representation = []
-                optionsStruct.optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.components
                 options.component_options
                 options.component_logLevelOverride
@@ -88,7 +88,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             override_options = rtd.sim.world.WorldEntity.get_componentOverrideOptions(components);
 
             % Merge all options
-            self.mergeoptions(optionsStruct.optionsStruct, options, override_options);
+            self.mergeoptions(optionsStruct.options, options, override_options);
             
             % (Re)construct all components for consistency
             self.construct_component('info');
@@ -105,7 +105,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.component_options
                 options.component_logLevelOverride
                 options.verboseLevel
@@ -113,7 +113,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             end
             % Perform an internal update, then merge in options
             self.getoptions();
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
                         
             % reset all components
             self.reset_components()
