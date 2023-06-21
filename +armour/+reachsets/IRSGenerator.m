@@ -39,7 +39,12 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
             % First get the JRS (allow the use of a cached value if it
             % exists)
             jrsInstance = self.jrsGenerator.getReachableSet(robotState, ignore_cache=false);
-            
+            % For now, only support 1 problem
+            if length(jrsInstance) > 1
+                error('FOGenerator does not support multiple JRS yet!')
+            end
+            jrsInstance = jrsInstance.rs;
+
             self.vdisp("Generating input reachable set!", "INFO")
 
             % set up zeros and overapproximation of r
@@ -145,7 +150,10 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
             end
             
             % Save the generated reachable sets into the IRSInstance
-            reachableSet = armour.reachsets.IRSInstance(u_ub, u_lb, jrsInstance, self.get_vdisplevel);
+            rs = armour.reachsets.IRSInstance(u_ub, u_lb, jrsInstance, self.get_vdisplevel);
+            % Return the 1 RS that we have.
+            reachableSet.rs = rs;
+            reachableSet.id = 1;
         end
     end
 end

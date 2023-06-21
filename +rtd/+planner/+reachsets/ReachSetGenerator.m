@@ -132,6 +132,11 @@ classdef ReachSetGenerator < rtd.util.mixins.NamedClass & handle
             
             % generate and store.
             reachableSet = generateReachableSet(self, robotState, passthrough_args{:});
+            % verify the output
+            names = fieldnames(reachableSet);
+            if ~any([contains(names, 'id'), contains(names, 'rs')])
+                error('Expected return with id and rs fields!')
+            end
             self.cache{self.cache_index, 1} = hash;
             self.cache{self.cache_index, 2} = reachableSet;
         end

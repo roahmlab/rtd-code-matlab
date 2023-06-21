@@ -24,7 +24,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
         % Important stuff to get started
         function self = ArmourSimulation(optionsStruct, options)
             arguments
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.simulation_timestep
             end
             self.simulation_state = 'CONSTRUCTED';
@@ -203,7 +203,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
 %                     side_lengths = side_lengthss(obs_num,:);
                     optionsStruct = struct;
                     optionsStruct.component_options.info.creation_buffer = creation_buffer;
-                    prop_obs = rtd.entity.BoxObstacle.makeBox(center, side_lengths, optionsStruct);
+                    prop_obs = rtd.entity.BoxObstacle.makeBox(center, side_lengths, options=optionsStruct);
 
                     % test it
                     proposal_obj = prop_obs.collision.getCollisionObject(buffered=true);

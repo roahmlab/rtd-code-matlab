@@ -74,7 +74,9 @@ classdef JRSGenerator < rtd.planner.reachsets.ReachSetGenerator
             
             % Initialize this particular instance and return
             rs.initialize(self.traj_type);
-            reachableSet = rs;
+            % Return the 1 RS that we have.
+            reachableSet.rs = rs;
+            reachableSet.id = 1;
         end
     end
 end

@@ -40,13 +40,13 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
         function self = ArmourAgentState(arm_info, optionsStruct, options)
             arguments
                 arm_info armour.agent.ArmourAgentInfo
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_position
                 options.initial_velocity
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Setup
             self.entity_info = arm_info;
@@ -58,13 +58,13 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_position
                 options.initial_velocity
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set component dependent properties
             self.n_states = 2 * self.entity_info.num_q;

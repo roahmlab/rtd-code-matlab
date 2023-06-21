@@ -45,13 +45,13 @@ classdef Patch3dCollisionSystem < rtd.sim.systems.SimulationSystem & rtd.util.mi
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.log_collisions
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % if we're going to log, set it up
             if options.log_collisions

@@ -48,7 +48,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             arguments
                 collision_system
                 arm_agent
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.face_color
                 options.face_opacity
@@ -63,7 +63,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             self.collision_system = collision_system;
             self.arm_agent = arm_agent;
@@ -74,7 +74,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.face_color
                 options.face_opacity
@@ -89,7 +89,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             self.time_discretization = options.time_discretization;
             
             % Set up verbose output
@@ -219,12 +219,17 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
         
         function resetVisual(self)
             % Generate a visual
+            prev_fig = get(groot,'CurrentFigure');
+            temp_fig = figure;
             self.arm_agent.visual.plot_links(self.goal_position);
             % Extract the data to plot
             faces = {self.arm_agent.visual.plot_data.links.Faces};
             vertices = {self.arm_agent.visual.plot_data.links.Vertices};
             self.link_plot_data.faces = faces;
             self.link_plot_data.vertices = vertices;
+            % restore visual
+            close(temp_fig);
+            set(groot,'CurrentFigure',prev_fig);
         end
         
         function plot(self,options)

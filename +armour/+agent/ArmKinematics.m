@@ -21,11 +21,11 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
             arguments
                 arm_info armour.agent.ArmourAgentInfo
                 arm_state_component armour.agent.ArmourAgentState
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.verbose_level
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             self.arm_info = arm_info;
             self.arm_state = arm_state_component;
@@ -36,11 +36,11 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             self.set_vdisplevel(options.verboseLevel);
             self.name = options.name;
