@@ -219,12 +219,17 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
         
         function resetVisual(self)
             % Generate a visual
+            prev_fig = get(groot,'CurrentFigure');
+            temp_fig = figure;
             self.arm_agent.visual.plot_links(self.goal_position);
             % Extract the data to plot
             faces = {self.arm_agent.visual.plot_data.links.Faces};
             vertices = {self.arm_agent.visual.plot_data.links.Vertices};
             self.link_plot_data.faces = faces;
             self.link_plot_data.vertices = vertices;
+            % restore visual
+            close(temp_fig);
+            set(groot,'CurrentFigure',prev_fig);
         end
         
         function plot(self,options)
