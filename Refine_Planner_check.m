@@ -66,7 +66,7 @@ for i = 1: length(rs.robotState)
             options.manu_type = 'speed change';
             options.verboseLevel = 'INFO';
 
-            plan = Refine_Planner_test2 (vehrs_,rs,state,desired_idx_,waypoint,trajOptProps);
+            plan = Refine_Planner(vehrs_,rs,state,desired_idx_,waypoint,trajOptProps);
 
             disp('end of refine planner check')
         end
