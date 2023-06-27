@@ -85,7 +85,7 @@ classdef Refine_Planner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
                 h_epsilon = 1.0e-6;
                 xy_epsilon = 1.0e-6;
 
-                objective = DummyObjective();
+                objective = cost_function();
                 objectiveCallback = objective.genObjective();
 
                 % Call the objective callback function with the desired parameters
