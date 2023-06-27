@@ -1,6 +1,6 @@
 
 
-classdef Refine_Planner_test2 < rtd.planner.RtdPlanner & rtd.util.mixins.Options
+classdef Refine_Planner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
     properties
         manu_type %maneuver type
         frs
@@ -19,7 +19,7 @@ classdef Refine_Planner_test2 < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             end
         end
     methods
-        function self = Refine_Planner_test2(vehrs_,frs,state,desired_idx_,waypoint,trajOptProps)
+        function self = Refine_Planner(vehrs_,frs,state,desired_idx_,waypoint,trajOptProps)
             arguments
                 vehrs_ 
                 frs
