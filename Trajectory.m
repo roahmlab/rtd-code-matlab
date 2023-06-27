@@ -10,8 +10,6 @@ classdef Trajectory < rtd.planner.trajectory.Trajectory
         u0_goal
         manu_type
         t0_offset
-        
-        
     end
 
     properties (Constant)
@@ -345,10 +343,18 @@ classdef Trajectory < rtd.planner.trajectory.Trajectory
             traj.trajectoryParams = 0; % Specify the trajectory parameters here
             
             % Set the trajectory optimization properties
-            traj.trajOptProps = 0; % Specify the trajectory optimization properties here
+            % DUmmy variables for testing
+            trajOptProps = rtd.planner.trajopt.TrajOptProps();
+            trajOptProps.timeForCost = 1.0; % Set the time used for evaluation in the cost function
+            trajOptProps.planTime = 0.5; % Set the time duration of the nominal plan
+            trajOptProps.horizonTime = 1.0; % Set the time of the overall trajectory until stop
+            trajOptProps.doTimeout = false; % Set whether or not to timeout the optimization
+            trajOptProps.timeoutTime = 0.5; % Set the timeout time for the optimization
+            trajOptProps.randomInit = false; % Set whether or not to randomize unknown or extra parameters
+            traj.trajOptProps = trajOptProps; % Specify the trajectory optimization properties here
             
             % Set the start state
-            traj.startState = 0; % Specify the start state here
+            traj.startState = rtd.entity.states.EntityState(); % Specify the start state here
             
             % Call the setParameters method
             traj.setParameters(au, ay, u0_goal, manu_type, u0, t0_offset, h0);

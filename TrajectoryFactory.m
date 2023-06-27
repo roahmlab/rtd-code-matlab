@@ -1,7 +1,7 @@
-classdef TrajectoryFactory < Trajectory
+classdef TrajectoryFactory < rtd.planner.trajectory.TrajectoryFactory
     methods(Static)
 
-        function trajectories = CreateTrajectories(au_values,ay_values,u0_goal_val,manu_type_val,u0_val,t0_offset_val,h0_val)
+        function trajectories = createTrajectory(au_values,ay_values,u0_goal_val,manu_type_val,u0_val,t0_offset_val,h0_val)
             num_trajectories = numel(au_values);
             trajectories = cell(1,num_trajectories);
             for i = 1:num_trajectories
