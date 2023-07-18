@@ -1,13 +1,13 @@
 
 
-classdef test3_FRS_Instance_speed_change 
+classdef FRS_Instance_speed_change 
     properties
         Vehrs 
         constraints
     end
 
     methods
-        function self = test3_FRS_Instance_speed_change(Vehrs)
+        function self = FRS_Instance_speed_change(Vehrs)
             self = struct();
             %passing values to self
             self.Vehrs = Vehrs;
