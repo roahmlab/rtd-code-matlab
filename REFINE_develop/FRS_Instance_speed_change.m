@@ -4,14 +4,24 @@ classdef FRS_Instance_speed_change
     properties
         Vehrs 
         constraints
+        num_parameters
+        worldinfo
+    end
+
+    properties
+
+        input_range = [-1.0, 1.0]
+        output_range = [-1.0, 1.0]
+        
     end
 
     methods
-        function self = FRS_Instance_speed_change(Vehrs)
-            self = struct();
+        function self = FRS_Instance_speed_change(Vehrs,worldinfo)
+           
             %passing values to self
             self.Vehrs = Vehrs;
-            
+            self.num_parameters = 2;
+            self.worldinfo = worldinfo;
         end
         
         
@@ -22,7 +32,15 @@ classdef FRS_Instance_speed_change
             
             for each_zono = 1:num_zonotopes
                 zono = vehrs{each_zono};
-                obs_info = get_obs_mex(self,worldState.dyn_obstacles,worldState.bounds);
+                world_info=self.worldinfo;
+                disp('worldinfo class from instance: ')
+                disp((world_info))
+                % % dyn_obs = self.worldinfo(:,:);
+                % % bounds = self.worldinfo(:,:);
+                % disp(dyn_obs);
+                % disp('bounds')
+                % disp(bounds);
+                obs_info = get_obs_mex(self,world_info.dyn_obstacles,world_info.bounds);
                 constraints{each_zono} = self.GenerateConstraints(zono,obs_info);
             end
             self.constraints = constraints;
@@ -35,7 +53,8 @@ classdef FRS_Instance_speed_change
     methods (Access = private)
 
         %generate the obs_info
-        function obj_mex = get_obs_mex(self,dyn_obs, bounds)
+        function obj_mex = get_obs_mex(self,dyn_obs,bounds)
+           
             if ~iscell(dyn_obs)
                 dyn_obs = {dyn_obs};
             end
@@ -84,49 +103,133 @@ classdef FRS_Instance_speed_change
             obj_mex(:,end+1) = [xlo-b_half_thick; y_c; 0; 0; b_thick; dy];
         end
 
-
+%you might have to write a separate function for generatorLength and 
        %Generate constraints for vehrs
+       % function ret = FillZonosFromVehrs (vehrs)
+       % 
+       %      num_zonos = length(vehrs); %check length or size
+       %      ret.num_zonos = num_zonos;
+       % 
+       %      num_out_zono_gen_arr = zeros(1,num_zonos);
+       %      ret.num_out_zono_gen_arr = num_out_zono_gen_arr;
+       % 
+       %      cum_size_arr = zeros(1,num_zonos);
+       %      ret.cum_size_arr = cum_size_arr ;
+       % 
+       %      for i=1:length(num_zonos) %index starts at 0 in each of the below case.
+       %          ret.num_out_zono_gen_arr = vehrs.zono_sizes.at(i-1)+2;
+       %      end
+       %      cum_sum_num_out_zono_gen = 0;
+       %      for i =1: length(num_zonos)
+       %          cum_size_arr(i-1) = cum_sum_num_out_zono_gen;
+       %          cum_sum_num_out_zono_gen = cum_sum_num_out_zono_gen + num_out_zono_gen_arr(i-1);
+       %      end
+       %      ret.cum_sum__num_out_zono_gen = cum_sum_num_out_zono_gen;
+       % 
+       %      zono_arr_size = 2* cum_sum_num_out_zono_gen;
+       % 
+       %      fir 
+       % 
+       % end
        function constraints = GenerateConstraints(self, zono, obs_info)
-            num_obs_gens = 2;
-            num_out_zono_gens = numel(zono.generatorLength) + 2;
+
+           %NEW CHANGES TO THE CODE.
+           % obs_center = obs_info(:,1:2);
+           % obs_gen = obs_info(:,2:end);
+           % 
+           % ego_center = zono{1}.center;
+           % ego_gen = zono{1}.generators;
+
+           % obs_center = obs_info(1:2,1);
+           % obs_gen = obs_info(1:2,2:end);
+           % 
+           % zo = zono{1};
+           % ego_center = zo(1:2,1);
+           % ego_gen = zo(1:2,2:end);
+
+           obs_center = obs_info(:,1);
+            obs_gen = obs_info(:, 2:end);
             
-            if size(obs_info, 2) < 1 || num_out_zono_gens < 1
-                constraints = struct('delta_d_arr_', [], 'c_arr_', []);
-                return;
-            end
+            ego_center = zono{1}.center;
+            ego_gen = zono{1}.generators;
+
+            ego_gen = ego_gen(:,2:end);
+            [pa,pb] = polytope_PH(obs_info)
+            % [PA, Pb] = polytope_PH([ego_gen - obs_gen]);
+
+           % if size(ego_center, 2) ~= size(obs_center, 2)
+           %      error('Number of columns in ego_center and obs_center do not match.');
+           % end
+           % 
+           % % Make sure the number of columns match for ego_gen and obs_gen
+           % if size(ego_gen, 2) ~= size(obs_gen, 2)
+           %      error('Number of columns in ego_gen and obs_gen do not match.');
+           % end
             
-            total_d_size = num_out_zono_gens;
-            total_c_size = 2 * num_out_zono_gens;
-            delta_d_arr = zeros(1, total_d_size);
-            c_arr = zeros(1, total_c_size);
+           % Call polytope_PH with the modified inputs
+           % [PA, Pb] = polytope_PH([ego_center; obs_center] - ego_center, [ego_gen; obs_gen]);
+
+           % [PA, Pb] = polytope_PH(obs_info);
+           % 
+           % [PA_,Pb_]=polytope_PH(zono{1});
+
+
+
+
+
+           constraints.a = PA; %ACTUAL IS MULTIPLY BY SLICE_GEN
+           constraints.b = Pb;
+
+           
+
+
+
+           %PREVIOUS IMPLEMENTATION
+            % num_obs_gens = 2;
+            % disp(obs_info.center)
+            % disp((obs_info.generators))
             
-            % Compute initial values.
-            max_r_without_obs = num_out_zono_gens - num_obs_gens;
-            
-            % delta_d(r, c) = abs(C(r,:) * G(:,c))
-            for r = 1:max_r_without_obs
-                delta_d_arr(r) = 0;
-                
-                % C(r,:) = Normalize([-G(1, r); G(2, r)]), one-indexed
-                G = zono.generators;
-                c_r0 = -G(1,r);
-                c_r1 = G(2,r);
-                norm_factor = norm([c_r0, c_r1]);
-                c_r0 = c_r0 / norm_factor;
-                c_r1 = c_r1 / norm_factor;
-                
-                % Save to C array
-                c_arr(2*r) = c_r0;
-                c_arr(2*r-1) = c_r1;
-                
-                for c = 1:num_out_zono_gens - num_obs_gens
-                    g_c0 = G(2,c);
-                    g_c1 = G(1,c);
-                    delta_d_arr(r) = delta_d_arr(r) + abs((c_r0 * g_c0) + (c_r1 * g_c1));
-                end
-            end
-            
-            constraints = struct('delta_d_arr_', delta_d_arr, 'c_arr_', c_arr);
+            % [generatorLength,num_dims] = size(zono{1}.generators);
+            % num_out_zono_gens = numel(generatorLength) + 2;
+            % 
+            % if size(obs_info, 2) < 1 || cc < 1
+            %     constraints = struct('delta_d_arr_', [], 'c_arr_', []);
+            %     return;
+            % end
+            % 
+            % 
+            % total_d_size = num_out_zono_gens;
+            % total_c_size = 2 * num_out_zono_gens;
+            % delta_d_arr = zeros(1, total_d_size);
+            % c_arr = zeros(1, total_c_size);
+            % 
+            % % Compute initial values.
+            % max_r_without_obs = num_out_zono_gens - num_obs_gens;
+            % 
+            % % delta_d(r, c) = abs(C(r,:) * G(:,c))
+            % for r = 1:max_r_without_obs
+            %     delta_d_arr(r) = 0;
+            % 
+            %     % C(r,:) = Normalize([-G(1, r); G(2, r)]), one-indexed
+            %     G = zono.generators;
+            %     c_r0 = -G(1,r);
+            %     c_r1 = G(2,r);
+            %     norm_factor = norm([c_r0, c_r1]);
+            %     c_r0 = c_r0 / norm_factor;
+            %     c_r1 = c_r1 / norm_factor;
+            % 
+            %     % Save to C array
+            %     c_arr(2*r) = c_r0;
+            %     c_arr(2*r-1) = c_r1;
+            % 
+            %     for c = 1:num_out_zono_gens - num_obs_gens
+            %         g_c0 = G(2,c);
+            %         g_c1 = G(1,c);
+            %         delta_d_arr(r) = delta_d_arr(r) + abs((c_r0 * g_c0) + (c_r1 * g_c1));
+            %     end
+            % end
+            % 
+            % constraints = struct('delta_d_arr_', delta_d_arr, 'c_arr_', c_arr);
        
        end
 

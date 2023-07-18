@@ -1,19 +1,5 @@
 %% highway_simulation
 
-% Main function for REFINE simulation
-
-% load FRS
-% frs_filename = 'car_frs.mat';
-% if ~exist('frs','var')
-%     disp('Loading frs')
-%     frs = load(frs_filename) ;
-% else
-%     disp('table already loaded') ;
-% end
-
-%get frs obj
-%call NewhighwayAgent below
-
 plot_sim_flag = 1;
 plot_AH_flag = 1;
 save_result = false; % make it true if you want to save the simulation data
@@ -24,7 +10,7 @@ bounds = [0, 2000, -(lanewidth / 2) - 1, ((lanewidth/2) * 5) + 1];
 goal_radius = 12;
 world_buffer = 1 ;
 t_move = 3;
-t_plan = 25;
+t_plan = 25;%change desired idx for this
 t_failsafe_move = 3;
 verbose_level = 0;
 num_ego_vehicles = 1;
@@ -74,8 +60,8 @@ for j = 1:1000
     rng(j+1);
     IsDone4 = 0;
     Simulator.epscur = j;
-    Simulator.reset();
-    for i = 1:4000
+    Simulator.reset();%ORIGINAL
+    for i = 1:40
         AgentHelper.planned_path = [linspace(0,1000);repmat([0;0],1,100)];
         [~,~,IsDone,LoggedSignal]=Simulator.step([rand*2-1;rand*2-1]);
         if IsDone == 1 || IsDone == 3 || IsDone == 4 || IsDone == 5
