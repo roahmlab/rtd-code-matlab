@@ -134,51 +134,28 @@ classdef FRS_Instance_speed_change
        function constraints = GenerateConstraints(self, zono, obs_info)
 
            %NEW CHANGES TO THE CODE.
-           % obs_center = obs_info(:,1:2);
-           % obs_gen = obs_info(:,2:end);
-           % 
-           % ego_center = zono{1}.center;
-           % ego_gen = zono{1}.generators;
-
-           % obs_center = obs_info(1:2,1);
-           % obs_gen = obs_info(1:2,2:end);
-           % 
-           % zo = zono{1};
-           % ego_center = zo(1:2,1);
-           % ego_gen = zo(1:2,2:end);
-
-           obs_center = obs_info(:,1);
-            obs_gen = obs_info(:, 2:end);
+            obs_c = obs_info(1:2, 1);
+            ego_c = zono{1}.center;
+            obs_G = obs_info(1:2, 2:end);
+            ego_G = zono{1}.generators;
             
-            ego_center = zono{1}.center;
-            ego_gen = zono{1}.generators;
-
-            ego_gen = ego_gen(:,2:end);
-            [pa,pb] = polytope_PH(obs_info)
-            % [PA, Pb] = polytope_PH([ego_gen - obs_gen]);
-
-           % if size(ego_center, 2) ~= size(obs_center, 2)
-           %      error('Number of columns in ego_center and obs_center do not match.');
-           % end
-           % 
-           % % Make sure the number of columns match for ego_gen and obs_gen
-           % if size(ego_gen, 2) ~= size(obs_gen, 2)
-           %      error('Number of columns in ego_gen and obs_gen do not match.');
-           % end
+            % Pad obs_c with zeros if necessary
+            if size(obs_c, 2) < size(ego_c, 2)
+                obs_c = padarray(obs_c, [0 size(ego_c, 2) - size(obs_c, 2)], 'post');
+            elseif size(obs_c, 2) > size(ego_c, 2)
+                ego_c = padarray(ego_c, [0 size(obs_c, 2) - size(ego_c, 2)], 'post');
+            end
             
-           % Call polytope_PH with the modified inputs
-           % [PA, Pb] = polytope_PH([ego_center; obs_center] - ego_center, [ego_gen; obs_gen]);
-
-           % [PA, Pb] = polytope_PH(obs_info);
-           % 
-           % [PA_,Pb_]=polytope_PH(zono{1});
-
-
-
-
-
-           constraints.a = PA; %ACTUAL IS MULTIPLY BY SLICE_GEN
-           constraints.b = Pb;
+            % Pad obs_G with zeros if necessary
+            if size(obs_G, 2) < size(ego_G, 2)
+                obs_G = padarray(obs_G, [0 size(ego_G, 2) - size(obs_G, 2)], 'post');
+            elseif size(obs_G, 2) > size(ego_G, 2)
+                ego_G = padarray(ego_G, [0 size(obs_G, 2) - size(ego_G, 2)], 'post');
+            end
+            
+            [PA, Pb] = polytope_PH(obs_c - ego_c, [ego_G obs_G]);
+            constraint_a_mat = PA * slice_generators;
+            constraint_b_mat = Pb;
 
            
 
