@@ -15,7 +15,7 @@ classdef FRS_loader_speed_change  < rtd.planner.reachsets.ReachSetGenerator
     
     methods
         
-        function self = FRS_loader_speed_change_test2(file,t_plan)
+        function self = FRS_loader_speed_change(file,t_plan)
 
             %loading the file
             reachsets = loaders.RSLoader(file, do_caching=true, preload_data=false, preload_meta=false);
