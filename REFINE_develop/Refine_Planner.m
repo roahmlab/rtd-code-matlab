@@ -1,6 +1,6 @@
 
 
-classdef Refine_Planner_test2 < rtd.planner.RtdPlanner & rtd.util.mixins.Options
+classdef Refine_Planner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
     properties
         manu_type %maneuver type
         frs
@@ -24,7 +24,7 @@ classdef Refine_Planner_test2 < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             end
         end
     methods
-        function self = Refine_Planner_test2(trajOptProps,t_plan)%need options as argument
+        function self = Refine_Planner(trajOptProps,t_plan)%need options as argument
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
                 t_plan
@@ -44,7 +44,7 @@ classdef Refine_Planner_test2 < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             self.waypoint = waypoint;
             self.trajOptProps = trajOptProps;
            
-            frs = FRS_loader_speed_change_test2('converted_Au_frs.h5',t_plan);%check what all has to be passed here
+            frs = FRS_loader_speed_change('converted_Au_frs.h5',t_plan);%check what all has to be passed here
             
             for i = 1:numel(frs.vehrs)
                 %frs should be of type struct
