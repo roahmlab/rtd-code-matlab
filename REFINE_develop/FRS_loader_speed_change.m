@@ -1,9 +1,5 @@
 
-%DO NOT call the other functions inside
-%IT was done only for testing
-%CHECK FOR SPEED/DIRECTION/LANE --> DONE
-
-classdef FRS_loader_speed_change_test2  < rtd.planner.reachsets.ReachSetGenerator
+classdef FRS_loader_speed_change  < rtd.planner.reachsets.ReachSetGenerator
   
     properties
         robotState %states of the robot & UUID
@@ -116,7 +112,7 @@ classdef FRS_loader_speed_change_test2  < rtd.planner.reachsets.ReachSetGenerato
             for i = 1:length(self.vehrs)
                 
                 rs_ = struct();
-                rs_ = test2_FRS_Instance_speed_change(self.vehrs{i});
+                rs_ = FRS_Instance_speed_change(self.vehrs{i});
                 reachableSet.rs{i} = rs_;
                 reachableSet.id{i} = i;
                
