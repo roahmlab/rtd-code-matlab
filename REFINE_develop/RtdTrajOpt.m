@@ -22,7 +22,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
 %
     properties
         trajOptProps rtd.planner.trajopt.TrajOptProps %
-        robot %
         reachableSets %
         objective %
         optimizationEngine %
@@ -58,7 +57,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             %
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
-                % robot (1,1) rtd.sim.world.WorldEntity
                 reachableSets (1,1) struct
                 objective (1,1) rtd.planner.trajopt.Objective
                 optimizationEngine (1,1) rtd.planner.trajopt.OptimizationEngine
@@ -66,7 +64,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                 options.verboseLevel (1,1) rtd.util.types.LogLevel = 'DEBUG'
             end
             self.trajOptProps = trajOptProps;
-            % self.robot = robot; % this might go
             self.reachableSets = reachableSets;
             self.objective = objective;
             self.optimizationEngine = optimizationEngine;
