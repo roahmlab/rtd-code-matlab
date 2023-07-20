@@ -6,7 +6,7 @@ classdef MexWrapper < handle
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
 % Written: 2023-02-08
-% Last Revised: 2023-02-09
+% Last Revised: 2023-03-18
 %
 % See also mex
 %
@@ -28,8 +28,14 @@ classdef MexWrapper < handle
             end
 
             % Check if we need to do any rebuilds
-            if self.checkFileDateTimes()
-                fprintf("%s mex source folder updated, building!\n", class(self))
+            try
+                if self.checkFileDateTimes()
+                    fprintf("%s mex source folder updated, building!\n", class(self))
+                    self.compile()
+                end
+            catch
+                % If we're here, it also means they don't exist
+                fprintf("%s has unexpected mex state, building!\n", class(self))
                 self.compile()
             end
         end
@@ -89,6 +95,7 @@ classdef MexWrapper < handle
             % Get the base path
             currpath = basepath(self);
             mexfilepath = fullfile(currpath, 'private');
+            objfilepath = fullfile(currpath, 'private', 'obj');
             srcfilepath = fullfile(currpath, src_folder);
 
             % Compilation lists
@@ -98,6 +105,21 @@ classdef MexWrapper < handle
             % Get the list of functions
             fcns = self.mex_functionsToBuild();
             fcn_list = string(fieldnames(fcns).');
+
+            % First build the common files
+            if ~isempty(core_list)
+                fprintf("Building common files!\n");
+                abs_mask = arrayfun(@(path) startsWith(path, '/'), core_list);
+                resolved_files = fullfile(srcfilepath, core_list(~abs_mask));
+                core_files = [core_list(abs_mask), resolved_files];
+                mex_command = ["-outdir", objfilepath, "-c", core_files, comp_options];
+                mex_command = num2cell(mex_command);
+                mex(mex_command{:});
+            end
+
+            % Update the common file outputs
+            [~, core_list_names, ~] = fileparts(core_list);
+            core_files_precompiled = fullfile(objfilepath, core_list_names + ".o");
 
             % Build compilation commands
             for fcn=fcn_list
@@ -116,17 +138,24 @@ classdef MexWrapper < handle
 
                 % Resolve the filenames
                 fcn_files = string(fcn_srcs);
-                input_files = [fcn_files(:).', core_list];
+                input_files = fcn_files(:).';
 
                 % seperate the absolute files and resolve the relative ones
                 abs_mask = arrayfun(@(path) startsWith(path, '/'), input_files);
                 resolved_files = fullfile(srcfilepath, input_files(~abs_mask));
-                all_files = [input_files(abs_mask), resolved_files];
+                all_files = [input_files(abs_mask), resolved_files, core_files_precompiled];
 
                 % Generate the mex command and run it
                 mex_command = ["-outdir", mexfilepath, "-output", fcn, all_files, comp_options, fcn_opts];
                 mex_command = num2cell(mex_command);
                 mex(mex_command{:});
+            end
+
+            % Delete common files
+            if isfolder(objfilepath)
+                priorState = recycle('off');
+                rmdir(objfilepath, 's');
+                recycle(priorState);
             end
         end
     end

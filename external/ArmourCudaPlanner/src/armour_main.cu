@@ -3,10 +3,10 @@
 
 const std::string inputext = ".in";
 const std::string outputext1 = ".out";
-const std::string outputext2 = "_joint_position_center.out";
-const std::string outputext3 = "_joint_position_radius.out";
-const std::string outputext4 = "_control_input_radius.out";
-const std::string outputext5 = "_constraints.out";
+const std::string outputext2 = ".joint_position_center";
+const std::string outputext3 = ".joint_position_radius";
+const std::string outputext4 = ".control_input_radius";
+const std::string outputext5 = ".constraints";
 
 int main(int argc, char **argv) {
 /*

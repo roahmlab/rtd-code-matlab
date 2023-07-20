@@ -157,7 +157,7 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             
             % set the active figure
             try
-                set(0, 'CurrentFigure', self.figure_handle)
+                set(groot, 'CurrentFigure', self.figure_handle)
     
                 % plot each of the times requested
                 for t_plot = t_vec
@@ -186,7 +186,7 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             % if the figure handle is deleted, recreate it
             self.validateOrCreateFigure()
             % set the active figure
-            set(0, 'CurrentFigure', self.figure_handle)
+            set(groot, 'CurrentFigure', self.figure_handle)
             % Save the camera view
             try
                 ax = get(self.figure_handle, 'CurrentAxes');

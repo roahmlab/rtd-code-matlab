@@ -102,8 +102,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = true;
-use_robust_input = true;
+input_constraints_flag = false;
+use_robust_input = false;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...
@@ -114,9 +114,9 @@ planner = armour.ArmourPlanner( ...
         traj_type="bernstein", ...
         verboseLevel='DEBUG');
 
-planner = armour.ArmourCudaPlanner( ...
-        trajOptProps, sim.agent, ...
-        verboseLevel='DEBUG');
+% planner = armour.ArmourCudaPlanner( ...
+%         trajOptProps, sim.agent, ...
+%         verboseLevel='DEBUG');
 
 %% HLP stuff to migrate
 HLP = robot_arm_straight_line_HLP();

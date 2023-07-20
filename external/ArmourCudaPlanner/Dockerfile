@@ -57,7 +57,7 @@ WORKDIR ${IPOPTDIR}
 RUN git clone --depth 1 --branch releases/2.2.1 https://github.com/coin-or-tools/ThirdParty-HSL.git
 WORKDIR ${IPOPTDIR}/ThirdParty-HSL
 COPY ${HSLFILE} ${HSLFILE}
-RUN tar xvf ./${HSLFILE} && mv $(ls -d coinhsl*/) coinhsl
+RUN tar xvf ./${HSLFILE} && if [ ! -d "coinhsl" ]; then mv $(ls -d coinhsl*/) coinhsl; fi
 RUN ./configure --prefix=${HSLINSTALL} \
     && make \
     && make install

@@ -1,4 +1,20 @@
 classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rtd.util.mixins.NamedClass & handle
+% An abstraction for any entity of the world. This entity of the world
+% requires at least some info and state, but can contain any component
+% which should be coded into it.
+%
+% This base class includes a variety of utility functions for the world
+% entity to cre
+%
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2023-02-08
+% Last Revised: 2023-02-09
+%
+% See also mex
+%
+% --- More Info ---
+%
 
     properties (Abstract)
         info rtd.entity.components.BaseInfoComponent
