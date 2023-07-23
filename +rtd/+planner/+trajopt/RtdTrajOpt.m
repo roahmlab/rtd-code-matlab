@@ -22,7 +22,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
 %
     properties
         trajOptProps rtd.planner.trajopt.TrajOptProps %
-        robot %
         reachableSets %
         objective %
         optimizationEngine %
@@ -31,7 +30,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
     methods
         function self = RtdTrajOpt(     ...
                     trajOptProps,       ...
-                    robot,              ...
                     reachableSets,      ...
                     objective,          ...
                     optimizationEngine, ...
@@ -59,7 +57,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             %
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
-                robot (1,1) rtd.sim.world.WorldEntity
                 reachableSets (1,1) struct
                 objective (1,1) rtd.planner.trajopt.Objective
                 optimizationEngine (1,1) rtd.planner.trajopt.OptimizationEngine
@@ -67,7 +64,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                 options.verboseLevel (1,1) rtd.util.types.LogLevel = 'DEBUG'
             end
             self.trajOptProps = trajOptProps;
-            self.robot = robot; % this might go
             self.reachableSets = reachableSets;
             self.objective = objective;
             self.optimizationEngine = optimizationEngine;
@@ -128,12 +124,16 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                     rs_args = namedargs2cell(rsAdditionalArgs.(rs_name{1}));
                 end
                 rs = self.reachableSets.(rs_name{1}).getReachableSet(robotState, rs_args{:}, ignore_cache=false);
+%                 disp(fieldnames(rsInstances))
                 rsInstances.(rs_name{1}) = rs;
             end
 
             % Generate nonlinear constraints
             self.vdisp("Generating nonlinear constraints", 'DEBUG')
             rsInstances_cell = struct2cell(rsInstances).';
+%             rs=rs.rs;
+%             disp(rs.rs)
+%             disp(rsInstances)
             nlconCallbacks = cellfun(@(rs)rs.genNLConstraint(worldState), ...
                                     rsInstances_cell, ...
                                     UniformOutput = false);
