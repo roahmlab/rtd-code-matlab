@@ -1,51 +1,87 @@
 
 
-classdef FRS_Instance_speed_change 
+classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance
     properties
         Vehrs 
         constraints
         num_parameters
         worldinfo
+        manu_type
     end
 
     properties
-
         input_range = [-1.0, 1.0]
         output_range = [-1.0, 1.0]
-        
     end
 
     methods
-        function self = FRS_Instance_speed_change(Vehrs,worldinfo)
+        function self = FRS_Instance_speed_change(Vehrs,worldinfo,manu_type)
            
             %passing values to self
-            self.Vehrs = Vehrs;
+            self.Vehrs = Vehrs; %around 300
             self.num_parameters = 2;
             self.worldinfo = worldinfo;
+            self.manu_type = manu_type;
         end
         
         
-        function constraints = genNLConstraint(self, worldState)%genNl constraint called trajopt
+        function nlconFunction = genNLConstraint(self, worldState)%genNl constraint called trajopt
             vehrs = self.Vehrs;
             num_zonotopes = numel(vehrs);
             constraints = cell(1, num_zonotopes);
+            nlconFunction = [];
+            if (iscell(vehrs))
+                for each_zono = 1:num_zonotopes
+                    disp(class(vehrs))
+                    zono = vehrs{each_zono};
+                    world_info=self.worldinfo;
+                    
+                    obs_info = get_obs_mex(self,world_info.dyn_obstacles,world_info.bounds);
+                    obs_c = obs_info(1:2, 1);
+                    for z = 1:length(zono)
+                        zc = zono{z}.center;
+                        zg = zono{z}.generators;
+                        ego_c = zc(1:2,1);
+                        obs_G = obs_info(1:2, 2:end);
+                        ego_G = zg(1:2,2:end);
             
-            for each_zono = 1:num_zonotopes
-                zono = vehrs{each_zono};
-                world_info=self.worldinfo;
-                disp('worldinfo class from instance: ')
-                disp((world_info))
-                % % dyn_obs = self.worldinfo(:,:);
-                % % bounds = self.worldinfo(:,:);
-                % disp(dyn_obs);
-                % disp('bounds')
-                % disp(bounds);
-                obs_info = get_obs_mex(self,world_info.dyn_obstacles,world_info.bounds);
-                constraints{each_zono} = self.GenerateConstraints(zono,obs_info);
-            end
-            self.constraints = constraints;
-        end
+                        
+                        % Pad obs_c with zeros if necessary
+                        if size(obs_c, 2) < size(ego_c, 2)
+                            obs_c = padarray(obs_c, [0 size(ego_c, 2) - size(obs_c, 2)], 'post');
+                        elseif size(obs_c, 2) > size(ego_c, 2)
+                            ego_c = padarray(ego_c, [0 size(obs_c, 2) - size(ego_c, 2)], 'post');
+                        end
+                        
+                        % Pad obs_G with zeros if necessary
+                        if size(obs_G, 2) < size(ego_G, 2)
+                            obs_G = padarray(obs_G, [0 size(ego_G, 2) - size(obs_G, 2)], 'post');
+                        elseif size(obs_G, 2) > size(ego_G, 2)
+                            ego_G = padarray(ego_G, [0 size(obs_G, 2) - size(ego_G, 2)], 'post');
+                        end
+            
+                        
+                        [PA, Pb] = armour.pz_roahm.polytope_PH([obs_c - ego_c, ego_G, obs_G]); 
         
+                       nlconFunction = @(k) self.eval_constraints(k,PA,Pb);
+                    end
+                    
+                end
+            end
+            
+        end
+
+
+         %helper function for function call
+         %check
+       function [h, h_eq, grad_h, grad_heq] = eval_constraints(self, k, Pa, Pb)
+
+            h = Pa*k - Pb;
+            h_eq = [];
+            grad_h = Pa';
+            grad_heq = [];
+       end
+
        
 
     end
@@ -103,113 +139,7 @@ classdef FRS_Instance_speed_change
             obj_mex(:,end+1) = [xlo-b_half_thick; y_c; 0; 0; b_thick; dy];
         end
 
-%you might have to write a separate function for generatorLength and 
-       %Generate constraints for vehrs
-       % function ret = FillZonosFromVehrs (vehrs)
-       % 
-       %      num_zonos = length(vehrs); %check length or size
-       %      ret.num_zonos = num_zonos;
-       % 
-       %      num_out_zono_gen_arr = zeros(1,num_zonos);
-       %      ret.num_out_zono_gen_arr = num_out_zono_gen_arr;
-       % 
-       %      cum_size_arr = zeros(1,num_zonos);
-       %      ret.cum_size_arr = cum_size_arr ;
-       % 
-       %      for i=1:length(num_zonos) %index starts at 0 in each of the below case.
-       %          ret.num_out_zono_gen_arr = vehrs.zono_sizes.at(i-1)+2;
-       %      end
-       %      cum_sum_num_out_zono_gen = 0;
-       %      for i =1: length(num_zonos)
-       %          cum_size_arr(i-1) = cum_sum_num_out_zono_gen;
-       %          cum_sum_num_out_zono_gen = cum_sum_num_out_zono_gen + num_out_zono_gen_arr(i-1);
-       %      end
-       %      ret.cum_sum__num_out_zono_gen = cum_sum_num_out_zono_gen;
-       % 
-       %      zono_arr_size = 2* cum_sum_num_out_zono_gen;
-       % 
-       %      fir 
-       % 
-       % end
-       function constraints = GenerateConstraints(self, zono, obs_info)
-
-           %NEW CHANGES TO THE CODE.
-            obs_c = obs_info(1:2, 1);
-            ego_c = zono{1}.center;
-            obs_G = obs_info(1:2, 2:end);
-            ego_G = zono{1}.generators;
-            
-            % Pad obs_c with zeros if necessary
-            if size(obs_c, 2) < size(ego_c, 2)
-                obs_c = padarray(obs_c, [0 size(ego_c, 2) - size(obs_c, 2)], 'post');
-            elseif size(obs_c, 2) > size(ego_c, 2)
-                ego_c = padarray(ego_c, [0 size(obs_c, 2) - size(ego_c, 2)], 'post');
-            end
-            
-            % Pad obs_G with zeros if necessary
-            if size(obs_G, 2) < size(ego_G, 2)
-                obs_G = padarray(obs_G, [0 size(ego_G, 2) - size(obs_G, 2)], 'post');
-            elseif size(obs_G, 2) > size(ego_G, 2)
-                ego_G = padarray(ego_G, [0 size(obs_G, 2) - size(ego_G, 2)], 'post');
-            end
-            
-            [PA, Pb] = polytope_PH(obs_c - ego_c, [ego_G obs_G]);
-            constraint_a_mat = PA * slice_generators;
-            constraint_b_mat = Pb;
-
-           
-
-
-
-           %PREVIOUS IMPLEMENTATION
-            % num_obs_gens = 2;
-            % disp(obs_info.center)
-            % disp((obs_info.generators))
-            
-            % [generatorLength,num_dims] = size(zono{1}.generators);
-            % num_out_zono_gens = numel(generatorLength) + 2;
-            % 
-            % if size(obs_info, 2) < 1 || cc < 1
-            %     constraints = struct('delta_d_arr_', [], 'c_arr_', []);
-            %     return;
-            % end
-            % 
-            % 
-            % total_d_size = num_out_zono_gens;
-            % total_c_size = 2 * num_out_zono_gens;
-            % delta_d_arr = zeros(1, total_d_size);
-            % c_arr = zeros(1, total_c_size);
-            % 
-            % % Compute initial values.
-            % max_r_without_obs = num_out_zono_gens - num_obs_gens;
-            % 
-            % % delta_d(r, c) = abs(C(r,:) * G(:,c))
-            % for r = 1:max_r_without_obs
-            %     delta_d_arr(r) = 0;
-            % 
-            %     % C(r,:) = Normalize([-G(1, r); G(2, r)]), one-indexed
-            %     G = zono.generators;
-            %     c_r0 = -G(1,r);
-            %     c_r1 = G(2,r);
-            %     norm_factor = norm([c_r0, c_r1]);
-            %     c_r0 = c_r0 / norm_factor;
-            %     c_r1 = c_r1 / norm_factor;
-            % 
-            %     % Save to C array
-            %     c_arr(2*r) = c_r0;
-            %     c_arr(2*r-1) = c_r1;
-            % 
-            %     for c = 1:num_out_zono_gens - num_obs_gens
-            %         g_c0 = G(2,c);
-            %         g_c1 = G(1,c);
-            %         delta_d_arr(r) = delta_d_arr(r) + abs((c_r0 * g_c0) + (c_r1 * g_c1));
-            %     end
-            % end
-            % 
-            % constraints = struct('delta_d_arr_', delta_d_arr, 'c_arr_', c_arr);
-       
-       end
-
+      
     end
 end
     
