@@ -4,8 +4,15 @@ classdef Refine_Planner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
     properties
         manu_type %maneuver type
         frs
-        rs
+        rs_speed
+        rs_lane
+        AH
+%         rs
+%         rs1%speed change
+%         rs2%lane change
         trajopt
+        trajopt_speed
+        trajopt_lane
         trajOptProps
         objective
         optimizationEngine
@@ -22,71 +29,60 @@ classdef Refine_Planner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             end
         end
     methods 
-        function self = Refine_Planner(trajOptProps,t_plan,AH,options)%need options as argument with manu_type
+        function self = Refine_Planner(trajOptProps,AH)%need options as argument with manu_type
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
-                t_plan
+                
                 AH
-                options struct
-                % options.manu_type {mustBeMember(options.manu_type,{'speed change','direction change','lane change'})}
-            end
+       end
            
-            
-            %dummy variables for testing
-            waypoint1 = [10, 20];  % Example waypoint 1 [x1, y1]
-            waypoint2 = [15, 25];  % Example waypoint 2 [x2, y2]
-            waypoint3 = [20, 30];  % Example waypoint 3 [x3, y3]
 
-            % Store waypoints in a cell array/dummy variables
-            waypoint = {waypoint1, waypoint2, waypoint3};
-
-            % Initialize the properties
-            self.waypoint = waypoint;
             self.trajOptProps = trajOptProps;
-           file = 'converted_Au_frs.h5';
-           self.rs = struct;
-            self.rs.frs_ = FRS_loader_speed_change(file,t_plan);%check what all has to be passed here
-%             self.rs.AH =AH;
-            %using the t_plan find desired_idx for each re
-            frs = self.rs.frs_;
-            for i = 1:numel(frs.vehrs)
+            file = 'converted_Au_frs.h5';
 
-                self.frs{i} = frs; %print frs
-                self.vehrs = frs.vehrs;
-                self.desired_idx = frs.desired_idx;
-                vehrs = self.vehrs;
-                Robotstate_ = frs.robotState;
-                self.robotstate{i} = Robotstate_;
-                trajF = Trajectory_Factory(AH);
-           
-                %Set up the optimization engine (optimizationEngine)
-                self.optimizationEngine = rtd.planner.trajopt.FminconOptimizationEngine(trajOptProps);
-               
-                %objective function call
-                objective = Refine_Objective(trajOptProps,vehrs,self.desired_idx);
+            %NEW ADDITIONS
+            self.AH = AH;
+            self.rs_speed = struct;
+            self.rs_lane = struct;
 
-                self.trajopt_speed{i} = rtd.planner.trajopt.RtdTrajOpt(trajOptProps, self.rs,objective, self.optimizationEngine, trajF);%pass the objective
-%                 self.trajopt_lane{i} = rtd.planner.trajopt.RtdTrajOpt(trajOptProps, self.rs,objective, self.optimizationEngine, trajF);
-                %take for speed change and lane change separetly
-            end
+            %speed change
+            manu_type='speed_change';
+            self.rs_speed.frs_ = FRS_loader_speed_change(file,trajOptProps.planTime,manu_type);
+            trajF = TrajectoryFactory_pass_values(AH);
+            self.optimizationEngine = rtd.planner.trajopt.FminconOptimizationEngine(trajOptProps);
+            objective = Refine_Objective(trajOptProps,self.rs_speed.frs_.vehrs,self.desired_idx);
+            self.trajopt_speed = rtd.planner.trajopt.RtdTrajOpt(trajOptProps,self.rs_speed,objective,self.optimizationEngine,trajF);
+
+            %lane change
+            manu_type='lane_change';
+            self.rs_lane.frs_ = FRS_loader_speed_change(file,trajOptProps.planTime,manu_type);
+%             trajF = TrajectoryFactory_pass_values(AH);
+            self.optimizationEngine = rtd.planner.trajopt.FminconOptimizationEngine(trajOptProps);
+            objective = Refine_Objective(trajOptProps,self.rs_lane.frs_.vehrs,self.desired_idx);
+            self.trajopt_lane = rtd.planner.trajopt.RtdTrajOpt(trajOptProps,self.rs_lane,objective,self.optimizationEngine,trajF);
 
 
         end
 
         %plan trajectory function
         function [trajectory,info] = planTrajectory(self,robotState,worldinfo,worldState)
-            
-            frs_ = self.frs;
-            
-          
-            for i = 1:numel(self.trajopt)
-               
-                %generate frs instance-->generateReachableSet()
-                frs_{i}.setWorldInfo(worldinfo);
-                [trajectory, ~, info] = self.trajopt_speed{i}.solveTrajOpt(robotState, worldState, self.waypoint);
-%                 [trajectory, ~, info] = self.trajopt_lane{i}.solveTrajOpt(robotState, worldState, self.waypoint);
-                %best out of speed change and lane change.
-            end
+            self.rs_speed.frs_.setWorldInfo(worldinfo);
+            self.rs_lane.frs_.setWorldInfo(worldinfo);
+            self.waypoint = self.AH.waypoint;
+
+                    [trajectory_speed, cost_speed, info_speed] = self.trajopt_speed.solveTrajOpt(robotState, worldState, self.waypoint); %HERE PASSING THE INITIAL GUESS -> no need of initiAL guess
+                    [trajectory_lane,cost_lane, info_lane] = self.trajopt_lane.solveTrajOpt(robotState, worldState, self.waypoint);
+
+                    if(cost_speed < cost_lane)
+                        trajectory = trajectory_speed;
+                        info = info_speed;
+                    else
+                        trajectory = trajectory_lane;
+                        info = info_lane;
+
+                    end
+
+
 
         end
     end

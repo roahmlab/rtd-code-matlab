@@ -4,9 +4,10 @@ classdef NewhighwayAgentHelper < agentHelper
         HLP;
         robotState
         worldState
+        waypoint
         % partitions on u0
         u0_array        
-        
+%         t_move
         % reference data for plot
         ref_Z = [];
         proposed_ref_Z = [];
@@ -35,98 +36,25 @@ classdef NewhighwayAgentHelper < agentHelper
     end
     %% methods
     methods
-        function AH = NewhighwayAgentHelper(A, HLP,worldState, trajOptProps,t_plan,varargin)
+        function AH = NewhighwayAgentHelper(A, HLP,worldState, trajOptProps,varargin)
             %dummy for testing
             frs = 0;
-       
             AH@agentHelper(A,frs,varargin{:}); %calls gen_paramter_standalone here
-            % options = struct();
-            % options.manu_type = 'speed change';
-            
+            AH.t_move =3;
             AH.HLP = HLP;
-            
             AH.worldState = worldState;
             AH.truncating_factor = 1;
-            refinePlanner = Refine_Planner(trajOptProps,t_plan,AH);
+            refinePlanner = Refine_Planner(trajOptProps,AH);%no need to pass AH here, t_plan in trajOptProps.
             AH.refinePlanner = refinePlanner;
-            AH.robotState = refinePlanner.robotstate;
+
         end
         
         
         
         function [trajectory,tout] = gen_parameter_standalone(AH, worldinfo,agent_state,waypoints)
-
-            %here we have our plan trajectory
-            % disp(worldinfo)
-            disp('worldinfo class: ')
-            disp(class(worldinfo))
-            [trajectory,info] = AH.refinePlanner.planTrajectory(AH.robotState,worldinfo,AH.worldState);
+            AH.waypoint = waypoints;
+            [trajectory,tout] = AH.refinePlanner.planTrajectory(agent_state(1:6),worldinfo,waypoints);%initially it was AH.robotstate,worldinfo,AH.worldState
            
-%             
-%             if (AH.cur_t0_idx > 1 && AH.prev_action == 2) || (AH.cur_t0_idx > 2 && AH.prev_action == 3)|| AH.prev_action  == 1
-%                 AH.prev_action = -1;
-%                 AH.cur_t0_idx = 1;
-%             end
-% 
-%             if AH.prev_action ~= -1 
-%                 K = [AH.saved_K(1); AH.saved_K(2); AH.cur_t0_idx ;AH.prev_action];
-%                 AH.cur_t0_idx = AH.cur_t0_idx + 1;
-%                 return
-%             end
-
-            % x_des_mex = x_des;
-            % dyn_obs_mex = get_obs_mex(world_info.dyn_obstacles, world_info.bounds);
-            % agent_state_mex = agent_state(1:6);
-            % tic
-            % k_mex = TEST_MEX(agent_state_mex, x_des_mex, dyn_obs_mex); 
-            % t_temp = toc;
-            % AH.solve_time_hist = [AH.solve_time_hist, t_temp];
-            % indices = k_mex(5:6)+1;
-            % k_mex = k_mex(1:4);
-            % K = k_mex;
-            % if K(end) == -1
-            %     K = [];
-            % else % visualize FRS and update for the agent
-            %     type_manu = K(4);
-            %     multiplier = 1;
-            %     mirror_flag = 0;
-            % 
-            %     type_manu_all = ["Au","dir","lan"];
-            %     type_text = type_manu_all(type_manu);
-            %     [~,idxu0] = min(abs(AH.u0_array - agent_state(4)));
-            %     M = AH.zono_full.M_mega{idxu0};
-            % 
-            %     if type_manu == 1
-            %         k = K(1);
-            %         FRS = M(type_text);
-            %         AH.prev_action = -1; 
-            %         AH.cur_t0_idx = 1;
-            %     else
-            %         k = K(2);
-            %         if k<0
-            %             multiplier = -1;
-            %             mirror_flag = 1;
-            %         end
-            %         FRS = M(type_text); 
-            %         AH.prev_action = type_manu;
-            %         AH.cur_t0_idx = 2;
-            %         AH.saved_K = K;
-            %     end
-            %     if size(FRS,1) == 1
-            %         FRS = FRS';
-            %     end
-            %     FRS = FRS{indices(1),indices(2)};
-            %     AH.plot_selected_parameter_FRS(k,type_manu,FRS,mirror_flag,agent_state,multiplier);
-            % 
-            %     AH.waypt_hist = [AH.waypt_hist x_des];
-            %     AH.K_hist = [AH.K_hist k];
-            %     AH.FRS_hist{end+1} = FRS;
-            %     AH.mirror_hist = [AH.mirror_hist mirror_flag];
-            %     AH.type_manu_hist = [AH.type_manu_hist type_manu];
-            %     AH.state_hist = [AH.state_hist agent_state];
-            %     AH.time_hist = [AH.time_hist AH.A.time(end)];
-            % end
-%             tout = 0; % place holder
         end
         
         function plot_selected_parameter_FRS(AH,K,type_manu,FRS,mirror_flag,agent_state,multiplier)
@@ -144,43 +72,45 @@ classdef NewhighwayAgentHelper < agentHelper
 
 
         
-%         function [T, U, Z]=gen_ref(AH, K, reference_flag,agent_state, ref_time)
-%             % generate reference based on parameter and states
-%             if ~exist('agent_state','var')
-%                 agent_info = AH.get_agent_info();
-%                 agent_state = agent_info.state(:,end);
-%             end
-%             if ~exist('ref_time','var')
-%                 ref_time = AH.A.time(end);
-%             end
-%             if ~exist('reference_flag','var')
-%                 reference_flag = 1;
-%             end
-%             u_cur = agent_state(4) ;
-%             y_cur = agent_state(2) ;
-%             x_cur = agent_state(1) ;
-%             Au = K(1);
-%             Ay = K(2);
-%             t0_idx = K(3);
-%             
-%             t0 = (t0_idx-1)*AH.t_move;
-%             type_manu = K(4);
-%             if type_manu == 3 % 1: speed change. 2: direction change. 3: lane change
-%                 [T, U,Z] = gaussian_T_parameterized_traj_with_brake(t0,Ay,Au,u_cur,[],0,1);
-%             else
-%                 [T, U,Z] = sin_one_hump_parameterized_traj_with_brake(t0,Ay,Au,u_cur,[],0,1);
-%             end
-%             
-%             if reference_flag
-%                 AH.ref_Z=[AH.ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting
-%                 AH.t_real_start = [AH.t_real_start;ref_time];
-%             else
-%                 AH.proposed_ref_Z=[AH.proposed_ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting
-%                 AH.t_proposed_start = [AH.t_proposed_start;ref_time];
-%             end
-%             
-%             
-%         end
+        function [T, U, Z]=gen_ref(AH, K, reference_flag,agent_state, ref_time)
+            % generate reference based on parameter and states
+            if ~exist('agent_state','var')
+                agent_info = AH.get_agent_info();
+                agent_state = agent_info.state(:,end);
+            end
+            if ~exist('ref_time','var')
+                ref_time = AH.A.time(end);
+            end
+            if ~exist('reference_flag','var')
+                reference_flag = 1;
+            end
+            u_cur = agent_state(4) ;
+            y_cur = agent_state(2) ;
+            x_cur = agent_state(1) ;
+            Au = K(1);
+            Ay = K(2);
+            t0_idx = K(3);
+%             disp('t0 from h')
+%             disp(t0_idx)
+%             disp(AH.t_move)
+            t0 = (t0_idx-1)*AH.t_move;
+            type_manu = K(4);
+            if type_manu == 3 % 1: speed change. 2: direction change. 3: lane change
+                [T, U,Z] = gaussian_T_parameterized_traj_with_brake(t0,Ay,Au,u_cur,[],0,1);
+            else
+                [T, U,Z] = sin_one_hump_parameterized_traj_with_brake(t0,Ay,Au,u_cur,[],0,1);
+            end
+            
+            if reference_flag
+                AH.ref_Z=[AH.ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting
+                AH.t_real_start = [AH.t_real_start;ref_time];
+            else
+                AH.proposed_ref_Z=[AH.proposed_ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting
+                AH.t_proposed_start = [AH.t_proposed_start;ref_time];
+            end
+            
+            
+        end
 
         function reset(AH,flags,eps_seed)
             if ~exist('eps_seed','var')
@@ -272,45 +202,45 @@ classdef NewhighwayAgentHelper < agentHelper
 end
 
 %% helper function to generate obstacle structure for c++
-% function obj_mex = get_obs_mex(dyn_obs, bounds)
-%     all_pts = dyn_obs{1};
-%     all_vels = dyn_obs{2};
-%     obj_mex = [];
-%     n_obs = length(all_vels);
-%     for dyn_obs_idx = 1:n_obs
-%         dyn_obs_pts_start_idx = ((dyn_obs_idx-1) * 6) + 1;
-%         curr_pts = all_pts(:, ...
-%             dyn_obs_pts_start_idx:dyn_obs_pts_start_idx+3);
-%         deltas = max(curr_pts,[],2) - min(curr_pts,[],2);
-%         means = mean(curr_pts, 2);
-%         dyn_c_x = means(1);
-%         dyn_c_y = means(2);
-%         dyn_length = deltas(1);
-%         dyn_width = deltas(2);
-%         dyn_velocity = all_vels(dyn_obs_idx);
-%         dyn_heading_rad = 0;
-%         obj_mex(:,end+1) = [dyn_c_x; 
-%                             dyn_c_y; 
-%                             dyn_heading_rad;
-%                             dyn_velocity;
-%                             dyn_length;
-%                             dyn_width];
-%     end
-%     xlo = bounds(1) ; xhi = bounds(2) ;
-%     ylo = bounds(3) ; yhi = bounds(4) ;
-%     dx = xhi - xlo;
-%     dy = yhi - ylo;
-%     x_c = mean([xlo, xhi]);
-%     y_c = mean([ylo, yhi]);
-%     b_thick = 0.01;
-%     b_half_thick = b_thick / 2.0;
-% 
-%     % Top
-%     obj_mex(:,end+1) = [x_c; yhi+b_half_thick; 0; 0; dx; b_thick];
-%     % Bottom
-%     obj_mex(:,end+1) = [x_c; ylo-b_half_thick; 0; 0; dx; b_thick];
-%     % Right
-%     obj_mex(:,end+1) = [xhi+b_half_thick; y_c; 0; 0; b_thick; dy];
-%     % Left
-%     obj_mex(:,end+1) = [xlo-b_half_thick; y_c; 0; 0; b_thick; dy];
-% end
+function obj_mex = get_obs_mex(dyn_obs, bounds)
+    all_pts = dyn_obs{1};
+    all_vels = dyn_obs{2};
+    obj_mex = [];
+    n_obs = length(all_vels);
+    for dyn_obs_idx = 1:n_obs
+        dyn_obs_pts_start_idx = ((dyn_obs_idx-1) * 6) + 1;
+        curr_pts = all_pts(:, ...
+            dyn_obs_pts_start_idx:dyn_obs_pts_start_idx+3);
+        deltas = max(curr_pts,[],2) - min(curr_pts,[],2);
+        means = mean(curr_pts, 2);
+        dyn_c_x = means(1);
+        dyn_c_y = means(2);
+        dyn_length = deltas(1);
+        dyn_width = deltas(2);
+        dyn_velocity = all_vels(dyn_obs_idx);
+        dyn_heading_rad = 0;
+        obj_mex(:,end+1) = [dyn_c_x; 
+                            dyn_c_y; 
+                            dyn_heading_rad;
+                            dyn_velocity;
+                            dyn_length;
+                            dyn_width];
+    end
+    xlo = bounds(1) ; xhi = bounds(2) ;
+    ylo = bounds(3) ; yhi = bounds(4) ;
+    dx = xhi - xlo;
+    dy = yhi - ylo;
+    x_c = mean([xlo, xhi]);
+    y_c = mean([ylo, yhi]);
+    b_thick = 0.01;
+    b_half_thick = b_thick / 2.0;
+
+    % Top
+    obj_mex(:,end+1) = [x_c; yhi+b_half_thick; 0; 0; dx; b_thick];
+    % Bottom
+    obj_mex(:,end+1) = [x_c; ylo-b_half_thick; 0; 0; dx; b_thick];
+    % Right
+    obj_mex(:,end+1) = [xhi+b_half_thick; y_c; 0; 0; b_thick; dy];
+    % Left
+    obj_mex(:,end+1) = [xlo-b_half_thick; y_c; 0; 0; b_thick; dy];
+end

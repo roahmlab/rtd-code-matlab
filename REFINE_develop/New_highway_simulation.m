@@ -8,9 +8,9 @@ save_result = false; % make it true if you want to save the simulation data
 lanewidth = 3.7;
 bounds = [0, 2000, -(lanewidth / 2) - 1, ((lanewidth/2) * 5) + 1];
 goal_radius = 12;
-world_buffer = 1 ;
-t_move = 3;
-t_plan = 25;%change desired idx for this
+world_buffer = 1;
+t_move = 3;%passing in NewhighwayAGent
+t_plan = 3;%change desired idx for this
 t_failsafe_move = 3;
 verbose_level = 0;
 num_ego_vehicles = 1;
@@ -19,20 +19,16 @@ num_static_cars = 3;
 num_total_cars = num_ego_vehicles + num_moving_cars + num_static_cars;
 hlp_lookahead = 90;
 
-%Dummy variable
 worldState = [1 2 3;-3 -1 1];
 
-
-% options = struct();
-% options.manu_type = 'speed change';
 % DUmmy variables for testing
 trajOptProps = rtd.planner.trajopt.TrajOptProps;
 trajOptProps.timeForCost = 5.0; % Set the time used for evaluation in the cost function
-trajOptProps.planTime = 0.5; % Set the time duration of the nominal plan
+trajOptProps.planTime = t_plan; % Set the time duration of the nominal plan
 trajOptProps.horizonTime = 1.0; % Set the time of the overall trajectory until stop
 trajOptProps.doTimeout = false; % Set whether or not to timeout the optimization
 trajOptProps.timeoutTime = 0.5; % Set the timeout time for the optimization
-trajOptProps.randomInit = false; % Set whether or not to randomize unknown or extra parameters
+trajOptProps.randomInit = false; % Set whether or not to randomize unknown or extra parameters ---> unknown zeros
 
 
 
@@ -42,20 +38,19 @@ for j = 1:1000
         'buffer', world_buffer, 'goal', [1010;3.7], ...
         'verbose', verbose_level, 'goal_radius', goal_radius, ...
         'num_cars', num_total_cars, 'num_moving_cars', num_moving_cars, ...
-        't_move_and_failsafe', t_move+t_failsafe_move) ;
+        't_move_and_failsafe', t_move+t_failsafe_move);
 
     Agent = highway_cruising_10_state_agent; % takes care of vehicle states and dynamics
     Agent.desired_initial_condition = [10;0; 0; 20;0;0;20;0;0;0];
     Agent.integrator_type= 'ode45';
+    
     HLP = simple_highway_HLP; % high-level planner
     HLP.lookahead = hlp_lookahead; 
-    AgentHelper = NewhighwayAgentHelper(Agent,HLP,worldState,trajOptProps,t_plan); % takes care of online planning
+    AgentHelper = NewhighwayAgentHelper(Agent,HLP,worldState,trajOptProps); % takes care of online planning
     Simulator = rlsimulator(AgentHelper,World,'plot_sim_flag',plot_sim_flag,'plot_AH_flag',plot_AH_flag,'save_result',save_result);
 
     AgentHelper.S = Simulator;
     Simulator.eval = 1; %turn on evaluation so summary will be saved
-
-   
 
     rng(j+1);
     IsDone4 = 0;
@@ -74,7 +69,5 @@ for j = 1:1000
     end
     pause(1)
 end
-
-
 
 done = 'Simulation Complete';
