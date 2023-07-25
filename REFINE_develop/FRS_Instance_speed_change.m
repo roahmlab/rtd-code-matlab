@@ -32,15 +32,25 @@ classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance
             nlconFunction = [];
             if (iscell(vehrs))
                 for each_zono = 1:num_zonotopes
+<<<<<<< HEAD
 %                     disp(class(vehrs)) %cell
+=======
+                    disp(class(vehrs))
+>>>>>>> 3fda6b405842c5fcc29fb620cb92c9d2fbd2a6d1
                     zono = vehrs{each_zono};
                     world_info=self.worldinfo;
                     
                     obs_info = get_obs_mex(self,world_info.dyn_obstacles,world_info.bounds);
                     obs_c = obs_info(1:2, 1);
+<<<<<<< HEAD
 
                         zc = zono.Z(:,1);
                         zg = zono.Z(:,2:end);
+=======
+                    for z = 1:length(zono)
+                        zc = zono{z}.center;
+                        zg = zono{z}.generators;
+>>>>>>> 3fda6b405842c5fcc29fb620cb92c9d2fbd2a6d1
                         ego_c = zc(1:2,1);
                         obs_G = obs_info(1:2, 2:end);
                         ego_G = zg(1:2,2:end);
@@ -64,7 +74,11 @@ classdef FRS_Instance_speed_change < rtd.planner.reachsets.ReachSetInstance
                         [PA, Pb] = armour.pz_roahm.polytope_PH([obs_c - ego_c, ego_G, obs_G]); 
         
                        nlconFunction = @(k) self.eval_constraints(k,PA,Pb);
+<<<<<<< HEAD
 %                     end
+=======
+                    end
+>>>>>>> 3fda6b405842c5fcc29fb620cb92c9d2fbd2a6d1
                     
                 end
             end
