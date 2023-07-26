@@ -163,7 +163,7 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             for i=1:length(num_slack)
                 new_bounds = rsInstances_cell{i}.input_range;
                 if mask_ones(i)
-                    new_bounds = repmat(new_bonds, num_parameters, 1);
+                    new_bounds = repmat(new_bounds, num_parameters, 1);
                 elseif num_slack(i) > 0
                     % Isolate and add the slack
                     slack_bounds(slack_idxs(i)+1:slack_idxs(i+1),:) = new_bounds(num_parameters+1:end,:);
