@@ -1,0 +1,16 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/unsupported/test/cxx11_tensor_casts.cpp"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"BuildUnsupported"
+		],
+		"name" : "cxx11_tensor_casts"
+	}
+}

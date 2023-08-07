@@ -1,0 +1,198 @@
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags:  
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: -c 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags:  
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: -c 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: --c++ 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: --ec++ 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+
+The output was:
+No such file or directory
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: CMAKE_CXX_COMPILER-NOTFOUND 
+Build flags: 
+Id flags: -c;-I__does_not_exist__ 
+
+The output was:
+No such file or directory
+
+
+Performing C++ SOURCE FILE Test COMPILER_SUPPORT_Wshorten64to32 failed with the following output:
+Change Dir: /home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_373dd/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_373dd.dir/build.make CMakeFiles/cmTC_373dd.dir/build
+gmake[1]: Entering directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_373dd.dir/src.cxx.o
+/usr/bin/g++ -DCOMPILER_SUPPORT_Wshorten64to32  -std=c++03 -pedantic -Wall -Wextra -Wundef -Wcast-align -Wchar-subscripts -Wnon-virtual-dtor -Wunused-local-typedefs -Wpointer-arith -Wwrite-strings -Wformat-security -Werror   -Wshorten-64-to-32 -o CMakeFiles/cmTC_373dd.dir/src.cxx.o -c "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp/src.cxx"
+g++: error: unrecognized command-line option '-Wshorten-64-to-32'
+gmake[1]: *** [CMakeFiles/cmTC_373dd.dir/build.make:78: CMakeFiles/cmTC_373dd.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_373dd/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_SUPPORT_Wcpp11extensions failed with the following output:
+Change Dir: /home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_46a0d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_46a0d.dir/build.make CMakeFiles/cmTC_46a0d.dir/build
+gmake[1]: Entering directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_46a0d.dir/src.cxx.o
+/usr/bin/g++ -DCOMPILER_SUPPORT_Wcpp11extensions  -std=c++03 -pedantic -Wall -Wextra -Wundef -Wcast-align -Wchar-subscripts -Wnon-virtual-dtor -Wunused-local-typedefs -Wpointer-arith -Wwrite-strings -Wformat-security -Wlogical-op -Wenum-conversion -Werror   -Wc++11-extensions -o CMakeFiles/cmTC_46a0d.dir/src.cxx.o -c "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp/src.cxx"
+g++: error: unrecognized command-line option '-Wc++11-extensions'; did you mean '-fms-extensions'?
+gmake[1]: *** [CMakeFiles/cmTC_46a0d.dir/build.make:78: CMakeFiles/cmTC_46a0d.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_46a0d/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_SUPPORT_wd981 failed with the following output:
+Change Dir: /home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_08285/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_08285.dir/build.make CMakeFiles/cmTC_08285.dir/build
+gmake[1]: Entering directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_08285.dir/src.cxx.o
+/usr/bin/g++ -DCOMPILER_SUPPORT_wd981  -std=c++03 -pedantic -Wall -Wextra -Wundef -Wcast-align -Wchar-subscripts -Wnon-virtual-dtor -Wunused-local-typedefs -Wpointer-arith -Wwrite-strings -Wformat-security -Wlogical-op -Wenum-conversion -Wdouble-promotion -Wno-psabi -Wno-variadic-macros -Wno-long-long -fno-check-new -fno-common -fstrict-aliasing -Werror   -wd981 -o CMakeFiles/cmTC_08285.dir/src.cxx.o -c "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp/src.cxx"
+g++: error: unrecognized command-line option '-wd981'
+gmake[1]: *** [CMakeFiles/cmTC_08285.dir/build.make:78: CMakeFiles/cmTC_08285.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_08285/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_SUPPORT_wd2304 failed with the following output:
+Change Dir: /home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d3041/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d3041.dir/build.make CMakeFiles/cmTC_d3041.dir/build
+gmake[1]: Entering directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_d3041.dir/src.cxx.o
+/usr/bin/g++ -DCOMPILER_SUPPORT_wd2304  -std=c++03 -pedantic -Wall -Wextra -Wundef -Wcast-align -Wchar-subscripts -Wnon-virtual-dtor -Wunused-local-typedefs -Wpointer-arith -Wwrite-strings -Wformat-security -Wlogical-op -Wenum-conversion -Wdouble-promotion -Wno-psabi -Wno-variadic-macros -Wno-long-long -fno-check-new -fno-common -fstrict-aliasing -Werror   -wd2304 -o CMakeFiles/cmTC_d3041.dir/src.cxx.o -c "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp/src.cxx"
+g++: error: unrecognized command-line option '-wd2304'
+gmake[1]: *** [CMakeFiles/cmTC_d3041.dir/build.make:78: CMakeFiles/cmTC_d3041.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_d3041/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_SUPPORT_STRICTANSI failed with the following output:
+Change Dir: /home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_7f944/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7f944.dir/build.make CMakeFiles/cmTC_7f944.dir/build
+gmake[1]: Entering directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_7f944.dir/src.cxx.o
+/usr/bin/g++ -DCOMPILER_SUPPORT_STRICTANSI  -std=c++03 -pedantic -Wall -Wextra -Wundef -Wcast-align -Wchar-subscripts -Wnon-virtual-dtor -Wunused-local-typedefs -Wpointer-arith -Wwrite-strings -Wformat-security -Wlogical-op -Wenum-conversion -Wdouble-promotion -Wno-psabi -Wno-variadic-macros -Wno-long-long -fno-check-new -fno-common -fstrict-aliasing -Werror   -strict-ansi -o CMakeFiles/cmTC_7f944.dir/src.cxx.o -c "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp/src.cxx"
+g++: error: unrecognized command-line option '-strict-ansi'; did you mean '-fstrict-enums'?
+gmake[1]: *** [CMakeFiles/cmTC_7f944.dir/build.make:78: CMakeFiles/cmTC_7f944.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_7f944/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test COMPILER_SUPPORT_Qunusedarguments failed with the following output:
+Change Dir: /home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_5cee9/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_5cee9.dir/build.make CMakeFiles/cmTC_5cee9.dir/build
+gmake[1]: Entering directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_5cee9.dir/src.cxx.o
+/usr/bin/g++ -DCOMPILER_SUPPORT_Qunusedarguments  -std=c++03 -pedantic -Wall -Wextra -Wundef -Wcast-align -Wchar-subscripts -Wnon-virtual-dtor -Wunused-local-typedefs -Wpointer-arith -Wwrite-strings -Wformat-security -Wlogical-op -Wenum-conversion -Wdouble-promotion -Wno-psabi -Wno-variadic-macros -Wno-long-long -fno-check-new -fno-common -fstrict-aliasing -Werror   -Qunused-arguments -o CMakeFiles/cmTC_5cee9.dir/src.cxx.o -c "/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp/src.cxx"
+g++: error: unrecognized command-line option '-Qunused-arguments'
+gmake[1]: *** [CMakeFiles/cmTC_5cee9.dir/build.make:78: CMakeFiles/cmTC_5cee9.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/sukruthichidananda/ROAHM LAB/eigen-3.3.7/build/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_5cee9/fast] Error 2
+
+
+Source file was:
+int main() { return 0; }
