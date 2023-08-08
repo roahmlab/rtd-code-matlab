@@ -22,7 +22,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
 %
     properties
         trajOptProps rtd.planner.trajopt.TrajOptProps %
-        robot %
         reachableSets %
         objective %
         optimizationEngine %
@@ -31,7 +30,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
     methods
         function self = RtdTrajOpt(     ...
                     trajOptProps,       ...
-                    robot,              ...
                     reachableSets,      ...
                     objective,          ...
                     optimizationEngine, ...
@@ -59,7 +57,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             %
             arguments
                 trajOptProps (1,1) rtd.planner.trajopt.TrajOptProps
-                robot (1,1) rtd.sim.world.WorldEntity
                 reachableSets (1,1) struct
                 objective (1,1) rtd.planner.trajopt.Objective
                 optimizationEngine (1,1) rtd.planner.trajopt.OptimizationEngine
@@ -67,7 +64,6 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                 options.verboseLevel (1,1) rtd.util.types.LogLevel = 'DEBUG'
             end
             self.trajOptProps = trajOptProps;
-            self.robot = robot; % this might go
             self.reachableSets = reachableSets;
             self.objective = objective;
             self.optimizationEngine = optimizationEngine;
@@ -144,10 +140,23 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             mask = [rsInstances_arr.num_instances] > 0;
             rsInstances_arr = rsInstances_arr(mask);
 
+            % If initialGuess is none, or invalid, make a zero
+            try
+                guess = initialGuess.trajectoryParams;
+            catch
+                guess = [];
+            end
+
+            % If there are no problems, at least let us know
+            if isempty(rsInstances_arr)
+                self.vdisp('No problems to optimize! Continuing...','INFO');
+            end
+
+            % Copy and expand the instances for the output
+            problem_infos = rsInstances_arr;
+            [problem_infos.success] = deal(false);
+            [problem_infos.cost] = deal(Inf);
             % Generate nonlinear constraints
-            successes = false(1, length(rsInstances_arr));
-            parameters = cell(1, length(rsInstances_arr));
-            costs = zeros(1, length(rsInstances_arr)) + Inf;
             for rsInstances_idx=1:length(rsInstances_arr)
                 rsInstances = rsInstances_arr(rsInstances_idx).rs;
                 id = rsInstances_arr(rsInstances_idx).id;
@@ -183,7 +192,7 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                 for i=1:length(num_slack)
                     new_bounds = rsInstances_cell{i}.input_range;
                     if mask_ones(i)
-                        new_bounds = repmat(new_bonds, num_parameters, 1);
+                        new_bounds = repmat(new_bounds, num_parameters, 1);
                     elseif num_slack(i) > 0
                         % Isolate and add the slack
                         slack_bounds(slack_idxs(i)+1:slack_idxs(i+1),:) = new_bounds(num_parameters+1:end,:);
@@ -209,64 +218,53 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                 objectiveCallback = self.objective.genObjective(robotState, ...
                     waypoint, rsInstances);
                 
-                % If initialGuess is none, or invalid, make a zero
-                try
-                    guess = initialGuess.trajectoryParams;
-                catch
-                    guess = [];
-                end
-                
-                
                 % Optimize
                 self.vdisp("Optimizing!",'INFO')
                 [success, parameter, cost] = self.optimizationEngine.performOptimization(guess, ...
                     objectiveCallback, constraintCallback, bounds);
                 
-                % if success
+                % save outputs
                 if success
-                    successes(rsInstances_idx) = true;
-                    parameters{rsInstances_idx} = parameter;
-                    costs(rsInstances_idx) = cost;
+                    problem_infos(rsInstances_idx).success = true;
+                    problem_infos(rsInstances_idx).parameters = parameter;
+                    problem_infos(rsInstances_idx).cost = cost;
                 end
+                problem_infos(rsInstances_idx).nlconCallbacks = nlconCallbacks;
+                problem_infos(rsInstances_idx).objectiveCallback = objectiveCallback;
+                problem_infos(rsInstances_idx).bounds = bounds;
+                problem_infos(rsInstances_idx).num_parameters = num_parameters;
             end
             
             % Select the best cost
-            masked_costs = costs(successes);
-            masked_parameters = parameters(successes);
-            [min_cost, min_idx] = min(masked_costs);
-
-            % if success
-            if ~isempty(min_cost)
-
-                idxs = 1:length(successes);
-                idxs = idxs(successes);
-                rsInstances_idx = idxs(min_idx);
-                id = rsInstances_arr(rsInstances_idx).id;
+            num_success = sum([problem_infos.success]);
+            if num_success > 0
+                [min_cost, min_idx] = min([problem_infos.cost]);
+                id = rsInstances_arr(min_idx).id;
                 self.vdisp(['Optimal solution found in problem ', num2str(id)],'INFO');
-                rsInstances = rsInstances_arr(rsInstances_idx).rs;
-                parameter = masked_parameters{min_idx};
+                rsInstances = rsInstances_arr(min_idx).rs;
+                parameter = problem_infos(min_idx).parameters;
                 trajectory = self.trajectoryFactory.createTrajectory(robotState, rsInstances, parameter);
+                cost = min_cost;
             else
-                rsInstances_idx = -1;
+                id = [];
+                min_idx = -1;
                 trajectory = [];
+                parameter = [];
+                cost = Inf;
             end
             
             % Create an info struct for return
-            % TODO: Update for multi problem based system
             info.worldState = worldState;
             info.robotState = robotState;
-            info.rsInstances = rsInstances_arr;
-            info.nlconCallbacks = nlconCallbacks;
-            info.objectiveCallback = objectiveCallback;
             info.waypoint = waypoint;
-            info.bounds = bounds;
-            info.num_parameters = num_parameters;
             info.guess = guess;
-            info.trajectory = trajectory;
-            info.cost = cost;
-            info.parameters = parameters;
-            info.successes = successes;
-            info.solution_idx = rsInstances_idx;
+            info.problems = problem_infos;
+            info.num_success = num_success;
+            info.best_cost = cost;
+            info.best_trajectory = trajectory;
+            info.best_solution_idx = min_idx;
+            info.best_solution_id = id;
+            info.best_parameter = parameter;
         end
     end
 end
