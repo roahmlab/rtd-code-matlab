@@ -1,93 +1,213 @@
  %% get agent info
  classdef RefineAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mixins.Options & handle
      properties
+        dimension = 3;
+        desired_initial_condition = [0; 0; 0; 1; 0; 0; 1; 0; 0; 0];
+        %vehicle parameter in simulation
+        m %mass in kg
+        lf %
+        lr
+        mu_bar %coefficient of friction
+        Caf1 %torque
+        Caf2 %torque
+        Car1
+        Car2 
+        Izz %moment of inertia along z axis
+        rw %radius of wheels
+        
+        grav_const
+        l
+        %% Complicated LLC to cancel out dynamics; Front Wheel drive
+        %Refine coltroller parameter in simulation
+        Ku %control gain
+        Kh %control gain
+        Kr %control gain
+        kappaPU 
+        kappaIU
+        phiPU
+        phiIU
+        kappaP 
+        kappaI
+        phiP
+        phiI
+
+        Mu
+        Mr
+        name
+        
+        Cus
+        u_cri %critical velocity
+        
+        max_Fy_uncertainty
+        max_Fx_uncertainty
+        max_Fx_uncertainty_braking
+
+        default_footprint
+        n_states
+        n_inputs
+        stopping_time
+        sensor_radius
+        plot_data struct
+        make_footprint_plot_data
+        make_arrow_plot_data
 
      end
+
+      methods (Static)
+        function options = defaultoptions()
+            % Configurable options for this component
+            options.M_min_eigenvalue = 0.002; % arbitrary value
+            options.gravity = [0 0 -9.81];
+            options.joint_velocity_limits = [];
+            options.joint_torque_limits = [];
+            options.transmission_inertia = [];
+            options.buffer_dist = 0;
+        end
+    end
      
      methods
-         function A = RefineAgentInfo()
-             
+         function A = RefineAgentInfo(varargin)
+
+            A.name = 'highway_cruiser' ;
+            
+            A.default_footprint = [4.8 2.2]; 
+            A.n_states = 10 ;
+            A.n_inputs = 6 ; % ud vd rd dud dvd drd
+            A.stopping_time = 50 ; %not used
+            A.sensor_radius = 400 ;
+
+            % set up plot data
+            A.plot_data = struct();
+            A.plot_data.trajectory = [] ;
+            A.plot_data.footprint = [] ;
+            A.plot_data.arrow = [] ;
+            
+            % set up footprint and arrow for plot
+            A.make_footprint_plot_data() ;
+            A.make_arrow_plot_data() ;
+            
+            % reset time, states, and inputs, just in case
+%             A.reset() ;
+            
+            
+%             % create agent
+%             A@RTD_agent_2D('name',name,...
+%             'footprint',default_footprint,...
+%             'n_states',n_states,'n_inputs',n_inputs,...
+%             'stopping_time',stopping_time,'sensor_radius',sensor_radius,varargin{:});
+
+            load('my_const.mat')
+
+            A.m  = m;
+            A.lf = lf;
+            A.lr = lr;
+            A.l = lf+lr;
+            A.grav_const = grav_const;
+            A.Caf1 = Caf1;
+            A.Caf2 = Caf2;
+            A.Car1 = Car1;
+            A.Car2 = Car2;
+            A.mu_bar = mu_bar;
+            A.Izz  = Izz;
+            A.rw = rw;
+            A.Mu = Mu;
+            A.Mr = Mr;
+
+            %% proposed controller to cancel out dynamics; Front Wheel drive
+            A.Ku = Ku;
+            A.Kh = Kh;
+            A.Kr = Kr;
+            A.kappaPU = kappaPU; % kappa_1,u 
+            A.kappaIU = kappaIU; % kappa_2,u
+            A.phiPU = phiPU;   % phi_1,u
+            A.phiIU = phiIU;   % phi_2,u
+            A.kappaP = kappaP;  % kappa_1,r 
+            A.kappaI = kappaI;    % kappa_2,r
+            A.phiP = phiP;      % phi_1,r
+            A.phiI = phiI;      % phi_2,r
+
+            A.max_Fy_uncertainty = max_Fy_uncertainty;
+            A.max_Fx_uncertainty = max_Fx_uncertainty;
+            A.max_Fx_uncertainty_braking = max_Fx_uncertainty_braking;
+            A.Cus = m * grav_const * (lr / (A.l * Caf1) - lf / (A.l * Car1));
+            A.u_cri = u_really_slow;
+
+
          end
+
+         
         function agent_info = get_agent_info(A)
             % call superclass method
-            agent_info = get_agent_info@RTD_agent_2D(A) ;
+%             agent_info = get_agent_info@RTD_agent_2D(A) ;
+
+            agent_info.dimension = A.dimension ;
+            agent_info.state = A.state ;
+            agent_info.position = A.state(A.position_indices,:) ;
+            agent_info.position_indices = A.position_indices ;
+            agent_info.time = A.time ;
+            agent_info.sensor_radius = A.sensor_radius ;
+            agent_info.n_inputs = A.n_inputs ;
+            agent_info.n_states = A.n_states ;
+
+             % additional fields
+            agent_info.heading_index = A.heading_index ;
+            agent_info.desired_time = A.desired_time ;
+            agent_info.desired_input = A.desired_input ;
+            agent_info.desired_trajectory = A.desired_trajectory ;
+            agent_info.heading_index = A.heading_index ;
+            agent_info.footprint = A.footprint ;
+            agent_info.footprint_vertices = A.footprint_vertices ;
         end
-        function plot(A)
-            plot@RTD_agent_2D(A);
-            A.plot_wheel_at_time(A.time(end))
-        end
-        function plot_at_time(A,t)
-            plot_at_time@RTD_agent_2D(A,t);
-            A.plot_wheel_at_time(t);
-        end
-        function plot_wheel_at_time(A,t)
-            wheel_size = [0.7 0.4];
-            wheel = make_box(wheel_size);
-            wheel_position = [-2   -2  1.5 1.5
-                              -0.75 0.75 -0.75 0.75];
-            wheel_vertices = [];
-            for i = 1:4
-                wheel_vertices = [wheel_vertices wheel+repmat(wheel_position(:,i),[1,5]) [NaN;NaN]];
-            end
-            % compute footprint for plot
-            z_t = match_trajectories(t,A.time,A.state) ;
-            p_t = z_t(A.position_indices) ;
-            h_t = z_t(A.heading_index) ;
-            delta_t = z_t(6);
-            R_r = rotation_matrix_2D(h_t); 
-            V_ft = R_r*A.footprint_vertices_for_plotting + repmat(p_t,1,size(A.footprint_vertices_for_plotting,2));
-            R_f = rotation_matrix_2D(h_t+delta_t);
-            V_all = R_r*wheel_vertices + repmat(p_t,1,size(wheel_vertices,2)) ;
-            
-            for i = 1:4
-                if i == 3 || i == 4
-                    wheel_vert = V_all(:,6*i-5:6*i-1);
-                    wheel_center = repmat( 0.5*(max(wheel_vert,[],2)+min(wheel_vert,[],2)),[1,5]);
-                    origion_vert = wheel_vert - wheel_center;
-                    V_all(:,6*i-5:6*i-1) = R_f * origion_vert + wheel_center;
-                end               
-            end
-            
-            if check_if_plot_is_available(A,'pretty_footprint')
-                A.plot_data.pretty_footprint.Vertices = V_ft' ;
-                uistack(A.plot_data.pretty_footprint, 'top')
-            else
-                % plot footprint
-                fp_data = patch(V_ft(1,:),V_ft(2,:),A.plot_footprint_color,...
-                    'EdgeColor',A.plot_footprint_edge_color,...
-                    'FaceAlpha',A.plot_footprint_opacity,...
-                    'EdgeAlpha',A.plot_footprint_edge_opacity) ;
-                
-                
-                % save plot data
-                A.plot_data.pretty_footprint = fp_data ;
-            end
-            if check_if_plot_is_available(A,'wheel_plot_data')
-                for i = 1:4
-                    A.plot_data.wheel_plot_data{i}.XData =  V_all(1,6*i-5:6*i-1) ;
-                    A.plot_data.wheel_plot_data{i}.YData =  V_all(2,6*i-5:6*i-1);
-                    uistack(A.plot_data.wheel_plot_data{i}, 'top')
-                end
-                
-            else
-                for i =1:4
-                    h = fill( V_all(1,6*i-5:6*i-1), V_all(2,6*i-5:6*i-1),A.wheel_color) ;
-                    A.plot_data.wheel_plot_data{i} = h ;
-                    h.FaceAlpha = A.plot_footprint_opacity;
-                    h.EdgeAlpha = A.plot_footprint_edge_opacity;
-                end
-            end
-        end
+        
+%         function reset(A,state)
+%             if nargin < 2
+%                 
+%                 A.desired_time = zeros(1,0);
+%                 A.desired_input = zeros(2,0);
+%                 A.desired_trajectory =zeros(2,0);
+%                 reset@RTD_agent_2D(A,[A.desired_initial_condition]) ;
+%             else
+%                 reset@RTD_agent_2D(A,state) ;
+%             end
+%         end
+
+        %% reset
         function reset(A,state)
             if nargin < 2
-                
                 A.desired_time = zeros(1,0);
                 A.desired_input = zeros(2,0);
                 A.desired_trajectory =zeros(2,0);
-                reset@RTD_agent_2D(A,[A.desired_initial_condition]) ;
-            else
-                reset@RTD_agent_2D(A,state) ;
+                state = [A.desired_initial_condition];
             end
+            
+            % do the reset
+            A.state = zeros(A.n_states,1) ;
+            A.time = 0 ;
+            A.input = zeros(A.n_inputs,1) ;
+            A.input_time = 0 ;
+            
+            % reset the state
+            switch length(state)
+                case A.n_states
+                    A.state = state ;
+%                 case 2
+%                     A.state(A.position_indices) = state ;
+%                 case 3
+%                     A.state([A.position_indices,A.heading_index]) = state ;
+                otherwise
+                    error(['The provided state has an incorrect number of elements!',...
+                        ' Please provide ',...
+                        ' an n_states-by-1 full state vector.'])
+            end
+            
+            A.desired_trajectory = [];
+            A.desired_input = [];
+            A.desired_time = [];
         end
+
+        
+
+        
+        
      end
  end
