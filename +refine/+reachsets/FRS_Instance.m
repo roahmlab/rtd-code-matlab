@@ -29,11 +29,9 @@ classdef FRS_Instance < rtd.planner.reachsets.ReachSetInstance
         function nlconFunction = genNLConstraint(self, worldState)%genNl constraint called trajopt
             vehrs = self.Vehrs;
             self.worldState = worldState;
-            num_zonotopes = numel(vehrs);
+
             nlconFunction = [];
-            if (iscell(vehrs))
-                for each_zono = 1:num_zonotopes
-                    zono = vehrs{each_zono};
+                    zono = vehrs;
                     world_info=self.worldinfo;
                     obs_info = get_obs_mex(self,world_info.dyn_obstacles,world_info.bounds);
                     obs_c = obs_info(1:2, 1);
@@ -66,12 +64,8 @@ classdef FRS_Instance < rtd.planner.reachsets.ReachSetInstance
 
                    nlconFunction = @(k) self.eval_constraints(k,PA_mat,Pb_mat);%k is my lambda that is passed.
 
-                   nlconFunctions{each_zono} = nlconFunction;
-                    
-                end
+                   nlconFunctions = nlconFunction;
                 self.constraints = nlconFunctions;
-                
-            end
             
         end
 
@@ -145,4 +139,3 @@ classdef FRS_Instance < rtd.planner.reachsets.ReachSetInstance
     end
 end
     
-

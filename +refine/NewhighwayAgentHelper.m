@@ -158,6 +158,8 @@ classdef NewhighwayAgentHelper < agentHelper
 %             end
 %             tout = 0; % place holder
         end
+
+        %adaptions
         
         function plot_selected_parameter_FRS(AH,K,type_manu,FRS,mirror_flag,agent_state,multiplier)
             if ~isempty(K)
@@ -192,16 +194,15 @@ classdef NewhighwayAgentHelper < agentHelper
 
             type_manu = K(4);
             if(type_manu == 1) %speed change manu_type
-                disp('speed_change')
                 Au = K(1); %pu
+                K(2) = 0;
                 Ay = K(2); %0
             elseif(type_manu == 3)%lane change manu_type
-                disp('lane_change')
                 Au = K(1);%Au from the reachset-->u0
                 Ay = K(2);%-->Ay
             end
             
-            t0_idx = K(3);
+            t0_idx = 1;
             t0 = (t0_idx-1)*AH.t_move;
             
             if type_manu == 3 % 1: speed change. 2: direction change. 3: lane change
@@ -211,7 +212,7 @@ classdef NewhighwayAgentHelper < agentHelper
             end
             
             if reference_flag
-                AH.ref_Z=[AH.ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting
+                AH.ref_Z=[AH.ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting %CHANGES AH.ref_Z
                 AH.t_real_start = [AH.t_real_start;ref_time];
             else
                 AH.proposed_ref_Z=[AH.proposed_ref_Z;x_cur+Z(1,:);y_cur+Z(2,:)];% for plotting
@@ -342,8 +343,8 @@ function obj_mex = get_obs_mex(dyn_obs, bounds)
                             dyn_length;
                             dyn_width];
     end
-    xlo = bounds(1) ; xhi = bounds(2) ;
-    ylo = bounds(3) ; yhi = bounds(4) ;
+    xlo = bounds(1) ; xhi = bounds(2);
+    ylo = bounds(3) ; yhi = bounds(4);
     dx = xhi - xlo;
     dy = yhi - ylo;
     x_c = mean([xlo, xhi]);
@@ -360,4 +361,3 @@ function obj_mex = get_obs_mex(dyn_obs, bounds)
     % Left
     obj_mex(:,end+1) = [xlo-b_half_thick; y_c; 0; 0; b_thick; dy];
 end
-

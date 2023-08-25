@@ -43,20 +43,40 @@ classdef FRS_loader  < rtd.planner.reachsets.ReachSetGenerator
                     rs_zonos = reachsets.getGroup(rs1-1).getGroup(rs2-1).getZonos;
                     all_rs{idx} = rs_zonos;
                     idx = idx+1;
+                    
+
                 end
             end
 
-
+            new_rs = all_rs;
             for zono = 1:length(all_rs)
                 for z = 1:length(all_rs{zono})
                     z_matrix = all_rs{zono}{z}.Z;
                     robotState(zono) = refine.entity.states.Robot_State(all_rs{zono}{z}.Z); 
+                    if strcmp(manu_type,'lane_change')
+                        mirror =-1;
+                        z_matrix_ = z_matrix;
+                        z_matrix_(2,:) = z_matrix(2,:) * mirror;
+                        z_matrix_(3,:) = z_matrix(3,:) * mirror;
+                        z_matrix_(5,:) = z_matrix(5,:) * mirror;
+                        z_matrix_(6,:) = z_matrix(6,:) * mirror;
+                        z_matrix_(8,:) = z_matrix(8,:) * mirror;
+                        z_matrix_(9,:) = z_matrix(9,:) * mirror;
+                        z_matrix_(12,:) = z_matrix(12,:) * mirror;
+
+                        new_entry.Z = z_matrix_;
+                        new_rs{zono}{end+1} = new_entry;
+                    else
+                        new_rs = all_rs;
+                    end
+
+                    
                 end
             end
             
             %store all the rs of the desired_idx only
-            self.reachableSets = all_rs;%vehrs =reachableSets
-            self.vehrs = all_rs;%either remove reachableSets or vehrs from all files
+            self.reachableSets = new_rs;%vehrs =reachableSets
+            self.vehrs = new_rs;%either remove reachableSets or vehrs from all files
             self.z_matrix = z_matrix;
             self.robotState = robotState;
 
@@ -76,7 +96,7 @@ classdef FRS_loader  < rtd.planner.reachsets.ReachSetGenerator
 
         function reachableSet = generateReachableSet(self, robotState,varargin)%create an instance inside this to get constraints
 
-%             rs = struct('id', [], 'rs', []);
+            self.desired_idx = 0;
             rs = struct('id', double.empty(), 'rs', struct, 'num_instances', 0); % format expected by RtdTrajOpt
             lon_search = self.reachsets.getSearchSet.getZonos;
 
@@ -88,24 +108,23 @@ classdef FRS_loader  < rtd.planner.reachsets.ReachSetGenerator
 
             Mega_group = self.reachsets.getGroup(idx1-1); % Because matlab is 1-indexed, we need to subtract 1
             lat_head_search = Mega_group.getSearchSet.getZonos;
-        
             num_instances = 0;
             for idx2 = 1:length(lat_head_search)
-                
+
                 lat_head_center = lat_head_search{idx2}.Z(7:8,1);
                 lat_head_gen_idx1 = find(lat_head_search{idx2}.Z(7, 2:end) ~= 0, 1, 'first');
                 lat_head_gen_idx2 = find(lat_head_search{idx2}.Z(8, 2:end) ~= 0, 1, 'first');
-                lat_head_high_7 = lat_head_center(1) + lat_head_search{idx2}.Z(7,lat_head_gen_idx1+1);
-                lat_head_low_7 = lat_head_center(1) - lat_head_search{idx2}.Z(7,lat_head_gen_idx1+1);
-                lat_head_high_8 = lat_head_center(2) + lat_head_search{idx2}.Z(8,lat_head_gen_idx2+1);
-                lat_head_low_8 = lat_head_center(2) - lat_head_search{idx2}.Z(8,lat_head_gen_idx2+1);
+                lat_head_high_7 = lat_head_center(1) + abs(lat_head_search{idx2}.Z(7,lat_head_gen_idx1+1));
+                lat_head_low_7 = lat_head_center(1) - abs(lat_head_search{idx2}.Z(7,lat_head_gen_idx1+1));
+                lat_head_high_8 = lat_head_center(2) + abs(lat_head_search{idx2}.Z(8,lat_head_gen_idx2+1));
+                lat_head_low_8 = lat_head_center(2) - abs(lat_head_search{idx2}.Z(8,lat_head_gen_idx2+1));
                 desired_idx_ = 0;
 
                 %if the speed change and lane change initial conditions are
                 %the same, write it in one loop
 
-                if strcmp(self.manu_type,'speed_change')
-                    if  lat_head_low_7 <= robotState(4) && robotState(4) <= lat_head_high_7 && lat_head_low_8 <= robotState(5) && robotState(5) <= lat_head_high_8
+                 if and((lat_head_low_7 <= robotState(4)),(robotState(4) <= lat_head_high_7 )) && strcmp(self.manu_type, 'speed_change')
+
                         num_instances = num_instances +1;
                        
                         for z = 1:length(Mega_group.getGroup(idx2-1).getZonos)
@@ -120,15 +139,15 @@ classdef FRS_loader  < rtd.planner.reachsets.ReachSetGenerator
                             t_lb = abs(t_last - t_start);%time is never negative so abs is not required
                             if((self.t_plan<=t_ub) && (self.t_plan >=t_lb))
                                 desired_idx_ = z;
+                                self.desired_idx(idx2) = desired_idx_;
                             end
                           
                             
                         end
 
                         
-                    end
-                else
-                    if lon_search{idx1}.in(robotState(4)) && lat_head_low_8 <= robotState(5) && robotState(5) <= lat_head_high_8
+                   
+                elseif and((lat_head_low_7 <= robotState(4)),(robotState(4) <= lat_head_high_7 ))&& and((lat_head_low_8 <= robotState(5)),(robotState(5) <= lat_head_high_8)) && strcmp(self.manu_type,'lane_change')
                         num_instances = num_instances +1;
                      
                         
@@ -144,29 +163,36 @@ classdef FRS_loader  < rtd.planner.reachsets.ReachSetGenerator
                             t_lb = abs(t_last - t_start);%time is never negative so abs is not required
                             if((self.t_plan<=t_ub) && (self.t_plan >=t_lb))
                                 desired_idx_ = z;
+                                self.desired_idx(idx2) = desired_idx_;
                             end
                             
                         end
+
+
+                 else
+                     disp('No condition met')
                         
                         
-                    end
+                 end
                     
-                end
-                if desired_idx_ ~=0
-                    self.desired_idx(idx2) = desired_idx_;%desired_idx will be for either speed_change or lane_change
-                    rs_ = refine.reachsets.FRS_Instance(Mega_group.getGroup(idx2-1).getZonos{desired_idx_},self.worldinfo,self.manu_type);
-                    rs(idx2).rs = rs_;
-                    rs(idx2).id = idx2;
-                    self.worldState = rs_.worldState;
-                end
 
                 rs(idx2).num_instances = num_instances;
             
             end
             
 
+            if (self.desired_idx~=0)
+                for idx = 1:length(self.desired_idx)
+                        rs_ = refine.reachsets.FRS_Instance(Mega_group.getGroup(idx-1).getZonos{desired_idx_},self.worldinfo,self.manu_type);
+                        rs(idx).rs = rs_;
+                        rs(idx).id = idx;
+                        self.worldState = rs_.worldState;
+                end
+
+            end
             if (num_instances==0)
                 disp('rs is empty for this iteration')
+                reachableSet = [];
             else
                 reachableSet = rs;
             end
@@ -177,12 +203,12 @@ classdef FRS_loader  < rtd.planner.reachsets.ReachSetGenerator
 
         end
 
+   
     end
 end
     
 
     
-
 
 
 

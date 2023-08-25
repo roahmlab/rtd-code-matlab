@@ -115,7 +115,7 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             
             % Generate reachable sets
             self.vdisp("Generating reachable sets and nonlinear constraints", 'INFO')
-            rsInstances = struct;
+            rsInstances_arr = struct('id', double.empty(), 'rs', struct, 'num_instances', 0);
             for rs_name=fieldnames(self.reachableSets).'
                 self.vdisp(['Generating ', rs_name{1}], 'DEBUG')
                 rs_args = {};
@@ -123,104 +123,148 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                     self.vdisp(['Passing additional arguments to generate ', rs_name{1}], 'GENERAL')
                     rs_args = namedargs2cell(rsAdditionalArgs.(rs_name{1}));
                 end
-                rs = self.reachableSets.(rs_name{1}).getReachableSet(robotState, rs_args{:}, ignore_cache=false);
-%                 disp(fieldnames(rsInstances))
-                rsInstances.(rs_name{1}) = rs;
-            end
-
-            % Generate nonlinear constraints
-            self.vdisp("Generating nonlinear constraints", 'DEBUG')
-            rsInstances_cell = struct2cell(rsInstances).';
-%             rs=rs.rs;
-%             disp(rs.rs)
-%             disp(rsInstances)
-            nlconCallbacks = cellfun(@(rs)rs.genNLConstraint(worldState), ...
-                                    rsInstances_cell, ...
-                                    UniformOutput = false);
-
-            % Validate rs sizes
-            self.vdisp("Validating sizes", 'DEBUG')
-            num_parameters = cellfun(@(rs)rs.num_parameters, rsInstances_cell);
-            if ~all(num_parameters == num_parameters(1))
-                error("Reachable set parameter sizes don't match!")
-            end
-            num_parameters = num_parameters(1);
-
-            % Compute slack sizes
-            num_slack = cellfun(@(rs)size(rs.input_range,1), rsInstances_cell);
-            mask_ones = num_slack == 1;
-            num_slack(mask_ones) = num_parameters;
-            num_slack = num_slack - num_parameters;
-            if any(num_slack < 0)
-                error("Reachable sets have invalid `num_parameters` or invalid size on `input_range`.")
-            end
-            slack_idxs = [0, cumsum(num_slack)];
-
-            % Compute bounds
-            self.vdisp("Computing bounds", 'DEBUG')
-            param_bounds = [ones(num_parameters,1)*-Inf, ones(num_parameters,1)*Inf];
-            slack_bounds = zeros(slack_idxs(end), 2);
-            for i=1:length(num_slack)
-                new_bounds = rsInstances_cell{i}.input_range;
-                if mask_ones(i)
-                    new_bounds = repmat(new_bounds, num_parameters, 1);
-                elseif num_slack(i) > 0
-                    % Isolate and add the slack
-                    slack_bounds(slack_idxs(i)+1:slack_idxs(i+1),:) = new_bounds(num_parameters+1:end,:);
-                    new_bounds = new_bounds(1:num_parameters,:);
+                rs_struct = self.reachableSets.(rs_name{1}).getReachableSet(robotState, rs_args{:}, ignore_cache=false);
+                % expand struct into id's
+                for idx=1:length(rs_struct)
+                    id = rs_struct(idx).id;
+                    rsInstances_arr(id).id = id;
+                    rsInstances_arr(id).rs.(rs_name{1}) = rs_struct(idx).rs;
+                    if isempty(rsInstances_arr(id).num_instances)
+                        rsInstances_arr(id).num_instances = 0;
+                    end
+                    rsInstances_arr(id).num_instances = rsInstances_arr(id).num_instances + 1;
                 end
-
-                % Ensure bounds are the intersect of the intervals for the
-                % parameters
-                param_bounds(:, 1) = max(param_bounds(:, 1), new_bounds(:, 1));
-                param_bounds(:, 2) = min(param_bounds(:, 2), new_bounds(:, 2));
             end
-            
-            % Combine nlconCallbacks
-            % TODO update to allow combination with any other constraints
-            % needed if wanted
-            constraintCallback = @(k) merge_constraints(k, num_parameters, num_slack, nlconCallbacks, fieldnames(self.reachableSets).');
-            
-            % create bounds (robotInfo and worldInfo come into play here?)
-            bounds.param_limits = [param_bounds; slack_bounds];
-            bounds.ouput_limits = [];
-            
-            % Create the objective
-            objectiveCallback = self.objective.genObjective(robotState, ...
-                waypoint, rsInstances);
-            
+
+            % Discard empties
+            mask = [rsInstances_arr.num_instances] > 0;
+            rsInstances_arr = rsInstances_arr(mask);
+
             % If initialGuess is none, or invalid, make a zero
             try
                 guess = initialGuess.trajectoryParams;
             catch
                 guess = [];
             end
+
+            % If there are no problems, at least let us know
+            if isempty(rsInstances_arr)
+                self.vdisp('No problems to optimize! Continuing...','INFO');
+            end
+
+            % Copy and expand the instances for the output
+            problem_infos = rsInstances_arr;
+            [problem_infos.success] = deal(false);
+            [problem_infos.cost] = deal(Inf);
+            % Generate nonlinear constraints
+            for rsInstances_idx=1:length(rsInstances_arr)
+                rsInstances = rsInstances_arr(rsInstances_idx).rs;
+                id = rsInstances_arr(rsInstances_idx).id;
+                self.vdisp(['Solving problem ', num2str(id)], 'INFO')
+                self.vdisp("Generating nonlinear constraints", 'DEBUG')
+                rsInstances_cell = struct2cell(rsInstances).';
+                nlconCallbacks = cellfun(@(rs)rs.genNLConstraint(worldState), ...
+                                        rsInstances_cell, ...
+                                        UniformOutput = false);
+
+                % Validate rs sizes
+                self.vdisp("Validating sizes", 'DEBUG')
+                num_parameters = cellfun(@(rs)rs.num_parameters, rsInstances_cell);
+                if ~all(num_parameters == num_parameters(1))
+                    error("Reachable set parameter sizes don't match!")
+                end
+                num_parameters = num_parameters(1);
+    
+                % Compute slack sizes
+                num_slack = cellfun(@(rs)size(rs.input_range,1), rsInstances_cell);
+                mask_ones = num_slack == 1;
+                num_slack(mask_ones) = num_parameters;
+                num_slack = num_slack - num_parameters;
+                if any(num_slack < 0)
+                    error("Reachable sets have invalid `num_parameters` or invalid size on `input_range`.")
+                end
+                slack_idxs = [0, cumsum(num_slack)];
+    
+                % Compute bounds
+                self.vdisp("Computing bounds", 'DEBUG')
+                param_bounds = [ones(num_parameters,1)*-Inf, ones(num_parameters,1)*Inf];
+                slack_bounds = zeros(slack_idxs(end), 2);
+                for i=1:length(num_slack)
+                    new_bounds = rsInstances_cell{i}.input_range;
+                    if mask_ones(i)
+                        new_bounds = repmat(new_bounds, num_parameters, 1);
+                    elseif num_slack(i) > 0
+                        % Isolate and add the slack
+                        slack_bounds(slack_idxs(i)+1:slack_idxs(i+1),:) = new_bounds(num_parameters+1:end,:);
+                        new_bounds = new_bounds(1:num_parameters,:);
+                    end
+    
+                    % Ensure bounds are the intersect of the intervals for the
+                    % parameters
+                    param_bounds(:, 1) = max(param_bounds(:, 1), new_bounds(:, 1));
+                    param_bounds(:, 2) = min(param_bounds(:, 2), new_bounds(:, 2));
+                end
+                
+                % Combine nlconCallbacks
+                % TODO update to allow combination with any other constraints
+                % needed if wanted
+                constraintCallback = @(k) merge_constraints(k, num_parameters, num_slack, nlconCallbacks, fieldnames(self.reachableSets).');
+                
+                % create bounds (robotInfo and worldInfo come into play here?)
+                bounds.param_limits = [param_bounds; slack_bounds];
+                bounds.ouput_limits = [];
+                
+                % Create the objective
+                objectiveCallback = self.objective.genObjective(robotState, ...
+                    waypoint, rsInstances);
+                
+                % Optimize
+                self.vdisp("Optimizing!",'INFO')
+                [success, parameter, cost] = self.optimizationEngine.performOptimization(guess, ...
+                    objectiveCallback, constraintCallback, bounds);
+                
+                % save outputs
+                if success
+                    problem_infos(rsInstances_idx).success = true;
+                    problem_infos(rsInstances_idx).parameters = parameter;
+                    problem_infos(rsInstances_idx).cost = cost;
+                end
+                problem_infos(rsInstances_idx).nlconCallbacks = nlconCallbacks;
+                problem_infos(rsInstances_idx).objectiveCallback = objectiveCallback;
+                problem_infos(rsInstances_idx).bounds = bounds;
+                problem_infos(rsInstances_idx).num_parameters = num_parameters;
+            end
             
-            
-            % Optimize
-            self.vdisp("Optimizing!",'INFO')
-            [success, parameters, cost] = self.optimizationEngine.performOptimization(guess, ...
-                objectiveCallback, constraintCallback, bounds);
-            
-            % if success
-            if success
-                trajectory = self.trajectoryFactory.createTrajectory(robotState, rsInstances, parameters);
+            % Select the best cost
+            num_success = sum([problem_infos.success]);
+            if num_success > 0
+                [min_cost, min_idx] = min([problem_infos.cost]);
+                id = rsInstances_arr(min_idx).id;
+                self.vdisp(['Optimal solution found in problem ', num2str(id)],'INFO');
+                rsInstances = rsInstances_arr(min_idx).rs;
+                parameter = problem_infos(min_idx).parameters;
+                trajectory = self.trajectoryFactory.createTrajectory(robotState, rsInstances, parameter);
+                cost = min_cost;
             else
+                id = [];
+                min_idx = -1;
                 trajectory = [];
+                parameter = [];
+                cost = Inf;
             end
             
             % Create an info struct for return
             info.worldState = worldState;
             info.robotState = robotState;
-            info.rsInstances = rsInstances;
-            info.nlconCallbacks = nlconCallbacks;
-            info.objectiveCallback = objectiveCallback;
             info.waypoint = waypoint;
-            info.bounds = bounds;
-            info.num_parameters = num_parameters;
             info.guess = guess;
-            info.trajectory = trajectory;
-            info.cost = cost;
+            info.problems = problem_infos;
+            info.num_success = num_success;
+            info.best_cost = cost;
+            info.best_trajectory = trajectory;
+            info.best_solution_idx = min_idx;
+            info.best_solution_id = id;
+            info.best_parameter = parameter;
         end
     end
 end

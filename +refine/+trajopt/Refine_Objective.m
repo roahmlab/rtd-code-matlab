@@ -17,20 +17,22 @@ classdef Refine_Objective < rtd.planner.trajopt.Objective
     end
 
     methods
-        function self = Refine_Objective(trajOptProps, vehrs)%removed desired_idx
+        function self = Refine_Objective(trajOptProps, vehrs,manu_type)%removed desired_idx
             arguments
                 trajOptProps rtd.planner.trajopt.TrajOptProps
                 vehrs
+                manu_type
             end
             self.t_cost = trajOptProps.timeForCost;%not used here
             self.vehrs = vehrs;
+            self.manu_type = manu_type;%do you need manu_type? or can you extract it from rsInstance
         end
         
         function objectiveCallback = genObjective(self,robotState,waypoint, rsInstances)
 
                 %below there is self.desired_idx
                 zono = self.vehrs{1:length(self.vehrs)};%taking the zonos of the desired idx only
-                self.manu_type = rsInstances.frs_.manu_type;%check if this is in the right format
+%                 self.manu_type = rsInstances.frs_.manu_type%check if this is in the right format
                
 
                 for i =1:length(zono)
@@ -105,6 +107,8 @@ classdef Refine_Objective < rtd.planner.trajopt.Objective
 
             u0v0r0p_lambda_vals = ([u0v0r0] - zono_center_u0v0r0p(1:3)) ./ zono_u0v0r0p_slice_gens_slice(1:3); %4th element = params
 
+            disp(params)
+            disp(self.manu_type)
             if strcmp(self.manu_type,'speed_change')
                 u0v0r0p_lambda_vals(4) = params(1);
             elseif strcmp(self.manu_type,'lane_change')
@@ -129,5 +133,4 @@ classdef Refine_Objective < rtd.planner.trajopt.Objective
         end
     end  
 end
-
 
