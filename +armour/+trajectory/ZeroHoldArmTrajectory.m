@@ -1,4 +1,4 @@
-classdef ZeroHoldArmTrajectory < rtd.planner.trajectory.Trajectory
+classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
     % ZeroHoldArmTrajectory
     % Required properties
     properties (Constant)

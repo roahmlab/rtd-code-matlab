@@ -1,4 +1,4 @@
-classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
+classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
     % PiecewiseArmTrajectory
     % The original ArmTD trajectory with peicewise accelerations
     % Required properties
@@ -7,6 +7,9 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
     end
     % Additional properties
     properties
+        planTime
+        horizonTime
+
         % Precomputed values
         q_ddot         {mustBeNumeric}
         q_peak         {mustBeNumeric}
@@ -17,7 +20,8 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
         % include these following handles too.
         % The JRS which contains the center and range to scale the
         % parameters
-        jrsInstance
+        paramScale rtd.util.RangeScaler = rtd.util.RangeScaler.empty()
+        numParams
     end
 
     methods
@@ -25,15 +29,25 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
         % attempts to call internalUpdate, a helper function made for this
         % class to update all other internal parameters once fully
         % parameterized.
-        function self = PiecewiseArmTrajectory(trajOptProps, startState, jrsInstance)
+        function self = PiecewiseArmTrajectory(startState, planTime, horizonTime, numParams)
             arguments
-                trajOptProps(1,1) rtd.planner.trajopt.TrajOptProps
                 startState(1,1) rtd.entity.states.ArmRobotState
-                jrsInstance(1,1) armour.reachsets.JRSInstance
+                planTime(1,1) double
+                horizonTime(1,1) double
+                numParams(1,1) double
             end
-            self.trajOptProps = trajOptProps;
             self.startState = startState;
-            self.jrsInstance = jrsInstance;
+            self.planTime = planTime;
+            self.horizonTime = horizonTime;
+            self.numParams = numParams;
+        end
+
+        function setParamScale(self, paramScale)
+            arguments
+                self armour.trajectory.PiecewiseArmTrajectory
+                paramScale(1,1) rtd.util.RangeScaler
+            end
+            self.paramScale = paramScale;
         end
         
         % Set the parameters of the trajectory, with a focus on the
@@ -43,14 +57,18 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
                 self armour.trajectory.PiecewiseArmTrajectory
                 trajectoryParams(1,:) double
                 options.startState rtd.entity.states.ArmRobotState = self.startState
-                options.jrsInstance armour.reachsets.JRSInstance = self.jrsInstance
+                options.planTime(1,1) double = self.planTime
+                options.horizonTime(1,1) double = self.horizonTime
+                options.numParams(1,1) double = self.numParams
             end
             self.trajectoryParams = trajectoryParams;
-            if length(self.trajectoryParams) > self.jrsInstance.n_q
-                self.trajectoryParams = self.trajectoryParams(1:self.jrsInstance.n_q);
-            end
             self.startState = options.startState;
-            self.jrsInstance = options.jrsInstance;
+            self.planTime = options.planTime;
+            self.horizonTime = options.horizonTime;
+            self.numParams = options.numParams;
+            if length(self.trajectoryParams) > self.numParams
+                self.trajectoryParams = self.trajectoryParams(1:self.numParams);
+            end
             
             % Perform an internal update (compute peak and stopping values)
             self.internalUpdate();
@@ -65,11 +83,11 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
             % Make sure everything is nonempty
             valid = not( ...
                 isempty(self.trajectoryParams) || ...
-                isempty(self.jrsInstance) || ...
                 isempty(self.startState));
 
             % Make sure the trajectory params make sense
-            valid = valid && length(self.trajectoryParams) == self.jrsInstance.n_q;
+            valid = valid && length(self.trajectoryParams) == self.numParams;
+            valid = valid && self.numParams == length(self.startState.position);
             
             % Throw if wanted
             if ~valid && throwOnError
@@ -90,24 +108,30 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
             q_0 = self.startState.position;
             q_dot_0 = self.startState.velocity;
             
-            % Scale the parameters
-            out = self.jrsInstance.output_range;
-            in = self.jrsInstance.input_range;
-            self.q_ddot = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            % % Scale the parameters
+            % out = self.jrsInstance.output_range;
+            % in = self.jrsInstance.input_range;
+            % self.q_ddot = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
+            self.q_ddot = self.trajectoryParams;
+            if isempty(self.paramScale)
+                self.q_ddot = self.trajectoryParams;
+            else
+                self.q_ddot = self.paramScale.scaleout(self.trajectoryParams);
+            end
             
             % Compute the peak parameters
             self.q_peak = q_0 + ...
-                q_dot_0 * self.trajOptProps.planTime + ...
-                (1/2) * self.q_ddot * self.trajOptProps.planTime^2;
+                q_dot_0 * self.planTime + ...
+                (1/2) * self.q_ddot * self.planTime^2;
             self.q_dot_peak = q_dot_0 + ...
-                self.q_ddot * self.trajOptProps.planTime;
+                self.q_ddot * self.planTime;
 
             % Compute the stopping parameters
-            self.q_ddot_to_stop = (0-self.q_dot_peak) / ...
-                (self.trajOptProps.horizonTime - self.trajOptProps.planTime);
+            stopping_time = (self.horizonTime - self.planTime);
+            self.q_ddot_to_stop = (0-self.q_dot_peak) / stopping_time;
             self.q_end = self.q_peak + ...
-                self.q_dot_peak * self.trajOptProps.planTime + ...
-                (1/2) * self.q_ddot_to_stop * self.trajOptProps.planTime^2;
+                self.q_dot_peak * stopping_time + ...
+                (1/2) * self.q_ddot_to_stop * stopping_time^2;
         end
         
         % Computes the actual input commands for the given time.
@@ -132,18 +156,17 @@ classdef PiecewiseArmTrajectory < rtd.planner.trajectory.Trajectory
             end
 
             % Mask the first and second half of the trajectory
-            t_plan_mask = t_shifted < self.trajOptProps.planTime;
-            t_stop_mask = logical((t_shifted < self.trajOptProps.horizonTime) - t_plan_mask);
+            t_plan_mask = t_shifted < self.planTime;
+            t_stop_mask = logical((t_shifted < self.horizonTime) - t_plan_mask);
             t_plan_vals = t_shifted(t_plan_mask);
-            t_stop_vals = t_shifted(t_stop_mask) - self.trajOptProps.planTime;
+            t_stop_vals = t_shifted(t_stop_mask) - self.planTime;
 
             % Create the combined state variable
             t_size = length(time);
-            n_q = self.jrsInstance.n_q;
-            pos_idx = 1:n_q;
-            vel_idx = pos_idx + n_q;
-            acc_idx = vel_idx + n_q;
-            state = zeros(n_q*3, t_size);
+            pos_idx = 1:self.numParams;
+            vel_idx = pos_idx + self.numParams;
+            acc_idx = vel_idx + self.numParams;
+            state = zeros(self.numParams*3, t_size);
             
             % Rename variables
             q_0 = self.startState.position;

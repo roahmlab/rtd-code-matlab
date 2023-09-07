@@ -113,7 +113,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         function setTrajectory(self, trajectory)
             arguments
                 self
-                trajectory rtd.planner.trajectory.Trajectory
+                trajectory rtd.trajectory.Trajectory
             end
             % Add the trajectory if it is valid
             if trajectory.validate()

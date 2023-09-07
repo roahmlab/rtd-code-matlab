@@ -1,4 +1,4 @@
-classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
+classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
     % BernsteinArmTrajectory
     % This encapsulates the conversion of parameters used in optimization
     % to the actual trajectory generated from those parameters. It's also
@@ -9,28 +9,37 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
     end
     % Additional properties
     properties
+        horizonTime
+
         % Initial parameters from the robot used to calculate the desired
         % trajectory
         alpha   {mustBeNumeric}
         q_end   {mustBeNumeric}
-        % I flatten these out for simplicity, but startState is updated to
-        % include these following handles too.
-        % The JRS which contains the center and range to scale the
-        % parameters
-        jrsInstance
+
+        % Extra properties to scale the parameters
+        paramScale rtd.util.RangeScaler = rtd.util.RangeScaler.empty()
+        numParams
     end
     methods
         % An example constructor for the trajectory object. Should be
         % implemented with varargin
-        function self = BernsteinArmTrajectory(trajOptProps, startState, jrsInstance)
+        function self = BernsteinArmTrajectory(startState, horizonTime, numParams)
             arguments
-                trajOptProps(1,1) rtd.planner.trajopt.TrajOptProps
                 startState(1,1) rtd.entity.states.ArmRobotState
-                jrsInstance(1,1) armour.reachsets.JRSInstance
+                horizonTime(1,1) double
+                numParams(1,1) double
             end
-            self.trajOptProps = trajOptProps;
             self.startState = startState;
-            self.jrsInstance = jrsInstance;
+            self.horizonTime = horizonTime;
+            self.numParams = numParams;
+        end
+
+        function setParamScale(self, paramScale)
+            arguments
+                self armour.trajectory.BernsteinArmTrajectory
+                paramScale(1,1) rtd.util.RangeScaler
+            end
+            self.paramScale = paramScale;
         end
         
         % A validated method to set the parameters for the trajectory.
@@ -40,14 +49,16 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
                 self armour.trajectory.BernsteinArmTrajectory
                 trajectoryParams(1,:) double
                 options.startState rtd.entity.states.ArmRobotState = self.startState
-                options.jrsInstance armour.reachsets.JRSInstance = self.jrsInstance
+                options.horizonTime(1,1) double = self.horizonTime
+                options.numParams(1,1) double = self.numParams
             end
             self.trajectoryParams = trajectoryParams;
-            if length(self.trajectoryParams) > self.jrsInstance.n_q
-                self.trajectoryParams = self.trajectoryParams(1:self.jrsInstance.n_q);
-            end
             self.startState = options.startState;
-            self.jrsInstance = options.jrsInstance;
+            self.horizonTime = options.horizonTime;
+            self.numParams = options.numParams;
+            if length(self.trajectoryParams) > self.numParams
+                self.trajectoryParams = self.trajectoryParams(1:self.numParams);
+            end
             
             % Perform an internal update (compute peak and stopping values)
             self.internalUpdate();
@@ -62,11 +73,11 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             % Make sure everything is nonempty
             valid = not( ...
                 isempty(self.trajectoryParams) || ...
-                isempty(self.jrsInstance) || ...
                 isempty(self.startState));
 
             % Make sure the trajectory params make sense
-            valid = valid && length(self.trajectoryParams) == self.jrsInstance.n_q;
+            valid = valid && length(self.trajectoryParams) == self.numParams;
+            valid = valid && self.numParams == length(self.startState.position);
             
             % Throw if wanted
             if ~valid && throwOnError
@@ -84,20 +95,20 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             end
             
             % Get the desired final position
-            out = self.jrsInstance.output_range;
-            in = self.jrsInstance.input_range;
-            q_goal = rescale(self.trajectoryParams, out(:,1), out(:,2),'InputMin',in(:,1),'InputMax',in(:,2));
-            q_goal = self.startState.q + q_goal;
+            if isempty(self.paramScale)
+                q_goal = self.trajectoryParams;
+            else
+                q_goal = self.startState.q + self.paramScale.scaleout(self.trajectoryParams);
+            end
 
-            n_q = self.jrsInstance.n_q;
-            self.alpha = zeros(n_q, 6);
-            for j = 1:n_q  % Modified to use matrix instead of cells
+            self.alpha = zeros(self.numParams, 6);
+            for j = 1:self.numParams  % Modified to use matrix instead of cells
                 beta = armour.legacy.match_deg5_bernstein_coefficients({...
                     self.startState.position(j); ...
                     self.startState.velocity(j); ...
                     self.startState.acceleration(j); ...
                     q_goal(j); ...
-                    0; 0}, self.trajOptProps.horizonTime);
+                    0; 0}, self.horizonTime);
                 self.alpha(j,:) = cell2mat(armour.legacy.bernstein_to_poly(beta, 5));
             end
             
@@ -138,17 +149,16 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             % Get a mask for the active trajectory time and the stopped
             % trajectory times.
             t_size = length(t_shifted);
-            horizon_mask = t_shifted < self.trajOptProps.horizonTime;
-            t_masked_scaled = t_shifted(horizon_mask) / self.trajOptProps.horizonTime;
+            horizon_mask = t_shifted < self.horizonTime;
+            t_masked_scaled = t_shifted(horizon_mask) / self.horizonTime;
             t_masked_size = length(t_masked_scaled);
-            n_q = self.jrsInstance.n_q;
 
             % Original implementation adapted
-            q_des = zeros(n_q, t_masked_size);
-            q_dot_des = zeros(n_q, t_masked_size);
-            q_ddot_des = zeros(n_q, t_masked_size);
+            q_des = zeros(self.numParams, t_masked_size);
+            q_dot_des = zeros(self.numParams, t_masked_size);
+            q_ddot_des = zeros(self.numParams, t_masked_size);
             
-            for j = 1:n_q
+            for j = 1:self.numParams
                 for coeff_idx = 0:5
                     q_des(j,:) = q_des(j,:) + ...
                         self.alpha(j,coeff_idx+1) * t_masked_scaled.^coeff_idx;
@@ -170,13 +180,13 @@ classdef BernsteinArmTrajectory < rtd.planner.trajectory.Trajectory
             %q_ddot_des = sum(((2:deg).*(1:deg-1)).*self.alpha(:,3:end).*(t_masked.^(0:deg-2)),2);
 
             % Move to a combined state variable
-            state = zeros(n_q*3, t_size);
-            pos_idx = 1:n_q;
-            vel_idx = pos_idx + n_q;
-            acc_idx = vel_idx + n_q;
+            state = zeros(self.numParams*3, t_size);
+            pos_idx = 1:self.numParams;
+            vel_idx = pos_idx + self.numParams;
+            acc_idx = vel_idx + self.numParams;
             state(pos_idx,horizon_mask) = q_des;
-            state(vel_idx,horizon_mask) = q_dot_des / self.trajOptProps.horizonTime;
-            state(acc_idx,horizon_mask) = q_ddot_des / self.trajOptProps.horizonTime^2;
+            state(vel_idx,horizon_mask) = q_dot_des / self.horizonTime;
+            state(acc_idx,horizon_mask) = q_ddot_des / self.horizonTime^2;
 
             % Update all states times after the horizon time
             state(pos_idx,~horizon_mask) = repmat(self.q_end, 1, t_size-t_masked_size);
