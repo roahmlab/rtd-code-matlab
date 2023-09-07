@@ -34,11 +34,11 @@ classdef GenericArmObjective < rtd.planner.trajopt.Objective
             %
             % Arguments:
             %   trajOptProps (rtd.planner.trajopt.TrajOptProps)
-            %   trajectoryFactory (rtd.planner.trajectory.TrajectoryFactory)
+            %   trajectoryFactory (rtd.trajectory.TrajectoryFactory)
             %
             arguments
                 trajOptProps rtd.planner.trajopt.TrajOptProps
-                trajectoryFactory rtd.planner.trajectory.TrajectoryFactory
+                trajectoryFactory rtd.trajectory.TrajectoryFactory
             end
             self.trajectoryFactory = trajectoryFactory;
             self.t_cost = trajOptProps.timeForCost;

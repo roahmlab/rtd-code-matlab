@@ -1,4 +1,4 @@
-classdef ArmTrajectoryFactory < rtd.planner.trajectory.TrajectoryFactory & handle
+classdef ArmTrajectoryFactory < rtd.trajectory.TrajectoryFactory & handle
 
     properties
         traj_type {mustBeMember(traj_type,{'piecewise', 'bernstein', 'zerohold'})} = 'piecewise'
@@ -35,13 +35,22 @@ classdef ArmTrajectoryFactory < rtd.planner.trajectory.TrajectoryFactory & handl
 
             switch options.traj_type
                 case 'piecewise'
-                    trajectory = armour.trajectory.PiecewiseArmTrajectory(self.trajOptProps, robotState, options.jrsInstance);
+                    trajectory = armour.trajectory.PiecewiseArmTrajectory(robotState, ...
+                        self.trajOptProps.planTime, ...
+                        self.trajOptProps.horizonTime, ...
+                        options.jrsInstance.num_parameters);
+                    paramScale = rtd.util.RangeScaler(options.jrsInstance.input_range, options.jrsInstance.output_range);
+                    trajectory.setParamScale(paramScale)
 
                 case 'bernstein'
-                    trajectory = armour.trajectory.BernsteinArmTrajectory(self.trajOptProps, robotState, options.jrsInstance);
+                    trajectory = armour.trajectory.BernsteinArmTrajectory(robotState, ...
+                        self.trajOptProps.horizonTime, ...
+                        options.jrsInstance.num_parameters);
+                    paramScale = rtd.util.RangeScaler(options.jrsInstance.input_range, options.jrsInstance.output_range);
+                    trajectory.setParamScale(paramScale)
 
                 case 'zerohold'
-                    trajectory = armour.trajectory.ZeroHoldArmTrajectory(self.trajOptProps, robotState);
+                    trajectory = armour.trajectory.ZeroHoldArmTrajectory(robotState);
             end
 
             if ~isempty(trajectoryParams)

@@ -51,7 +51,7 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             %   reachableSets (struct)
             %   objective (rtd.planner.trajopt.Objective)
             %   optimizationEngine (rtd.planner.trajopt.OptimizationEngine)
-            %   trajectoryFactory (rtd.planner.trajectory.TrajectoryFactory)
+            %   trajectoryFactory (rtd.trajectory.TrajectoryFactory)
             %   options: Keyword arguments. See below.
             %
             % Keyword Arguments
@@ -63,7 +63,7 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
                 reachableSets (1,1) struct
                 objective (1,1) rtd.planner.trajopt.Objective
                 optimizationEngine (1,1) rtd.planner.trajopt.OptimizationEngine
-                trajectoryFactory (1,1) rtd.planner.trajectory.TrajectoryFactory
+                trajectoryFactory (1,1) rtd.trajectory.TrajectoryFactory
                 options.verboseLevel (1,1) rtd.util.types.LogLevel = 'DEBUG'
             end
             self.trajOptProps = trajOptProps;
@@ -100,11 +100,11 @@ classdef RtdTrajOpt < rtd.util.mixins.NamedClass & handle
             %   robotState: State of the robot.
             %   worldState: Observed state of the world for the reachable sets
             %   waypoint: Waypoint we want to optimize to
-            %   initialGuess (rtd.planner.trajectory.Trajectory): Past trajectory to use as an initial guess
+            %   initialGuess (rtd.trajectory.Trajectory): Past trajectory to use as an initial guess
             %   rsAdditionalArgs (Optional struct): additional arguments to pass to the reachable sets, by set name
             %
             % Returns:
-            %   [trajectory(rtd.planner.trajectory.Trajectory), cost(double), info(struct)]:
+            %   [trajectory(rtd.trajectory.Trajectory), cost(double), info(struct)]:
             %   `trajectory` is an instance of the trajectory object that
             %   corresponds to the solved trajectory optimization. If it
             %   wasn't successful, this will either be an invalid

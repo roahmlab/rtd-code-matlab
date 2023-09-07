@@ -19,7 +19,7 @@ Reachable Sets Generation Interfaces
 
 Trajectory Interfaces
 ---------------------
-.. mat:automodule:: +rtd.+planner.+trajectory
+.. mat:automodule:: +rtd.+trajectory
    :show-inheritance:
    :members:
    :undoc-members:

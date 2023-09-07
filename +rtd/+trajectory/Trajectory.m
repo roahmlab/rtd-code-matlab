@@ -5,7 +5,7 @@ classdef Trajectory < handle
 % the actual trajectory generated from those parameters. This can also be
 % used by an :mat:class:`+rtd.+planner.+trajopt.Objective` object as part
 % of the objective function call. It should be generated with some
-% :mat:class:`+rtd.+planner.+trajectory.TrajectoryFactory`.
+% :mat:class:`+rtd.+trajectory.TrajectoryFactory`.
 %
 % Note:
 %   The functions `validate(self, throwOnError)`, `setParameters(self,
@@ -23,15 +23,15 @@ classdef Trajectory < handle
 % Last Revised: 2023-02-02
 % 
 % See also validate, setParameters, getCommand,
-% rtd.planner.trajectory.TrajectoryFactory, arguments
+% rtd.trajectory.TrajectoryFactory, arguments
 %
-% ---More Info ---
+% ---More Info ---code 
 %
 
     properties
         % Properties from the trajectory optimization, which also describe
         % properties for the trajectory.
-        trajOptProps rtd.planner.trajopt.TrajOptProps %
+        % trajOptProps rtd.planner.trajopt.TrajOptProps %
 
         % The parameters used for this trajectory
         trajectoryParams(:,1) double %
