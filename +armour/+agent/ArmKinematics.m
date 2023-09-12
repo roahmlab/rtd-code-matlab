@@ -76,7 +76,7 @@ classdef ArmKinematics < rtd.util.mixins.NamedClass & rtd.util.mixins.Options & 
                 end
                 
                 % interpolate the state for the corresponding time
-                j_vals = self.arm_state.get_state(t).q;
+                j_vals = self.arm_state.get_state(t).position;
             else
                 % assume a configuration was put in
                 q = time_or_config;

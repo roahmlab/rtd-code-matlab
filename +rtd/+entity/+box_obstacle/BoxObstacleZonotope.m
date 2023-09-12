@@ -36,7 +36,7 @@ classdef BoxObstacleZonotope < rtd.util.mixins.NamedClass & handle
                 state = self.box_state.get_state(options.time);
             end
             
-            zono = self.base_zonotope + state.state;
+            zono = self.base_zonotope + state.state_data;
         end
     end
 end

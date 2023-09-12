@@ -105,7 +105,7 @@ classdef ArmourPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamic
             q = options.q;
             if ~isempty(options.time)
                 state = self.arm_state.get_state(options.time);
-                q = state.q;
+                q = state.position;
             end
             
             [R,T] = self.kinematics.get_link_rotations_and_translations(q) ;

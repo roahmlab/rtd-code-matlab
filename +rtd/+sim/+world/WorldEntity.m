@@ -140,7 +140,7 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
                             = components.(fieldname{1}).getoptions();
                     catch
                         componentoptions.(fieldname{1}) ...
-                            = eval([components.(fieldname{1}) '.defaultoptions()']);
+                            = feval([components.(fieldname{1}) '.defaultoptions']);
                     end
                 end
             end

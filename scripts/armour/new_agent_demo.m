@@ -114,9 +114,9 @@ planner = armour.ArmourPlanner( ...
         traj_type="bernstein", ...
         verboseLevel='DEBUG');
 
-planner = armour.ArmourCudaPlanner( ...
-        trajOptProps, sim.agent, ...
-        verboseLevel='DEBUG');
+% planner = armour.ArmourCudaPlanner( ...
+%         trajOptProps, sim.agent, ...
+%         verboseLevel='DEBUG');
 
 %% HLP stuff to migrate
 HLP = robot_arm_straight_line_HLP();
@@ -176,10 +176,12 @@ function info = planner_callback(sim, planner, agent_info, world_info, lookahead
 
     % get the sensor readings at the time
     worldState.obstacles = rtd.sim.sensors.zonotope_sensor(sim.world, sim.agent, time);
+    a = tic;
     [trajectory, plan_info] = planner.planTrajectory(ref_state, worldState, q_des);
+    toc(a)
     %FO = plan_info.rsInstances{2}.FO;
     %jrsinfo = plan_info.rsInstances{1}.jrs_info;
-    
+
     if ~isempty(trajectory)
         sim.agent.controller.setTrajectory(trajectory)
     end

@@ -121,7 +121,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
             state = self.box_state.get_state(options.time);
             
             % Shift the patch points
-            V = self.plot_patch_data.vertices + state.state.';
+            V = self.plot_patch_data.vertices + state.state_data.';
             F = self.plot_patch_data.faces;
             
             % Plot/update them

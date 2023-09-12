@@ -9,6 +9,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
     end
     % Additional properties
     properties
+        startState(1,1) rtd.entity.states.ArmRobotStateInstance
         horizonTime
 
         % Initial parameters from the robot used to calculate the desired
@@ -25,10 +26,11 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
         % implemented with varargin
         function self = BernsteinArmTrajectory(startState, horizonTime, numParams)
             arguments
-                startState(1,1) rtd.entity.states.ArmRobotState
+                startState(1,1) rtd.entity.states.ArmRobotStateInstance
                 horizonTime(1,1) double
                 numParams(1,1) double
             end
+            
             self.startState = startState;
             self.horizonTime = horizonTime;
             self.numParams = numParams;
@@ -48,7 +50,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             arguments
                 self armour.trajectory.BernsteinArmTrajectory
                 trajectoryParams(1,:) double
-                options.startState rtd.entity.states.ArmRobotState = self.startState
+                options.startState rtd.entity.states.ArmRobotStateInstance = self.startState
                 options.horizonTime(1,1) double = self.horizonTime
                 options.numParams(1,1) double = self.numParams
             end
@@ -98,7 +100,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             if isempty(self.paramScale)
                 q_goal = self.trajectoryParams;
             else
-                q_goal = self.startState.q + self.paramScale.scaleout(self.trajectoryParams);
+                q_goal = self.startState.position + self.paramScale.scaleout(self.trajectoryParams);
             end
 
             self.alpha = zeros(self.numParams, 6);
@@ -192,9 +194,12 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             state(pos_idx,~horizon_mask) = repmat(self.q_end, 1, t_size-t_masked_size);
             
             % Generate the output.
-            command = rtd.entity.states.ArmRobotState(pos_idx, vel_idx, acc_idx);
-            command.time = time;
-            command.state = state;
+            command(length(time)) = rtd.entity.states.ArmRobotStateInstance();
+            command.setTimes(time);
+            command.setStateSpace(state, ...
+                position_idxs=pos_idx, ...
+                velocity_idxs=vel_idx, ...
+                acceleration_idxs=acc_idx);
         end
     end
 end

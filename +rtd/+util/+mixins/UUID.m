@@ -20,8 +20,11 @@ classdef UUID < handle
 % --- More Info ---
 %
 
-    properties
+    properties (NonCopyable, Access=private)
         % A character-array string representing the UUID generated.
+        rtd_internal_uuid
+    end
+    properties (Dependent)
         uuid
     end
     methods
@@ -32,7 +35,13 @@ classdef UUID < handle
             % from this mixin. It will generate and associate a UUID to
             % the `uuid` property of this class.
             %
-            self.uuid = rtd.functional.uuid();
+            self.rtd_internal_uuid = rtd.functional.uuid();
+        end
+        function uuid = get.uuid(self)
+            if isempty(self.rtd_internal_uuid)
+                self.rtd_internal_uuid = rtd.functional.uuid();
+            end
+            uuid = self.rtd_internal_uuid;
         end
     end
 end

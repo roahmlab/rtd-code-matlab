@@ -7,6 +7,7 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
     end
     % Additional properties
     properties
+        startState(1,1) rtd.entity.states.ArmRobotStateInstance
         planTime
         horizonTime
 
@@ -31,7 +32,7 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
         % parameterized.
         function self = PiecewiseArmTrajectory(startState, planTime, horizonTime, numParams)
             arguments
-                startState(1,1) rtd.entity.states.ArmRobotState
+                startState(1,1) rtd.entity.states.ArmRobotStateInstance
                 planTime(1,1) double
                 horizonTime(1,1) double
                 numParams(1,1) double
@@ -56,7 +57,7 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
             arguments
                 self armour.trajectory.PiecewiseArmTrajectory
                 trajectoryParams(1,:) double
-                options.startState rtd.entity.states.ArmRobotState = self.startState
+                options.startState rtd.entity.states.ArmRobotStateInstance = self.startState
                 options.planTime(1,1) double = self.planTime
                 options.horizonTime(1,1) double = self.horizonTime
                 options.numParams(1,1) double = self.numParams
@@ -196,9 +197,12 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
             state(pos_idx,~(t_plan_mask+t_stop_mask)) = repmat(self.q_end, 1, t_size-sum(t_plan_mask+t_stop_mask));
 
             % Generate the output.
-            command = rtd.entity.states.ArmRobotState(pos_idx, vel_idx, acc_idx);
-            command.time = time;
-            command.state = state;
+            command(length(time)) = rtd.entity.states.ArmRobotStateInstance();
+            command.setTimes(time);
+            command.setStateSpace(state, ...
+                position_idxs=pos_idx, ...
+                velocity_idxs=vel_idx, ...
+                acceleration_idxs=acc_idx);
         end
     end
 end

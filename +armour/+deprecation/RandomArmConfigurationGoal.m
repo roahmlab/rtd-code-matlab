@@ -109,7 +109,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             self.goal_radius = options.goal_radius;
             
             if isempty(self.start_position)
-                self.start_position = self.arm_agent.state.get_state().q;
+                self.start_position = self.arm_agent.state.get_state().position;
             end
             if isempty(self.min_dist_start_to_goal)
                 pos_limits = [self.arm_agent.info.joints.position_limits];
@@ -151,7 +151,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             
             % Accumulate the return
             goal = false;
-            get_pos = @(t)self.arm_agent.state.get_state(t).q;
+            get_pos = @(t)self.arm_agent.state.get_state(t).position;
             for t_check = t_vec
                 goal = goal || all(abs(get_pos(t_check) - self.goal_position) <= self.goal_radius, 'all');
             end
@@ -202,7 +202,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 end
 
                 % compute distance to the goal & update time
-                proposed_goal = self.arm_agent.state.get_state().q;
+                proposed_goal = self.arm_agent.state.get_state().position;
                 proposed_goal_dist = norm(self.start_position - proposed_goal);
             end
             if isempty(proposed_goal)
