@@ -127,6 +127,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             self.q_end = q_goal;
             % Proposed vectorized implementation
             %self.q_end = sum(self.alpha.*(trajOptProps.horizon.^(0:5)),2);
+            self.startTime = self.startState.time;
         end
         
         % Computes the actual input commands for the given time.
@@ -141,7 +142,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             % Do a parameter check and time check, and throw if anything is
             % invalid.
             self.validate(true);
-            t_shifted = time - self.startState.time;
+            t_shifted = time - self.startTime;
             if any(t_shifted < 0)
                 ME = MException('BernsteinArmTrajectory:InvalidTime', ...
                     'Invalid time provided to BernsteinArmTrajectory');

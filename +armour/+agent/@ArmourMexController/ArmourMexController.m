@@ -53,9 +53,8 @@ classdef ArmourMexController < armour.agent.ArmourController & rtd.util.MexWrapp
             velocity = z(self.robot_state.velocity_indices);
 
             % Prepare trajectory
-            trajectory = self.trajectories{end};
             startTime = self.robot_state.get_state().time;
-            target = trajectory.getCommand(startTime + t);
+            target = self.trajectories.getCommand(startTime + t);
 
             % Get the control inputs from the mex controller
             [u, tau, v] = updateKinovaController( ...

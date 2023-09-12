@@ -102,8 +102,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = true;
-use_robust_input = true;
+input_constraints_flag = false;
+use_robust_input = false;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...
@@ -111,7 +111,7 @@ planner = armour.ArmourPlanner( ...
         input_constraints_flag=input_constraints_flag,...
         use_robust_input=use_robust_input,...
         smooth_obs=smooth_obs, ...
-        traj_type="bernstein", ...
+        traj_type="piecewise", ...
         verboseLevel='DEBUG');
 
 % planner = armour.ArmourCudaPlanner( ...
@@ -165,7 +165,7 @@ sim.run(max_steps=100, pre_step_callback={cb});
 function info = planner_callback(sim, planner, agent_info, world_info, lookahead, HLP)
     % Get the end state
     time = sim.agent.state.time(end);
-    ref_state = sim.agent.controller.trajectories{end}.getCommand(time);
+    ref_state = sim.agent.controller.trajectories.getCommand(time);
     agent_info.state = sim.agent.state.state(:,end);
 
     q_des = HLP.get_waypoint(agent_info,world_info,lookahead);

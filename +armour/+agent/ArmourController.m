@@ -11,6 +11,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         robot_state = armour.agent.ArmourAgentState.empty()
         
         n_inputs uint32 = 0
+        
+        trajectories
     end
     
     % Extra properties we define
@@ -23,8 +25,6 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         alpha_constant double
         V_max double
         r_norm_threshold double
-        
-        trajectories = {}
     end
     
     methods (Static)
@@ -106,7 +106,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             
             % Create the initial trajectory
             initial_traj = armour.trajectory.ZeroHoldArmTrajectory(self.robot_state.get_state);
-            self.trajectories = {initial_traj};
+            self.trajectories.setInitialTrajectory(initial_traj);
+            self.trajectories.clear()
         end
             
         
@@ -117,7 +118,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             end
             % Add the trajectory if it is valid
             if trajectory.validate()
-                self.trajectories = [self.trajectories, {trajectory}];
+                self.trajectories.setTrajectory(trajectory);
             end
         end
         
@@ -135,9 +136,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             velocity = z(self.robot_state.velocity_indices);
 
             % Prepare trajectory
-            trajectory = self.trajectories{end};
             startTime = self.robot_state.get_state().time;
-            target = trajectory.getCommand(startTime + t);
+            target = self.trajectories.getCommand(startTime + t);
 
             % error terms
             err = target.position - position;
@@ -272,8 +272,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             t_check = t_input(1):t_check_step:t_input(end);
             u_check = self.robot_state.get_state(t_check);
             % Get the reference trajectory
-            trajectory = self.trajectories{end};
-            reference_trajectory = arrayfun(@(t)trajectory.getCommand(t), t_check);
+            reference_trajectory = arrayfun(@(t)self.trajectories.getCommand(t), t_check);
             u_pos_ref = [reference_trajectory.position];
             u_vel_ref = [reference_trajectory.velocity];
             
