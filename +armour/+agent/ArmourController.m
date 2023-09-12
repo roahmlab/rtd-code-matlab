@@ -274,15 +274,15 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             % Get the reference trajectory
             trajectory = self.trajectories{end};
             reference_trajectory = arrayfun(@(t)trajectory.getCommand(t), t_check);
-            u_pos_ref = [reference_trajectory.q];
-            u_vel_ref = [reference_trajectory.q_dot];
+            u_pos_ref = [reference_trajectory.position];
+            u_vel_ref = [reference_trajectory.velocity];
             
             % check bound satisfaction
             self.vdisp('Running ultimate bound check!', 'INFO');
             
             % Absolute difference
-            u_pos_diff = abs(u_pos_ref - u_check.q);
-            u_vel_diff = abs(u_vel_ref - u_check.q_dot);
+            u_pos_diff = abs(u_pos_ref - [u_check.position]);
+            u_vel_diff = abs(u_vel_ref - [u_check.velocity]);
             position_exceeded = u_pos_diff > self.ultimate_bound_position;
             velocity_exceeded = u_vel_diff > self.ultimate_bound_velocity;
             

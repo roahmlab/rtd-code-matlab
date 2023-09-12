@@ -25,7 +25,7 @@ classdef Trajectory < handle
 % See also validate, setParameters, getCommand,
 % rtd.trajectory.TrajectoryFactory, arguments
 %
-% ---More Info ---code 
+% ---More Info ---
 %
 
     properties
@@ -35,10 +35,8 @@ classdef Trajectory < handle
 
         % The parameters used for this trajectory
         trajectoryParams(:,1) double %
-
-        % The initial state for this trajectory
-        startState(1,1) rtd.entity.states.EntityState %
     end
+    
     properties (Abstract, Constant)
         % Set to true if this trajectory supports getting commands for a
         % time vector instead of just a single moment in time.

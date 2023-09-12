@@ -118,7 +118,9 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             
             % get the current state
             state = self.robot_state.get_state;
-            zcur = state.state;
+            zcur = state.getStateSpace( ...
+                position_idxs=self.robot_state.position_indices, ...
+                velocity_idxs=self.robot_state.velocity_indices);
             
             % call the ode solver to simulate agent
             [tout,zout] = self.integrator(@(t,z) self.dynamics(t,z),...

@@ -74,7 +74,7 @@ classdef ArmourPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
         function [trajectory, info] = planTrajectory(self, robotState, worldState, waypoint)
             arguments
                 self armour.ArmourPlanner
-                robotState rtd.entity.states.ArmRobotState
+                robotState rtd.entity.states.ArmRobotStateInstance
                 worldState
                 waypoint
             end

@@ -5,6 +5,9 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
         vectorized = true
     end
     % Additional properties
+    properties
+        startState(1,1) rtd.entity.states.ArmRobotStateInstance
+    end
     methods
         % The ZeroHoldArmTrajectory constructor, which simply sets parameters and
         % attempts to call internalUpdate, a helper function made for this
@@ -12,7 +15,7 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
         % parameterized.
         function self = ZeroHoldArmTrajectory(startState)
             arguments
-                startState(1,1) rtd.entity.states.ArmRobotState
+                startState(1,1) rtd.entity.states.ArmRobotStateInstance
             end
             self.startState = startState;
         end
@@ -23,7 +26,7 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
             arguments
                 self armour.trajectory.ZeroHoldArmTrajectory
                 trajectoryParams(1,:) double
-                options.startState rtd.entity.states.ArmRobotState = self.startState
+                options.startState rtd.entity.states.ArmRobotStateInstance = self.startState
             end
             self.trajectoryParams = trajectoryParams;
             self.startState = options.startState;
@@ -67,15 +70,18 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
             end
             
             % Make the state
-            n_q = length(self.startState.q);
-            state = repmat([self.startState.q;0], 1, length(time));
+            n_q = length(self.startState.position);
+            state = repmat([self.startState.position;0], 1, length(time));
             pos_idx = 1:n_q;
             acc_vel_idx = ones(1,n_q)+n_q;
 
             % Generate the output.
-            command = rtd.entity.states.ArmRobotState(pos_idx, acc_vel_idx, acc_vel_idx);
-            command.time = time;
-            command.state = state;
+            command(length(time)) = rtd.entity.states.ArmRobotStateInstance();
+            command.setTimes(time);
+            command.setStateSpace(state, ...
+                position_idxs=pos_idx, ...
+                velocity_idxs=acc_vel_idx, ...
+                acceleration_idxs=acc_vel_idx);
         end
     end
 end

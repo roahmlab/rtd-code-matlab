@@ -79,5 +79,5 @@ end
 function [cost] = evalTrajectory(trajectoryParams, trajectoryObj, q_des, t_cost)
     trajectoryObj.setParameters(trajectoryParams);
     plan = trajectoryObj.getCommand(t_cost);
-    cost = sum((plan.q_des - q_des).^2);
+    cost = sum((plan.position - q_des).^2);
 end

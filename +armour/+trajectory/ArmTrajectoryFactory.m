@@ -18,7 +18,7 @@ classdef ArmTrajectoryFactory < rtd.trajectory.TrajectoryFactory & handle
         function trajectory = createTrajectory(self, robotState, rsInstances, trajectoryParams, options)
             arguments
                 self armour.trajectory.ArmTrajectoryFactory
-                robotState rtd.entity.states.ArmRobotState
+                robotState rtd.entity.states.ArmRobotStateInstance
                 rsInstances struct = struct
                 trajectoryParams (:,1) double = []
                 options.jrsInstance armour.reachsets.JRSInstance = armour.reachsets.JRSInstance.empty()

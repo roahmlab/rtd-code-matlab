@@ -77,7 +77,7 @@ classdef BoxPatchCollision < rtd.sim.systems.patch3d_collision.Patch3dDynamicObj
             end
             
             % Compat for Patch3d
-            shift = state.state.';
+            shift = state.state_data.';
             if self.box_info.dimension == 2
                 shift = [shift, 0];
             end
