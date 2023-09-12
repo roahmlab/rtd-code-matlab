@@ -14,6 +14,11 @@ classdef ArmRobotStateInstance < rtd.entity.states.BaseEntityStateInstance
     end
 
     methods
+        % getStateSpace - Get the state space of the robot
+        %   Returns a matrix of the state space of the robot. The rows
+        %   correspond to the state space indices provided in the options
+        %   struct. The columns correspond to the individual robot state
+        %   instances.
         function state = getStateSpace(self, options)
             arguments
                 self(1,:) rtd.entity.states.ArmRobotStateInstance
@@ -29,6 +34,10 @@ classdef ArmRobotStateInstance < rtd.entity.states.BaseEntityStateInstance
             state(acc_idx, :) = [self.acceleration];
         end
 
+        % setStateSpace - Set the state space of the robot
+        %   Sets the state space of the robot. The rows correspond to the
+        %   state space indices provided in the options struct. The columns
+        %   correspond to the individual robot state instances.
         function setStateSpace(self, state_data, options)
             arguments
                 self(1,:) rtd.entity.states.ArmRobotStateInstance
@@ -61,6 +70,12 @@ classdef ArmRobotStateInstance < rtd.entity.states.BaseEntityStateInstance
     end
 
     methods (Access=private)
+        % resolveStateSpaceIndices - Resolve the state space indices
+        %   Resolves the state space indices for the position, velocity,
+        %   and acceleration. If the indices are not provided, then they
+        %   are automatically resolved. If they are provided, then they
+        %   must be valid and match the number of states in the state
+        %   space.
         function [pos_idx, vel_idx, acc_idx] = resolveStateSpaceIndices(self, pos_idx, vel_idx, acc_idx)
             bad_pos_idx = length(pos_idx) ~= length(self.position);
             bad_vel_idx = length(vel_idx) ~= length(self.velocity);

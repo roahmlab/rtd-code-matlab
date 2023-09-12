@@ -35,6 +35,9 @@ classdef Trajectory < handle
 
         % The parameters used for this trajectory
         trajectoryParams(:,1) double %
+
+        % The time at which this trajectory is valid
+        startTime(1,1) double
     end
     
     properties (Abstract, Constant)

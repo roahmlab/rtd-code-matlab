@@ -133,6 +133,8 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
             self.q_end = self.q_peak + ...
                 self.q_dot_peak * stopping_time + ...
                 (1/2) * self.q_ddot_to_stop * stopping_time^2;
+
+            self.startTime = self.startState.time;
         end
         
         % Computes the actual input commands for the given time.
@@ -149,7 +151,7 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
             % Do a parameter check and time check, and throw if anything is
             % invalid.
             self.validate(true);
-            t_shifted = time - self.startState.time;
+            t_shifted = time - self.startTime;
             if t_shifted < 0
                 ME = MException('PiecewiseArmTrajectory:InvalidTrajectory', ...
                     'Invalid time provided to PiecewiseArmTrajectory');

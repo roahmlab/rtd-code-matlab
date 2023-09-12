@@ -12,22 +12,40 @@ classdef BaseEntityStateInstance < rtd.util.mixins.UUID & handle
     % more meaningful
     % Time is also forcefully set to a single value
     properties
+        % time is a scalar double, and is the time at which this state
+        % instance was recorded
         time(1,1) double
     end
+    
     properties (Abstract, Dependent)
+        % num_states is the number of states in the state-space form
         num_states
     end
+    
     methods (Abstract)
+        % getStateSpace returns the state-space form of a vector of state
+        % instance, in the form of a matrix of size num_states x num_time
+        % where num_time is the number of time points in the state instance
         state = getStateSpace(self, options)
+
+        % setStateSpace sets the state-space form of a vector of state instance,
+        % in the form of a matrix of size num_states x num_time
+        % where num_time is the number of time points in the state instance
         setStateSpace(self, state, options)
     end
+
     methods
+        % getTimes returns the times at which the vector elements of state
+        % instance was recorded, as a vector of size 1 x num_time
         function times = getTimes(self)
             arguments
                 self(1,:) rtd.entity.states.BaseEntityStateInstance
             end
             times = [self.time];
         end
+
+        % setTimes sets the times at which the vector elements of state
+        % instance was recorded, as a vector of size 1 x num_time
         function setTimes(self, time_data)
             arguments
                 self(1,:) rtd.entity.states.BaseEntityStateInstance

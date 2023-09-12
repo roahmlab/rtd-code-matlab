@@ -18,6 +18,7 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
                 startState(1,1) rtd.entity.states.ArmRobotStateInstance
             end
             self.startState = startState;
+            self.startTime = self.startState.time;
         end
         
         % Set the parameters of the trajectory, with a focus on the
@@ -30,6 +31,7 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
             end
             self.trajectoryParams = trajectoryParams;
             self.startState = options.startState;
+            self.startTime = self.startState.time;
         end
         
         % Validate that the trajectory is fully characterized
@@ -63,7 +65,7 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
             % Do a parameter check and time check, and throw if anything is
             % invalid.
             self.validate(true);
-            if any(time < self.startState.time)
+            if any(time < self.startTime)
                 ME = MException('ZeroHoldArmTrajectory:InvalidTime', ...
                     'Invalid time provided to ZeroHoldArmTrajectory');
                 throw(ME)
