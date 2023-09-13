@@ -14,7 +14,7 @@ classdef TrajectoryFactory < handle
 % Last Revised: 2023-02-02
 % 
 % See also createTrajectory, rtd.trajectory.Trajectory,
-% rtd.planner.trajopt.TrajOptProps
+% rtd.planner.trajopt.TrajOptProps, rtd.trajectory.TrajectoryContainer
 %
 % --- More Info ---
 % 

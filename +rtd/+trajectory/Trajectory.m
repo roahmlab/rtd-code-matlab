@@ -23,16 +23,18 @@ classdef Trajectory < handle
 % Last Revised: 2023-02-02
 % 
 % See also validate, setParameters, getCommand,
-% rtd.trajectory.TrajectoryFactory, arguments
+% rtd.trajectory.TrajectoryFactory, arguments,
+% rtd.trajectory.TrajectoryContainer
 %
-% ---More Info ---
+% --- Revision History ---
+% 2023-09-07 Removed the start state and trajoptprops properties and
+%   added the startTime property to reduce class interdependencies.
+% 2023-02-02 Added vectorized property
+%
+% --- More Info ---
 %
 
     properties
-        % Properties from the trajectory optimization, which also describe
-        % properties for the trajectory.
-        % trajOptProps rtd.planner.trajopt.TrajOptProps %
-
         % The parameters used for this trajectory
         trajectoryParams(:,1) double %
 
@@ -46,6 +48,7 @@ classdef Trajectory < handle
         vectorized(1,1) logical
     end
 
+    % Expected interfaces for subclasses
     methods (Abstract)
         % Validates if the trajectory is parameterized right.
         %
@@ -69,7 +72,7 @@ classdef Trajectory < handle
         %
         % Arguments:
         %   trajectoryParams: the parameters of the trajectory to set.
-        %   options: Any additiona keyword arguments or choice.
+        %   options: Any additional keyword arguments or choice.
         % 
         setParameters(self, trajectoryParams, options)
         
@@ -81,7 +84,7 @@ classdef Trajectory < handle
         %   time: Time to use to calculate the desired state for this trajectory
         %
         % Returns:
-        %   rtd.entity.states.EntityState: Desired state at the given time
+        %   rtd.entity.states.BaseEntityStateInstance: Desired state at the given time
         %
         command = getCommand(self, time)
     end
