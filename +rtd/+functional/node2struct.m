@@ -1,40 +1,45 @@
-function [struct_out, root_name, version] = dom2struct(dom)
+function [struct_out, root_name, attributes_struct] = node2struct(rootNode)
 % Converts a DOM object to a struct
 %
 % This is a function that converts a DOM object to a struct. The struct
 % will have the same structure as the XML file. This is useful for
 % converting XML files to a struct for use in MATLAB, and is the
-% counterpart to struct2dom. 
+% counterpart to struct2node. 
 %
 % Usage:
 %   parser = matlab.io.xml.dom.Parser;
 %   dom = parser.parseFile('example.xml');
-%   [struct_out, root_name, version] = dom2struct(dom)
+%   rootNode = dom.getDocumentElement();
+%   [struct_out, root_name, attributes_struct] = rtd.functional.node2struct(rootNode)
 %
 % Arguments
-%   dom - A DOM object
+%   node - A DOM node object
 %
 % Returns:
-%   struct_out - A struct with the same structure as the XML file
+%   struct_out - A struct with the same structure as the XML file's node
 %   root_name - The name of the root element
-%   version - The version of the XML file (which would have been provided to struct2dom)
+%   attributes_struct - Attributes associated with the root element
 %
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
 % Written: 2023-09-14
 %
-% See Also: rtd.functional.struct2dom
+% See Also: rtd.functional.struct2node
 %
 % --- More Info ---
 %
     arguments
-        dom(1,1) matlab.io.xml.dom.Document
+        rootNode(1,1) matlab.io.xml.dom.Node
     end
 
-    rootNode = dom.getDocumentElement();
+%     rootNode = dom.getDocumentElement();
     root_name = rootNode.TagName;
-    version = rootNode.getAttribute('version');
-    struct_out = parseStruct(dom.getDocumentElement());
+    attributes_struct = struct;
+    for i=0:rootNode.getAttributes().getLength()-1
+        attr_node = rootNode.getAttributes().item(i);
+        attributes_struct.(attr_node.Name) = attr_node.TextContent;
+    end
+    struct_out = parseStruct(rootNode);
 end
 
 % TODO Document helpers

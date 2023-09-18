@@ -1,43 +1,52 @@
-function dom = struct2dom(struct_in, root_name, version_string)
+function node = struct2node(struct_in, document, root_name, attributes_struct)
 % Convert a struct to a DOM object
 %
 % This is a function that converts a struct to a DOM object. This is
 % useful for writing out a struct to an XML file. The resulting DOM object
-% can be conversely converted back to a struct using the dom2struct
+% can be conversely converted back to a struct using the node2struct
 % function.
 %
 % Usage:
-%   dom = struct2dom(struct_in, root_name, version_string)
+%   dom = matlab.io.xml.dom.Document('example_dom');
+%   old_rootNode = dom.getDocumentElement();
+%   new_rootNode = rtd.functional.struct2node(struct_in, dom, root_name, attributes_struct);
+%   dom.replaceChild(new_rootNode, old_rootNode)
 %   writer = matlab.io.xml.dom.DOMWriter;
 %   writer.writeToFile(dom, 'example.xml');
 %
 % Arguments:
 %   struct_in: The struct to convert to a DOM object
+%   document: The document that DOM object is associated with
 %   root_name: The name of the root node to store in the DOM object
-%   version_string: A version string to save in the DOM object
+%   attributes_struct: Attributes to associate with the root element
 %
 % Returns:
-%   dom: The DOM object
+%   node: An element node created for the given document
 %
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
 % Written: 2023-09-14
 % 
-% See also: rtd.functional.dom2struct
+% See also: rtd.functional.node2struct
 %
 % --- More Info ---
 %
     arguments
         struct_in(1,1) struct
-        root_name(1,:) char = 'root_node'
-        version_string(1,:) char = '0.1'
+        document(1,1) matlab.io.xml.dom.Document
+        root_name {mustBeTextScalar} = 'root_node'
+        attributes_struct(1,1) struct = struct('version', '0.1')
     end
 
-    doc = matlab.io.xml.dom.Document(root_name);
-    rootNode = doc.getDocumentElement();
-    rootNode.setAttribute('version', version_string);
-    processStruct(doc, rootNode, struct_in);
-    dom = doc;
+%     doc = matlab.io.xml.dom.Document(root_name);
+%     rootNode = doc.getDocumentElement();
+    node = document.createElement(root_name);
+    for name_cell=fieldnames(attributes_struct).'
+        name = name_cell{1};
+        node.setAttribute(name, attributes_struct.(name));
+    end
+    processStruct(document, node, struct_in);
+%     dom = doc;
 end
 
 % TODO Document helpers
@@ -96,7 +105,7 @@ function node = createNode(document, name, val)
         node = [];
         return
     end
-    node = createElement(document, class(val));
+    node = document.createElement(class(val));
     if ~isempty(name)
         node.setAttribute('name', name);
     end
