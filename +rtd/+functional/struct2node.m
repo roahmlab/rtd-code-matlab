@@ -49,68 +49,148 @@ function node = struct2node(struct_in, document, root_name, attributes_struct)
 %     dom = doc;
 end
 
-% TODO Document helpers
-function rootNode = processStruct(document, rootNode, struct_to_parse)
+% --- Helper Functions ---
 
-% Parse through the struct
-keys = fieldnames(struct_to_parse).';
-for key_cell=keys
-    key = key_cell{1};
-    val = struct_to_parse.(key);
-    % Create our node
-    node = createNode(document, key, val);
-    if ~isempty(node)
-        rootNode.appendChild(node);
+function rootNode = processStruct(document, rootNode, struct_to_parse)
+% Process a struct into a DOM object node
+%
+% This is a function that converts a struct to a DOM object. This is
+% useful for writing out a struct to an XML file. The resulting DOM object
+% can be conversely converted back to a struct using the node2struct
+% function.
+%
+% Arguments:
+%   document: The document that DOM object is associated with
+%   rootNode: The root node to append to
+%   struct_to_parse: The struct to convert to a DOM object
+%
+% Returns:
+%   rootNode: The root node with the struct appended
+%
+    arguments
+        document(1,1) matlab.io.xml.dom.Document
+        rootNode(1,1) matlab.io.xml.dom.Node
+        struct_to_parse(1,1) struct
     end
-end
+
+    % Parse through the struct
+    keys = fieldnames(struct_to_parse).';
+    for key_cell=keys
+        key = key_cell{1};
+        val = struct_to_parse.(key);
+        % Create our node
+        node = createNode(document, key, val);
+        if ~isempty(node)
+            rootNode.appendChild(node);
+        end
+    end
 end
 
 function processDispatcher(document, node, val)
-if isstruct(val)
-    processStruct(document, node, val);
+% Dispatches the processing of a value to the appropriate function
+%
+% This is a function that dispatches the processing of a value to the
+% appropriate function. It serializes the value to a string and then
+% assigns it to the node.
+%
+% Arguments:
+%   document: The document that DOM object is associated with
+%   node: The node to append to
+%   val: The value to process
+%
+    arguments
+        document(1,1) matlab.io.xml.dom.Document
+        node(1,1) matlab.io.xml.dom.Node
+        val
+    end
 
-elseif iscell(val)
-    processCell(document, node, val);
+    if isstruct(val)
+        processStruct(document, node, val);
 
-elseif ischar(val)
-    node.setTextContent(val)
+    elseif iscell(val)
+        processCell(document, node, val);
 
-elseif isnumeric(val) || islogical(val) || isstring(val)
-    val = val(:);
-    node.setTextContent(jsonencode(val, ConvertInfAndNaN=false));
+    elseif ischar(val)
+        node.setTextContent(val)
 
-else
-    error(['Encountered Unsupported Type ', class(val), '!'])
+    elseif isnumeric(val) || islogical(val) || isstring(val)
+        val = val(:);
+        node.setTextContent(jsonencode(val, ConvertInfAndNaN=false));
 
-end
+    else
+        error(['Encountered Unsupported Type ', class(val), '!'])
+    end
 end
 
 function rootNode = processCell(document, rootNode, cells_to_parse)
-
-% Flatten the cells
-cells_to_parse = cells_to_parse(:).';
-for cell_entry=cells_to_parse
-    val = cell_entry{1};
-    % Create our node
-    node = createNode(document, [], val);
-    if ~isempty(node)
-        rootNode.appendChild(node);
+% Process a cell into a DOM object node
+%
+% This is a function that converts a cell to a DOM object by converting
+% each cell entry to a DOM object.
+%
+% Arguments:
+%   document: The document that DOM object is associated with
+%   rootNode: The root node to append to
+%   cells_to_parse: The cell to convert to a DOM object
+%
+% Returns:
+%   rootNode: The root node with the cell appended
+%
+    arguments
+        document(1,1) matlab.io.xml.dom.Document
+        rootNode(1,1) matlab.io.xml.dom.Node
+        cells_to_parse cell
     end
-end
+
+    % Flatten the cells
+    cells_to_parse = cells_to_parse(:).';
+    for cell_entry=cells_to_parse
+        val = cell_entry{1};
+        % Create our node with an empty name
+        node = createNode(document, '', val);
+        if ~isempty(node)
+            rootNode.appendChild(node);
+        end
+    end
 end
 
 function node = createNode(document, name, val)
-    % Create our node
+% Create a node for a given value
+%
+% This is a function that creates a node for a given value. It adds the
+% appropriate attributes to the node and then dispatches the processing of
+% the value to the appropriate function.
+%
+% Arguments:
+%   document: The document that DOM object is associated with
+%   name: The name of the node to create
+%   val: The value to process
+%
+% Returns:
+%   node: The node created for the given value
+%
+    arguments
+        document(1,1) matlab.io.xml.dom.Document
+        name {mustBeTextScalar}
+        val
+    end
+
+    % Create our node if we have a value
     if numel(val) == 0
         node = [];
         return
     end
     node = document.createElement(class(val));
+
+    % Add a name attribute if we have one
     if ~isempty(name)
         node.setAttribute('name', name);
     end
+
+    % Add the size attribute if we have a non-scalar value
     if numel(val) > 1
         node.setAttribute('size', jsonencode(size(val)));
     end
+    
     processDispatcher(document, node, val);
 end
