@@ -42,8 +42,24 @@ function [struct_out, root_name, attributes_struct] = node2struct(rootNode)
     struct_out = parseStruct(rootNode);
 end
 
-% TODO Document helpers
+% --- Helper Functions ---
+
 function struct_out = parseStruct(element)
+% Parses a struct from an element
+%
+% This is a helper function that parses a struct from an element. It
+% recursively calls itself to parse sub-structs.
+%
+% Arguments:
+%   element - A DOM element object
+%
+% Returns:
+%   struct_out - A struct with the same structure as the XML file's node
+%
+    arguments
+        element(1,1) matlab.io.xml.dom.Node
+    end
+
     struct_out = struct;
     for child=element.Children
         if isa(child, 'matlab.io.xml.dom.Text')
@@ -57,6 +73,23 @@ function struct_out = parseStruct(element)
 end
 
 function cells_out = parseCells(element, size_vec)
+% Parses a cell array from an element
+%
+% This is a helper function that parses a cell array from an element. It
+% recursively calls itself to parse sub-cells.
+%
+% Arguments:
+%   element - A DOM element object
+%   size_vec - The size of the cell array
+%
+% Returns:
+%   cells_out - A cell array with the same structure as the XML file's node
+%
+    arguments
+        element(1,1) matlab.io.xml.dom.Node
+        size_vec(1,:) double
+    end
+
     cells_out = cell(prod(size_vec),1);
     idx = 1;
     for child=element.Children
@@ -72,36 +105,60 @@ function cells_out = parseCells(element, size_vec)
     cells_out = reshape(cells_out, size_vec);
 end
 
-
 function [key, value] = parseElement(element)
+% Parses an element
+%
+% This is a helper function that parses an element. It determines the type
+% of the element and calls the appropriate function to parse it.
+%
+% Arguments:
+%   element - A DOM element object
+%
+% Returns:
+%   key - The name of the element
+%   value - The value of the element
+%
+    arguments
+        element(1,1) matlab.io.xml.dom.Node
+    end
+
+    % Get the type of the element
     classtype = element.TagName;
     key = element.getAttribute('name');
     size_vec = element.getAttribute('size');
+    % If the size is empty, then it's a scalar
     if isempty(size_vec)
         size_vec = [1,1];
     else
         size_vec = jsondecode(size_vec).';
     end
     
+    % Get the empty type for dispatching, also get the type handle
     emptytype = feval([classtype, '.empty']);
     typehandle = str2func(classtype);
 
+    % Parse the element
     if isstruct(emptytype)
         value = parseStruct(element);
+
     elseif iscell(emptytype)
         value = parseCells(element, size_vec);
+
     elseif ischar(emptytype)
         value = element.TextContent;
+
     elseif isstring(emptytype)
         value = jsondecode(element.TextContent);
         value = string(value);
         value = reshape(value, size_vec);
+
     elseif isnumeric(emptytype) || islogical(emptytype)
         % Decode and reshape the value
         value = jsondecode(element.TextContent);
         value = reshape(value, size_vec);
         % Convert the type
         value = typehandle(value);
+        
     else
         error(['Encountered Unsupported Type ', classtype, '!'])
     end
