@@ -66,6 +66,47 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             box = rtd.entity.BoxObstacle(options=optionsStruct.options, ...
                               component_options=component_options);
         end
+
+        function [box, timed_out] = randomizeBox(world_bounds, size_range, options)
+            arguments
+                world_bounds(2,3) double
+                size_range(1,2) double
+                options.creation_buffer(1,1) double = 0
+                options.collision_system(:,1) = []
+                options.timeout(1,1) double = 10
+                options.extra_options(1,1) struct = struct()
+            end
+
+            randomizing = true;
+            start_tic = tic;
+            t_cur = toc(start_tic);
+            while randomizing && t_cur <= options.timeout
+                % create center, side lengths
+                center = ...
+                    rtd.random.deprecation.rand_range( world_bounds(1,:) + size_range(2)/2,...
+                                     world_bounds(2,:) - size_range(2)/2 );
+                side_lengths = ...
+                    rtd.random.deprecation.rand_range(size_range(1),...
+                                          size_range(2),...
+                                          [],[],...
+                                          1, 3); % 3 is the dim of the world in this case
+                % Create obstacle
+                optionsStruct = options.extra_options;
+                optionsStruct.component_options.info.creation_buffer = options.creation_buffer;
+                prop_box = rtd.entity.BoxObstacle.makeBox(center, side_lengths, options=optionsStruct);
+
+                % test it if we have a collision system
+                if ~isempty(options.collision_system)
+                    proposal_collision = prop_box.collision.getCollisionObject(buffered=true);
+                    [randomizing, ~] = options.collision_system.checkCollisionObject(proposal_collision);
+                else
+                    randomizing = false;
+                end
+                t_cur = toc(start_tic);
+            end
+            box = prop_box;
+            timed_out = t_cur > options.timeout;
+        end
     end
     
     methods

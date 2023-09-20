@@ -54,7 +54,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.face_opacity
                 options.edge_color
                 options.edge_opacity
-                options.edge_width
+                options.edge_style
                 options.start_position
                 options.goal_position
                 options.min_dist_start_to_goal
@@ -80,7 +80,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.face_opacity
                 options.edge_color
                 options.edge_opacity
-                options.edge_width
+                options.edge_style
                 options.start_position
                 options.goal_position
                 options.min_dist_start_to_goal

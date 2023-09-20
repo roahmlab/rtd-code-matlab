@@ -385,6 +385,15 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
                 self.redraw();
             end
         end
+
+        function close(self)
+            % try to close
+            try
+                close(self.figure_handle)
+            catch
+            end
+        end
+
     end
 
     methods (Static)
