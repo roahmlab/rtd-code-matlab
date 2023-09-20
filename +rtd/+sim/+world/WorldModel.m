@@ -36,7 +36,7 @@ classdef WorldModel < handle
     
     % Entity and system management methods
     methods
-        function addEntity(self, entity, options)
+        function name = addEntity(self, entity, options)
             % Add an entity to the world
             %
             % Arguments:
@@ -51,6 +51,9 @@ classdef WorldModel < handle
             %   name: the name of the entity. If not given, the name will
             %       be the classname of the entity with a number appended
             %       to it. Default: ''
+            %
+            % Returns:
+            %   name: the name of the entity added
             %
             arguments
                 self(1,1) rtd.sim.world.WorldModel
@@ -92,7 +95,7 @@ classdef WorldModel < handle
             end
         end
 
-        function addSystem(self, system, name, options)
+        function name = addSystem(self, system, name, options)
             % Add a system to the world
             %
             % Arguments:
@@ -109,6 +112,9 @@ classdef WorldModel < handle
             % Raises:
             %   SystemExists: if the system already exists and replace_system
             %       is false
+            %
+            % Returns:
+            %   name: the name of the system added
             %
             arguments
                 self(1,1) rtd.sim.world.WorldModel
@@ -199,6 +205,35 @@ classdef WorldModel < handle
                 end
                 struct_out.(name) = component;
             end
+        end
+
+        function [in_sync, out_entities, out_systems, time] = checkTimeSync(self, time)
+            arguments
+                self(1,1) rtd.sim.world.WorldModel
+                time(1,1) double = -1
+            end
+            % Get the latest times & names
+            % Don't consider static entities.
+            dyn_ent_names = fieldnames(self.dynamic_entities).';
+            entity_times = cellfun(@(name)self.dynamic_entities.(name).state.time(end), dyn_ent_names);
+            
+            system_names = fieldnames(self.systems).';
+            system_times = cellfun(@(name)self.systems.(name).time(end), system_names);
+            
+            % If provided time is negative, we are just finding synchrony
+            % to the latest time
+            if time < 0
+                time = max([entity_times, system_times]);
+            end
+
+            % Check time synchrony
+            in_sync_entities = entity_times == time;
+            in_sync_systems = system_times == time;
+            in_sync = all([in_sync_entities, in_sync_systems]);
+
+            % Get out of sync systems and entities
+            out_entities = dyn_ent_names(~in_sync_entities);
+            out_systems = system_names(~in_sync_systems);
         end
     end
 

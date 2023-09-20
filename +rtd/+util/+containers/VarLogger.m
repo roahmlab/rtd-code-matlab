@@ -185,7 +185,11 @@ classdef VarLogger < handle
             for i=1:num_res
                 entry = self.log_entries(key_name{i});
                 if options.flatten && ~isempty(entry)
-                    values{i} = [entry{:}];
+                    try
+                        values{i} = [entry{:}];
+                    catch
+                        values{i} = {entry};
+                    end
                 else
                     values{i} = {entry};
                 end

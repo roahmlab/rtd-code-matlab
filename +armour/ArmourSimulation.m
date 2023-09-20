@@ -1,11 +1,7 @@
 classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
+    % Inherited properties we want to define
     properties
         simulation_timestep = 0.5
-        world = struct
-        world_by_uuid = struct
-        entities
-        %systems
-        simulation_log rtd.util.containers.VarLogger = rtd.util.containers.VarLogger.empty()
     end
     properties
         agent
@@ -18,8 +14,9 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
         PreStep
         Step
         PostStep
-        NewObjectAdded
     end
+    
+    % Simulation Methods
     methods
         % Important stuff to get started
         function self = ArmourSimulation(optionsStruct, options)
@@ -30,115 +27,29 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             self.simulation_state = 'CONSTRUCTED';
         end
         
-        % Add object
-        function add_object(self, object, options)
-            arguments
-                self armour.ArmourSimulation
-                object
-                options.isentity = false
-                options.update_name = false
-                options.collision = []
-                options.visual = []
-            end
-            
-            % Add the object to the world
-            % Create a name for the object based on its classname if it
-            % doesn't have a given name.
-            name = object.name;
-            if isempty(name)
-                % Base classname
-                name = object.classname;
-                % Get number to append by summing a regexp. It returns the
-                % index of the occurance in each string, but since it's
-                % limited to the first word anyway, it'll be 1 or empty.
-                search_string = ['^', char(name), '\d+$'];
-                all_names = fieldnames(self.world);
-                id = sum(cell2mat(regexp(all_names, search_string)));
-                name = [char(name), num2str(id)];
-            end
-            if options.update_name
-                object.update_name(name);
-            end
-            self.world.(name) = object;
-            
-            % Add to the entity list if it's an entity
-            if options.isentity
-                self.entities = [self.entities, {object}];
-                % Add the collision component provided to the collision system
-                if ~isempty(options.collision)
-                    self.collision_system.addObjects(dynamic=options.collision);
-                end
-                % Add the visualization component provided to the visual
-                % system
-                if ~isempty(options.visual)
-                    self.visual_system.addObjects(dynamic=options.visual);
-                end
-            % if it's not, check for and add to collision or visual
-            else
-                if ~isempty(options.collision)
-                    self.collision_system.addObjects(static=options.collision);
-                end
-                % Add the visualization component provided to the visual
-                % system
-                if ~isempty(options.visual)
-                    self.visual_system.addObjects(static=options.visual);
-                end
-            end
-
-            % TODO setup custom event data to return the object added
-            notify(self, 'NewObjectAdded')
-        end
-        
         function setup(self, agent)
             arguments
                 self armour.ArmourSimulation
                 agent armour.ArmourAgent
             end
-            if self.simulation_state > "SETTING_UP"
-                self.world = struct;
-                self.entities = [];
-            end
             self.simulation_state = 'SETTING_UP';
+
+            self.world = rtd.sim.world.WorldModel;
             
             self.agent = agent;
+            self.world.addEntity(agent, type='dynamic');
+
             % Initialize the visual and collision systems
             self.visual_system = rtd.sim.systems.patch_visual.PatchVisualSystem;
             self.collision_system = rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem(time_discretization=0.01);
-            %self.systems = {self.visual_system, self.collision_system};
-            
-            % add the agent
-            self.add_object(agent, isentity=true, collision=agent.collision, visual=agent.visual);
+            self.world.addSystem(self.visual_system, 'visual_system');
+            self.world.addSystem(self.collision_system, 'collision_system');
 
-%             % Create the base obstacles
-%             base_creation_buffer = 0.025;
-%             face_color = [0.5 0.5 0.5];
-%             edge_color = [0 0 0];
-% 
-%             base_options.info.is_base_obstacle = true;
-%             base_options.info.creation_buffer = base_creation_buffer;
-%             base_options.visual.face_color = face_color;
-%             base_options.visual.edge_color = edge_color;
-%             optionsStruct.component_options = base_options;
-%             base = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 0.1778], ...
-%                                         2*[0.2794, 0.2794, 0.1778], ...
-%                                         optionsStruct);
-%             tower = rtd.entity.BoxObstacle.makeBox([-0.2359; 0; 0.6868], ...
-%                                         2*[0.1016, 0.1651, 0.3312], ...
-%                                         optionsStruct);
-%             head = rtd.entity.BoxObstacle.makeBox( [-0.0580; 0; 1.0816], ...
-%                                         2*[0.1651, 0.1397, 0.0635], ...
-%                                         optionsStruct);
-%             % Floor
-%             floor_color = [0.9, 0.9, 0.9];
-%             optionsStruct.component_options.visual.face_color = floor_color;
-%             floor = rtd.entity.BoxObstacle.makeBox([-0.0331;0;0.005], ...
-%                                         2*[1.3598, 1.3598, 0.0025], ...
-%                                         optionsStruct);
-% 
-%             % Add them to the world
-%             for obs = [base, tower, head, floor]
-%                 self.add_object(obs, collision=obs.collision.getCollisionObject, visual=obs.visual);
-%             end
+            self.collision_system.addObjects(dynamic=self.agent.collision)
+            self.visual_system.addObjects(dynamic=self.agent.visual)
+
+            self.goal_system = armour.deprecation.RandomArmConfigurationGoal(self.collision_system, self.agent);
+            self.world.addSystem(self.goal_system, 'goal_system');
             
             % reset the log
             % For other simulations, you might want to validate keys and
@@ -149,9 +60,47 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             self.simulation_state = 'SETUP_READY';
         end
         
+        function import(self, filename)
+            arguments
+                self(1,1) armour.ArmourSimulation
+                filename {mustBeFile}
+            end
+            if self.simulation_state > "INITIALIZING"
+                self.visual_system.close();
+                self.setup(self.agent);
+            end
+            self.simulation_state = 'INITIALIZING';
+            self.world.mergeFromXML(filename)
+            
+            % Add collision objects to the collision system
+            static_collisions = self.world.getEntityComponent('collision', type='static');
+            static_collision_objects = cellfun(@(x)(static_collisions.(x).getCollisionObject()),fieldnames(static_collisions));
+
+            dynamic_collisions = self.world.getEntityComponent('collision', type='dynamic');
+            dynamic_collision_objects = cellfun(@(x)(dynamic_collisions.(x)),fieldnames(dynamic_collisions));
+
+            self.collision_system.addObjects(static=static_collision_objects, dynamic=dynamic_collision_objects);
+
+            % add visual objects to the visual system
+            static_visuals = self.world.getEntityComponent('visual', type='static');
+            static_visual_objects = cellfun(@(x)(static_visuals.(x)),fieldnames(static_visuals));
+
+            dynamic_visuals = self.world.getEntityComponent('visual', type='dynamic');
+            dynamic_visual_objects = cellfun(@(x)(dynamic_visuals.(x)),fieldnames(dynamic_visuals));
+
+            self.visual_system.addObjects(static=static_visual_objects, dynamic=dynamic_visual_objects);
+
+            % Add the collision system
+            self.visual_system.addObjects(static=self.goal_system);
+
+            % Reset the visuals and ready the sim
+            self.visual_system.redraw();
+            self.simulation_state = 'READY';
+        end
+
         function initialize(self)
             if self.simulation_state > "INITIALIZING"
-                %error("This simulation currently does not support reinitialization without resetup");
+                error("This simulation currently does not support reinitialization without resetup");
             end
             self.simulation_state = 'INITIALIZING';
 
@@ -162,70 +111,43 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             start_tic = tic;
             t_cur = toc(start_tic);
             while randomizing && t_cur <= timeout
-                self.agent.state.random_init();
+                self.agent.state.random_init(save_to_options=true);
                 proposal_obj = self.agent.collision.getCollisionObject();
 
                 % test it in the collision system
-                [randomizing, pairs] = self.collision_system.checkCollisionObject(proposal_obj);
+                [randomizing, ~] = self.collision_system.checkCollisionObject(proposal_obj);
                 t_cur = toc(start_tic);
             end
-%             self.agent.state.reset(initial_position = [0,-pi/2,0,0,0,0,0]);
-            % This is captured by the goal generator if we don't set anything as the
-            % start.
 
             % Create the random obstacles
             n_obstacles = 3;
             obstacle_size_range = [0.01 0.5] ; % [min, max] side length
             creation_buffer = 0.05;
-%             centers = [-0.0584, 0.1813, 0.4391;
-%                         0.5333, -0.2291, 0.2884;
-%                         0.2826, 0.5121, 0.2953];
-%             side_lengthss = [0.3915, 0.0572, 0.1350;
-%                             0.1760, 0.3089, 0.1013;
-%                             0.1545, 0.2983, 0.0352];
             world_bounds = [self.agent.info.reach_limits(1:2:6); self.agent.info.reach_limits(2:2:6)];
-            for obs_num = 1:n_obstacles
-                randomizing = true;
-                start_tic = tic;
-                t_cur = toc(start_tic);
-                while randomizing && t_cur <= timeout
-                    % create center, side lengths
-                    center = ...
-                        rtd.random.deprecation.rand_range( world_bounds(1,:) + obstacle_size_range(2)/2,...
-                                         world_bounds(2,:) - obstacle_size_range(2)/2 );
-                    side_lengths = ...
-                        rtd.random.deprecation.rand_range(obstacle_size_range(1),...
-                                              obstacle_size_range(2),...
-                                              [],[],...
-                                              1, 3); % 3 is the dim of the world in this case
-                    % Create obstacle
-%                     center = centers(:,obs_num);
-%                     side_lengths = side_lengthss(obs_num,:);
-                    optionsStruct = struct;
-                    optionsStruct.component_options.info.creation_buffer = creation_buffer;
-                    prop_obs = rtd.entity.BoxObstacle.makeBox(center, side_lengths, options=optionsStruct);
-
-                    % test it
-                    proposal_obj = prop_obs.collision.getCollisionObject(buffered=true);
-
-                    % test it in the collision system
-                    [randomizing, pairs] = self.collision_system.checkCollisionObject(proposal_obj);
-                    t_cur = toc(start_tic);
+            for i=1:n_obstacles
+                % Randomize an obstacle
+                [box, timed_out] = rtd.entity.BoxObstacle.randomizeBox(world_bounds, ...
+                    obstacle_size_range, creation_buffer=creation_buffer, ...
+                    collision_system=self.collision_system, timeout=timeout);
+                if timed_out
+                    warning("Timeout occured when creating obstacle, obstacle may be overlapping with robot configuration!")
                 end
-                % if it's good, we save the proposal_obj
-                self.add_object(prop_obs, collision=prop_obs.collision.getCollisionObject, visual=prop_obs.visual);
+
+                % Add it
+                self.world.addEntity(box);
+                self.collision_system.addObjects(static=box.collision.getCollisionObject)
+                self.visual_system.addObjects(static=box.visual)
             end
 
-            % Create and add the goal
-            self.goal_system = armour.deprecation.RandomArmConfigurationGoal(self.collision_system, self.agent);
-%             goal_position = [2.19112372555967;0.393795848789382;-2.08886547149797;-1.94078143810946;-1.82357815033695;-1.80997964933365;2.12483409695310];
-%             self.goal_system.reset();
-%             self.goal_system.createGoal(goal_position);
+            % Create the goal
             self.goal_system.reset();
             self.goal_system.createGoal();
+            % Save the goal position (workaround for the deprecated goal
+            % system)
+            self.goal_system.reset(goal_position=self.goal_system.goal_position);
             self.visual_system.addObjects(static=self.goal_system);
 
-            % reset the agent
+            % reset the agent (We saved the position to options earlier)
             self.agent.reset
 
             % redraw
@@ -233,18 +155,8 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             
             self.simulation_state = 'READY';
         end
-        function info = pre_step(self)
-            self.simulation_state = 'PRE_STEP';
-            
-            % CALL PLANNER
-            info = struct;
 
-            % TODO setup custom event data to return the sim
-            notify(self, 'PreStep')
-        end
-        function info = step(self)
-            self.simulation_state = 'STEP';
-            
+        function info = step_impl(self)
             % Update entities
             agent_results = self.agent.update(self.simulation_timestep);
             
@@ -253,73 +165,20 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
 
             if collision
                 disp("Collision Detected, Breakpoint!")
-                pause
+                keyboard
                 disp("Continuing")
             end
             info.agent_results = agent_results;
             info.collision = collision;
             info.contactPairs = contactPairs;
-
-            % TODO setup custom event data to return the sim
-            notify(self, 'Step')
         end
-        function info = post_step(self)
-            self.simulation_state = 'POST_STEP';
+        
+        function info = post_step_impl(self)
             % Check if goal was achieved
             goal = self.goal_system.updateGoal(self.simulation_timestep);
             pause_requested = self.visual_system.updateVisual(self.simulation_timestep);
             info.goal = goal;
             info.pause_requested = pause_requested;
-
-            % TODO setup custom event data to return the sim
-            notify(self, 'PostStep')
-        end
-        function summary(self, options)
-        end
-        function run(self, options)
-            arguments
-                self armour.ArmourSimulation
-                options.max_steps = 1e8
-                options.max_time = Inf
-                options.pre_step_callback cell = {}
-                options.step_callback cell = {}
-                options.post_step_callback cell = {}
-                options.stop_on_goal = true
-            end
-            
-            % Build the execution order
-            execution_queue = [ {@(self)self.pre_step()},   ...
-                                options.pre_step_callback,  ...
-                                {@(self)self.step()},       ...
-                                options.step_callback,      ...
-                                {@(self)self.post_step()},  ...
-                                options.post_step_callback ];
-
-            steps = 0;
-            start_tic = tic;
-            t_cur = toc(start_tic);
-            pause_time = 0;
-            stop = false;
-            while steps < options.max_steps && t_cur < options.max_time && ~stop
-                % Iterate through all functions in the execution queue
-                for fcn = execution_queue
-                    info = fcn{1}(self);
-                    % Automate logging here if wanted
-                    stop = stop || (isfield(info, 'stop') && info.stop);
-                    if options.stop_on_goal && isfield(info, 'goal') && info.goal
-                        stop = true;
-                        disp("Goal acheived!")
-                    end
-                    % Pause if requested
-                    if isfield(info, 'pause_requested') && info.pause_requested
-                        start_pause = tic;
-                        keyboard
-                        pause_time = pause_time + toc(start_pause);
-                    end
-                end
-                steps = steps + 1;
-                t_cur = toc(start_tic) - pause_time;
-            end
         end
     end
 end
