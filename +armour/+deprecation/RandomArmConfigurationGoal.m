@@ -54,7 +54,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.face_opacity
                 options.edge_color
                 options.edge_opacity
-                options.edge_width
+                options.edge_style
                 options.start_position
                 options.goal_position
                 options.min_dist_start_to_goal
@@ -80,7 +80,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.face_opacity
                 options.edge_color
                 options.edge_opacity
-                options.edge_width
+                options.edge_style
                 options.start_position
                 options.goal_position
                 options.min_dist_start_to_goal
@@ -208,7 +208,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             if isempty(proposed_goal)
                 self.vdisp('Failed to find collision free goal! Using random goal', 'GENERAL');
                 % Position is already randomized
-                proposed_goal = self.arm_agent.state.get_state().q;
+                proposed_goal = self.arm_agent.state.get_state().position;
             end
             % save and update
             self.goal_position = proposed_goal;

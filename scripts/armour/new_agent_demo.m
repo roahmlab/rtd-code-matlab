@@ -159,8 +159,14 @@ pausing = false;
 %     sim.run(max_steps=1);
 %     pause(0.1)
 % end
+% Using callbacks to attach to the sim
 cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
-sim.run(max_steps=100, pre_step_callback={cb});
+sim.run(max_steps=100, pre_step_callback={cb}, autolog=true);
+
+% % How to use the listeners to attach to the sim instead of callbacks
+% cb = @(sim, event) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
+% addlistener(sim, 'Step', cb);
+% sim.run(max_steps=100, autolog=true);
 
 function info = planner_callback(sim, planner, agent_info, world_info, lookahead, HLP)
     % Get the end state
@@ -175,7 +181,7 @@ function info = planner_callback(sim, planner, agent_info, world_info, lookahead
     end
 
     % get the sensor readings at the time
-    worldState.obstacles = rtd.sim.sensors.zonotope_sensor(sim.world, sim.agent, time);
+    worldState.obstacles = rtd.sim.sensors.zonotope_sensor(sim.world.all_entities, sim.agent, time);
     a = tic;
     [trajectory, plan_info] = planner.planTrajectory(ref_state, worldState, q_des);
     toc(a)

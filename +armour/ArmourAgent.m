@@ -130,7 +130,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.component_options
                 options.component_logLevelOverride
                 options.verboseLevel
@@ -138,7 +138,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
             end
             % Perform an internal update, then merge in options
             self.getoptions();
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % reset all components
             self.reset_components()

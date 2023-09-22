@@ -59,6 +59,7 @@ classdef MexWrapper < handle
 
         % Check if we need to do a compilation update
         function files_updated = checkFileDateTimes(self)
+            %
             % Get the list of functions
             fcns = self.mex_functionsToBuild();
             fcn_list = string(fieldnames(fcns).');

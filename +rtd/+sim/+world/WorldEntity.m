@@ -1,20 +1,47 @@
 classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rtd.util.mixins.NamedClass & handle
+% WorldEntity is the base class for all entities in the world. It is
+% responsible for managing the state and info of the entity, as well as
+% providing a common interface for interacting with the entity.
+%
+% It is also responsible for managing the options of the entity, and
+% providing a common interface for interacting with the options.
+%
+% --- More Info ---
+% Author: Adam Li (adamli@umich.edu)
+% Written: 2023-01-11
+%
+% See also: rtd.sim.world.WorldModel, rtd.sim.BaseSimulation,
+% rtd.util.mixins.Options, rtd.util.mixins.NamedClass
+%
+% --- More Info ---
+%
 
     properties (Abstract)
+        % Intrinsic properties of the entity which generally do not change
         info rtd.entity.components.BaseInfoComponent
+
+        % Internal state of the entity which changes over time
         state rtd.entity.components.BaseStateComponent
     end
 
     properties (Dependent)
+        % UUID of the entity from the info
         uuid
     end
 
     methods
-        function uuid = get.uuid(self)
-            uuid = self.info.uuid;
-        end
-
         function update_name(self, name)
+            % Update the name of the entity and all of its components
+            %
+            % Arguments:
+            %     name: Name of the entity
+            %
+            arguments
+                self(1,1) rtd.sim.world.WorldEntity
+                name {mustBeTextScalar}
+            end
+
+            % update the name
             self.name = name;
             
             % update options
@@ -32,19 +59,44 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
         end
 
         function component = construct_component(self, name, varargin)
+            % Construct a component with the given name and arguments
+            %
+            % Arguments:
+            %     name: Name of the component
+            %     varargin: Arguments to pass to the component
+            %
+            % Returns:
+            %     component: Constructed component
+            %
+            arguments
+                self(1,1) rtd.sim.world.WorldEntity
+                name {mustBeTextScalar}
+            end
+            arguments (Repeating)
+                varargin
+            end
+
+            % Get the options for the component if they exist
             option_struct = self.instanceOptions;
             if isfield(option_struct, 'component_options') ...
                     && isfield(option_struct.component_options, name)
+                % If we have options, pass them in
                 nvargs = namedargs2cell(option_struct.component_options.(name));
                 component = feval(option_struct.components.(name), varargin{:}, nvargs{:});
             else
+                % Otherwise, just pass in the arguments
                 component = feval(option_struct.components.(name), varargin{:});
             end
+
             self.(name) = component;
         end
 
-        % TODO add inclusion, exclusion options
         function reset_components(self)
+            % Reset all components of the entity
+            %
+            % TODO add inclusion, exclusion options
+            %
+
             % Get the latest options
             options = self.getoptions();
 
@@ -77,15 +129,21 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
             end
         end
 
-        % Get all the options used for initialization of the robot
         function options = getoptions(self)
+            % Get the options for the entity and all of its components
+            % Also performs an internal update of the options
+            %
+            % Returns:
+            %     options (struct): Options for the entity and its components
+            %
+
             % Update all the component options before returning.
 
             % Get a proposal set of options
             options = getoptions@rtd.util.mixins.Options(self);
 
             % Get all the component options
-            options.component_options = rtd.sim.world.WorldEntity.get_componentoptions(options.components, self);
+            options.component_options = get_componentoptions(options.components, self);
 
             % Merge it back into the stored options
             options = self.mergeoptions(options);
@@ -93,9 +151,21 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
 
     end
 
-    methods (Static)
+    % Methods for dependent properties
+    methods
+        function uuid = get.uuid(self)
+            uuid = self.info.uuid;
+        end
+    end
 
+    methods (Static)
         function options = baseoptions()
+            % Base options for any world entity
+            %
+            % Returns:
+            %     options (struct): Options for the entity and its components
+            %
+
             options.components = struct;
             options.component_options = struct;%get_componentoptions(components);
             options.component_logLevelOverride = [];
@@ -104,6 +174,19 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
         end
 
         function options = get_componentOverrideOptions(components)
+            % Gets options for provided components if they are already constructed or the default options if they aren't
+            % and returns them in a partial options struct for the entity to merge in as overrides
+            %
+            % Arguments:
+            %     components (struct): Struct of components to generate override options for
+            %
+            % Returns:
+            %     options (struct): Partial struct of WorldEntity options for the just the components provided
+            %
+            arguments
+                components (1,1) struct
+            end
+
             % mark each of our preconstructed components and save them
             names = fieldnames(components).';
             components = struct2cell(components).';
@@ -122,27 +205,35 @@ classdef WorldEntity < matlab.mixin.Heterogeneous & rtd.util.mixins.Options & rt
 
             % Preprocess the instances for options
             component_handles = [provided_component_names(~string_mask); provided_components(~string_mask)];
-            options.component_options = rtd.sim.world.WorldEntity.get_componentoptions(struct(component_handles{:}));
+            options.component_options = get_componentoptions(struct(component_handles{:}));
         end
+    end
+end
 
-        function componentoptions = get_componentoptions(component_classnames, components)
-            arguments
-                component_classnames
-                components = component_classnames
-            end
-            % Generate an entry for each field which is of type rtd.util.mixins.Options
-            fields = fieldnames(component_classnames).';
-            componentoptions = struct;
-            for fieldname = fields
-                if ismember('rtd.util.mixins.Options', superclasses(components.(fieldname{1})))
-                    try
-                        componentoptions.(fieldname{1}) ...
-                            = components.(fieldname{1}).getoptions();
-                    catch
-                        componentoptions.(fieldname{1}) ...
-                            = feval([components.(fieldname{1}) '.defaultoptions']);
-                    end
-                end
+% Helper functions
+function componentoptions = get_componentoptions(component_classnames, components)
+    % Get the options for the provided components or call their default options
+    % if they aren't actually constructed
+    %
+    % Arguments:
+    %     component_classnames (struct): Struct of component classnames
+    %     components (struct): Struct of components or their classnames
+    arguments
+        component_classnames(1,1) struct
+        components = component_classnames
+    end
+
+    % Generate an entry for each field which is of type rtd.util.mixins.Options
+    fields = fieldnames(component_classnames).';
+    componentoptions = struct;
+    for fieldname = fields
+        if ismember('rtd.util.mixins.Options', superclasses(components.(fieldname{1})))
+            try
+                componentoptions.(fieldname{1}) ...
+                    = components.(fieldname{1}).getoptions();
+            catch
+                componentoptions.(fieldname{1}) ...
+                    = feval([components.(fieldname{1}) '.defaultoptions']);
             end
         end
     end
