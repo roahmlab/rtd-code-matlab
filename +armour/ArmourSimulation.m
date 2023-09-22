@@ -1,24 +1,29 @@
 classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
     % Inherited properties we want to define
     properties
+        % We plan and run ARMOUR at half second intervals
         simulation_timestep = 0.5
     end
+
+    % These are extra references to entities and systems stored in the world model just for convenience
     properties
+        % Reference to the primary arm agent entity for convenience
         agent
-        obstacles
+
+        % Reference to the collision system for convenience
         collision_system
+
+        % Reference to the visual system for convenience
         visual_system
+
+        % Reference to the goal system for convenience
         goal_system
-    end
-    events
-        PreStep
-        Step
-        PostStep
     end
     
     % Simulation Methods
     methods
         % Important stuff to get started
+        % TODO breakout options
         function self = ArmourSimulation(optionsStruct, options)
             arguments
                 optionsStruct.options struct = struct()
@@ -26,12 +31,23 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             end
             self.simulation_state = 'CONSTRUCTED';
         end
-        
+       
         function setup(self, agent)
+            % Setup the entity and systems for the simulation
+            %
+            % Resets the simulation to a blank state and sets up the
+            % simulation with the given ArmourAgent. For this simulation,
+            % this must be called before initialize or import as the
+            % ArmourAgent class is currently not fully serializable.
+            %
+            % Arguments:
+            %   agent: The ArmourAgent to use for the simulation
+            %
             arguments
-                self armour.ArmourSimulation
-                agent armour.ArmourAgent
+                self(1,1) armour.ArmourSimulation
+                agent(1,1) armour.ArmourAgent
             end
+
             self.simulation_state = 'SETTING_UP';
 
             self.world = rtd.sim.world.WorldModel;
@@ -56,15 +72,25 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             % manually add them to ensure the summary section works as
             % expected.
             self.simulation_log = rtd.util.containers.VarLogger(validate_keys=false);
-
+            self.simulation_time = 0;
             self.simulation_state = 'SETUP_READY';
         end
         
         function import(self, filename)
+            % Import all configurations for the simulation world from an XML file
+            %
+            % This function will import all entities and systems from an
+            % XML file. This needs to be called after setup and will
+            % overwrite any existing entities and systems.
+            %
+            % Arguments:
+            %   filename: The filename of the XML file to import
+            %
             arguments
                 self(1,1) armour.ArmourSimulation
                 filename {mustBeFile}
             end
+
             if self.simulation_state > "INITIALIZING"
                 self.visual_system.close();
                 self.setup(self.agent);
@@ -99,6 +125,16 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
         end
 
         function initialize(self)
+            % Initialize the simulation
+            %
+            % This function will initialize the simulation. This needs to
+            % be called after setup and will ready the simulation for
+            % stepping.
+            %
+            arguments
+                self(1,1) armour.ArmourSimulation
+            end
+
             if self.simulation_state > "INITIALIZING"
                 error("This simulation currently does not support reinitialization without resetup");
             end
@@ -155,7 +191,13 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             
             self.simulation_state = 'READY';
         end
+    end
 
+    % Protected methods for stepping
+    methods(Access=protected)
+        % Pre-step doesn't exist for this simulation
+
+        % Step the simulation
         function info = step_impl(self)
             % Update entities
             agent_results = self.agent.update(self.simulation_timestep);
@@ -173,6 +215,7 @@ classdef ArmourSimulation < rtd.sim.BaseSimulation & handle
             info.contactPairs = contactPairs;
         end
         
+        % Post-step goal checks and visual updates
         function info = post_step_impl(self)
             % Check if goal was achieved
             goal = self.goal_system.updateGoal(self.simulation_timestep);
