@@ -20,7 +20,7 @@ classdef FOGenerator < rtd.planner.reachsets.ReachSetGenerator
         function self = FOGenerator(robot, jrsGenerator, options)
             arguments
                 robot armour.ArmourAgent
-                jrsGenerator armour.reachsets.JRSGenerator
+                jrsGenerator armour.reachsets.JRS.OnlineGeneratorBase
                 options.smooth_obs(1,1) logical = false
                 options.obs_frs_combs(1,1) struct = struct('maxcombs', 200, 'combs', [])
                 options.verboseLevel(1,1) rtd.util.types.LogLevel = "DEBUG"

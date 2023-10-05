@@ -24,7 +24,7 @@ classdef JLSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
             self.dq_lb = dq_lb;
             self.n_q = jrsInstance.n_q;
             self.n_t = jrsInstance.n_t;
-            self.num_parameters = jrsInstance.n_k;
+            self.num_parameters = jrsInstance.num_parameters;
             
             self.input_range = jrsInstance.input_range;
             self.set_vdisplevel(verbosity);
@@ -47,7 +47,7 @@ classdef JLSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
                         msg = sprintf('ADDED UPPER BOUND JOINT POSITION CONSTRAINT ON JOINT %d AT TIME %d \n', j, i);
                         self.vdisp(msg, 'DEBUG')
                         constraints{end+1, 1} = @(k) slice(self.q_ub{i, 1}{j, 1}, k);
-                        grad_q_ub = grad(self.q_ub{i, 1}{j, 1}, self.n_q);
+                        grad_q_ub = grad(self.q_ub{i, 1}{j, 1}, self.num_parameters);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_q_ub);
                     end
                     
@@ -56,7 +56,7 @@ classdef JLSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
                         msg = sprintf('ADDED LOWER BOUND JOINT POSITION CONSTRAINT ON JOINT %d AT TIME %d \n', j, i);
                         self.vdisp(msg, 'DEBUG')
                         constraints{end+1, 1} = @(k) slice(self.q_lb{i, 1}{j, 1}, k);
-                        grad_q_lb = grad(self.q_lb{i, 1}{j, 1}, self.n_q);
+                        grad_q_lb = grad(self.q_lb{i, 1}{j, 1}, self.num_parameters);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_q_lb);
                     end
                     
@@ -65,7 +65,7 @@ classdef JLSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
                         msg = sprintf('ADDED UPPER BOUND JOINT VELOCITY CONSTRAINT ON JOINT %d AT TIME %d \n', j, i);
                         self.vdisp(msg, 'DEBUG')
                         constraints{end+1, 1} = @(k) slice(self.dq_ub{i, 1}{j, 1}, k);
-                        grad_dq_ub = grad(self.dq_ub{i, 1}{j, 1}, self.n_q);
+                        grad_dq_ub = grad(self.dq_ub{i, 1}{j, 1}, self.num_parameters);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_dq_ub);
                     end
                     
@@ -74,7 +74,7 @@ classdef JLSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
                         msg = sprintf('ADDED LOWER BOUND JOINT VELOCITY CONSTRAINT ON JOINT %d AT TIME %d \n', j, i);
                         self.vdisp(msg, 'DEBUG')
                         constraints{end+1, 1} = @(k) slice(self.dq_lb{i, 1}{j, 1}, k);
-                        grad_dq_lb = grad(self.dq_lb{i, 1}{j, 1}, self.n_q);
+                        grad_dq_lb = grad(self.dq_lb{i, 1}{j, 1}, self.num_parameters);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_dq_lb);
                     end
                 end

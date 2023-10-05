@@ -17,7 +17,7 @@ classdef JLSGenerator < rtd.planner.reachsets.ReachSetGenerator
         function self = JLSGenerator(robot, jrsGenerator, options)
             arguments
                 robot armour.ArmourAgent
-                jrsGenerator armour.reachsets.JRSGenerator
+                jrsGenerator armour.reachsets.JRS.OnlineGeneratorBase
                 options.verboseLevel(1,1) rtd.util.types.LogLevel = "DEBUG"
             end
             self.robot = robot;

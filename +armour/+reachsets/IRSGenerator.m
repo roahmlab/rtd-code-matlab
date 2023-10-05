@@ -18,7 +18,7 @@ classdef IRSGenerator < rtd.planner.reachsets.ReachSetGenerator
         function self = IRSGenerator(robot, jrsGenerator, options)
             arguments
                 robot armour.ArmourAgent
-                jrsGenerator armour.reachsets.JRSGenerator
+                jrsGenerator armour.reachsets.JRS.OnlineGeneratorBase
                 options.use_robust_input(1,1) logical = true
                 options.verboseLevel(1,1) rtd.util.types.LogLevel = "DEBUG"
             end

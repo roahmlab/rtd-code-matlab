@@ -26,7 +26,7 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
             self.FO = FO;
             self.jrsInstance = jrsInstance;
             self.smooth_obs = smooth_obs;
-            self.num_parameters = jrsInstance.n_k;
+            self.num_parameters = jrsInstance.num_parameters;
             
             self.input_range = jrsInstance.input_range;
             % self.output_range = jrsInstance.output_range;
@@ -78,7 +78,7 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
                         obs_constraint_pz_slice = @(k) slice(obs_constraint_pz, k);
 
                         % add gradients
-                        grad_obs_constraint_pz = grad(obs_constraint_pz, self.jrsInstance.n_q);
+                        grad_obs_constraint_pz = grad(obs_constraint_pz, self.jrsInstance.num_parameters);
                         grad_obs_constraint_pz_slice = @(k) cellfun(@(C) slice(C, k), grad_obs_constraint_pz, 'UniformOutput', false);
                         
                         % save
@@ -96,7 +96,7 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
                     end
                 end
             end
-            % update n_k and parameter_range if smooth
+            % update num_parameters and parameter_range if smooth
             if self.smooth_obs && ~isempty(smooth_obs_lambda_index)
                 self.num_parameters = self.jrsInstance.num_parameters;% + smooth_obs_lambda_index{end}(end);
                 %lambda_range = ones(5, 2) .* [0.0, 1.0];
@@ -107,8 +107,8 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
             if self.smooth_obs
                 nlconFunction = ...
                     @(k) eval_smooth_constraint( ...
-                        k(1:self.jrsInstance.n_k),...
-                        k(self.jrsInstance.n_k+1:end),...
+                        k(1:self.jrsInstance.num_parameters),...
+                        k(self.jrsInstance.num_parameters+1:end),...
                         smooth_obs_constraints_A,...
                         smooth_obs_constraints,...
                         smooth_obs_lambda_index);
@@ -124,8 +124,8 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
             [h_obs, max_idx] = max(c(k));
             h_obs = -h_obs;
             grad_eval = grad_c(k);
-            grad_h_obs = zeros(self.jrsInstance.n_k, 1);
-            for i = 1:self.jrsInstance.n_k
+            grad_h_obs = zeros(self.jrsInstance.num_parameters, 1);
+            for i = 1:self.jrsInstance.num_parameters
                 grad_h_obs(i, 1) = -grad_eval{i}(max_idx, :);
             end
         end
@@ -138,12 +138,12 @@ classdef FOInstance < rtd.planner.reachsets.ReachSetInstance
             h_obs = -c(k)'*lambda;
 
             % evaluate gradient w.r.t. k... 
-            % grad_c(k) gives n_k x 1 cell, each containing
+            % grad_c(k) gives num_parameters x 1 cell, each containing
             % an N x 1 vector, where N is the number of rows of A.
             % take the dot product of each cell with lambda
             grad_eval = grad_c(k);
-            grad_h_obs = zeros(self.jrsInstance.n_k, 1);
-            for i = 1:self.jrsInstance.n_k
+            grad_h_obs = zeros(self.jrsInstance.num_parameters, 1);
+            for i = 1:self.jrsInstance.num_parameters
                 grad_h_obs(i, 1) = -grad_eval{i}'*lambda;
             end
 
@@ -173,7 +173,7 @@ function [h, heq, grad_h, grad_heq] = eval_smooth_constraint(k, lambda, ...
     smooth_obs_constraints_A, smooth_obs_constraints, smooth_obs_lambda_index)
 
     n_obs_c = length(smooth_obs_constraints);
-    n_k = length(k);
+    num_parameters = length(k);
     n_lambda = length(lambda);
 
     % max_lambda_index = P.smooth_obs_lambda_index{end}(end);
@@ -184,7 +184,7 @@ function [h, heq, grad_h, grad_heq] = eval_smooth_constraint(k, lambda, ...
     % - n_lambda lambda \in {0, 1}
 
     h = zeros(2*n_obs_c, 1);
-    grad_h = zeros(n_k + n_lambda, 2*n_obs_c);
+    grad_h = zeros(num_parameters + n_lambda, 2*n_obs_c);
 
     for i = 1:n_obs_c
         lambda_idx = smooth_obs_lambda_index{i};
@@ -193,26 +193,26 @@ function [h, heq, grad_h, grad_heq] = eval_smooth_constraint(k, lambda, ...
 
         % obs avoidance constraints:
         h(i, 1) = h_i;
-        grad_h(1:n_k, i) = grad_h_i(1:n_k, 1);
-        grad_h(n_k + lambda_idx, i) = grad_h_i(n_k+1:end, 1);
+        grad_h(1:num_parameters, i) = grad_h_i(1:num_parameters, 1);
+        grad_h(num_parameters + lambda_idx, i) = grad_h_i(num_parameters+1:end, 1);
 
         % sum lambdas for this obstacle constraint >= 1
         % sum lambdas for this obstacle constraint <= 1?
 %                 h(n_obs_c + i, 1) = 1 - sum(lambda_i, 1); 
-%                 grad_h(n_k + lambda_idx, n_obs_c + i) = -ones(length(lambda_i), 1);
+%                 grad_h(num_parameters + lambda_idx, n_obs_c + i) = -ones(length(lambda_i), 1);
 
         % from Borrelli paper
         h(n_obs_c + i, 1) = norm(smooth_obs_constraints_A{i}'*lambda_i, 2) - 1;
         % implement gradient here!!!
         A_bar = smooth_obs_constraints_A{i}*smooth_obs_constraints_A{i}';
-        grad_h(n_k + lambda_idx, n_obs_c + i) = 0.5*(lambda_i'*A_bar*lambda_i)^(-0.5)*2*A_bar*lambda_i;
+        grad_h(num_parameters + lambda_idx, n_obs_c + i) = 0.5*(lambda_i'*A_bar*lambda_i)^(-0.5)*2*A_bar*lambda_i;
 
     end
 
     % lambda \in {0, 1} for each lambda
 %             heq = lambda.*(lambda - 1);
-%             grad_heq = zeros(n_k + n_lambda, n_lambda);
-%             grad_heq(n_k+1:end, :) = diag(2*lambda - 1);
+%             grad_heq = zeros(num_parameters + n_lambda, n_lambda);
+%             grad_heq(num_parameters+1:end, :) = diag(2*lambda - 1);
 
      heq = [];
      grad_heq = [];

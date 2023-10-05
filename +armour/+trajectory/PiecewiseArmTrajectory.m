@@ -233,8 +233,8 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
             end
 
             % Mask the first and second half of the trajectory
-            t_plan_mask = t_shifted < self.planTime;
-            t_stop_mask = logical((t_shifted < self.horizonTime) - t_plan_mask);
+            t_plan_mask = t_shifted <= self.planTime;
+            t_stop_mask = logical((t_shifted <= self.horizonTime) - t_plan_mask);
             t_plan_vals = t_shifted(t_plan_mask);
             t_stop_vals = t_shifted(t_stop_mask) - self.planTime;
 
