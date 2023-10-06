@@ -20,7 +20,7 @@ classdef IRSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
             self.u_lb = u_lb;
             self.n_q = jrsInstance.n_q;
             self.n_t = jrsInstance.n_t;
-            self.num_parameters = jrsInstance.n_k;
+            self.num_parameters = jrsInstance.num_parameters;
             
             self.input_range = jrsInstance.input_range;
             self.set_vdisplevel(verbosity);
@@ -43,7 +43,7 @@ classdef IRSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
                         msg = sprintf('ADDED UPPER BOUND INPUT CONSTRAINT ON JOINT %d AT TIME %d \n', j, i);
                         self.vdisp(msg, 'DEBUG');
                         constraints{end+1, 1} = @(k) slice(self.u_ub{i, 1}{j, 1}, k);
-                        grad_u_ub = grad(self.u_ub{i, 1}{j, 1}, self.n_q);
+                        grad_u_ub = grad(self.u_ub{i, 1}{j, 1}, self.num_parameters);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_u_ub);
                     end
 
@@ -53,7 +53,7 @@ classdef IRSInstance < rtd.planner.reachsets.ReachSetInstance & rtd.util.mixins.
                         msg = sprintf('ADDED LOWER BOUND INPUT CONSTRAINT ON JOINT %d AT TIME %d \n', j, i);
                         self.vdisp(msg, 'DEBUG');
                         constraints{end+1, 1} = @(k) slice(self.u_lb{i, 1}{j, 1}, k);
-                        grad_u_lb = grad(self.u_lb{i, 1}{j, 1}, self.n_q);
+                        grad_u_lb = grad(self.u_lb{i, 1}{j, 1}, self.num_parameters);
                         grad_constraints{end+1, 1} = @(k) cellfun(@(C) slice(C, k), grad_u_lb);
                     end
                 end

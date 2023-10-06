@@ -22,38 +22,40 @@ import armour.pz_roahm.*
     cq = cos_sin_q.c(1);
     sq = cos_sin_q.c(2);
     C = eye(3) + sq*U + (1-cq)*U^2;
-    C_t = C';
+%     C_t = C';
 
     Grest = [];
-    Grest_t = [];
+%     Grest_t = [];
     for j = 1:size(cos_sin_q.Grest, 2)
         cq = cos_sin_q.Grest(1, j);
         sq = cos_sin_q.Grest(2, j);
         Grest_tmp = sq*U + -cq*U^2;
         Grest = cat(3, Grest, Grest_tmp);
-        Grest_t = cat(3, Grest_t, Grest_tmp');
+%         Grest_t = cat(3, Grest_t, Grest_tmp');
     end
 
     G = [];
-    G_t = [];
+%     G_t = [];
     for j = 1:size(cos_sin_q.G, 2)
         cq = cos_sin_q.G(1, j);
         sq = cos_sin_q.G(2, j);
         G_tmp = sq*U + -cq*U^2;
         G = cat(3, G, G_tmp);
-        G_t = cat(3, G_t, G_tmp');
+%         G_t = cat(3, G_t, G_tmp');
     end
 
     if isempty(G) && isempty(Grest)
         R = matPolyZonotope_ROAHM(C);
-        R_t = matPolyZonotope_ROAHM(C_t);
+%         R_t = matPolyZonotope_ROAHM(C_t);
     elseif isempty(G) && ~isempty(Grest)
         R = matPolyZonotope_ROAHM(C, G, Grest);
-        R_t = matPolyZonotope_ROAHM(C_t, G_t, Grest_t);
+%         R_t = matPolyZonotope_ROAHM(C_t, G_t, Grest_t);
     elseif ~isempty(G)
         R = matPolyZonotope_ROAHM(C, G, Grest, cos_sin_q.expMat, cos_sin_q.id);
-        R_t = matPolyZonotope_ROAHM(C_t, G_t, Grest_t, cos_sin_q.expMat, cos_sin_q.id);
+%         R_t = matPolyZonotope_ROAHM(C_t, G_t, Grest_t, cos_sin_q.expMat, cos_sin_q.id);
     end
+
+    R_t = R.';
 
 
 end
