@@ -19,7 +19,7 @@ classdef EEGenerator < rtd.planner.reachsets.ReachSetGenerator
         function self = EEGenerator(robot, jrsGenerator, options)
             arguments
                 robot armour.ArmourAgent
-                jrsGenerator armour.reachsets.JRSGenerator
+                jrsGenerator armour.reachsets.JRS.OnlineGeneratorBase
                 options.u_s(1,1) double = 0.609382421
                 options.surf_rad(1,1) double = 0.029
             end
@@ -40,6 +40,7 @@ classdef EEGenerator < rtd.planner.reachsets.ReachSetGenerator
             % First get the JRS (allow the use of a cached value if it
             % exists)
             jrsInstance = self.jrsGenerator.getReachableSet(robotState, ignore_cache=false);
+            jrsInstance = jrsInstance.rs;
             
             % set up zeros and overapproximation of r
             self.vdisp("Set up zeros for overapproximation", 'TRACE')
@@ -198,7 +199,9 @@ classdef EEGenerator < rtd.planner.reachsets.ReachSetGenerator
                 slip_poly{i,1} = remove_dependence(slip_poly{i,1},jrsInstance.k_id(end));
             end
             
-            reachableSet = waitr.reachsets.EEInstance(sep_poly, slip_poly, tip_poly, jrsInstance);
+            reachableSet = struct;
+            reachableSet.id = 1;
+            reachableSet.rs = waitr.reachsets.EEInstance(sep_poly, slip_poly, tip_poly, jrsInstance);
         end
     end
 end

@@ -24,7 +24,7 @@ classdef EEInstance < rtd.planner.reachsets.ReachSetInstance
             self.tip_poly = tip_poly;
             self.n_q = jrsInstance.n_q;
             self.n_t = jrsInstance.n_t;
-            self.num_parameters = jrsInstance.n_k;
+            self.num_parameters = jrsInstance.num_parameters;
             
             self.input_range = jrsInstance.input_range;
             self.output_range = [];

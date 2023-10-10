@@ -42,7 +42,7 @@ classdef WaitrPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
                 options.grasp_constraints_flag (1,1) logical
                 options.use_robust_input (1,1) logical
                 options.smooth_obs (1,1) logical
-                options.traj_type {mustBeMember(options.traj_type,{'piecewise','bernstein'})}
+                options.traj_type {mustBeMember(options.traj_type,{'piecewise','bernstein','twobernstein'})}
                 options.verboseLevel (1,1) rtd.util.types.LogLevel
                 options.u_s (1,1) double
                 options.surf_rad (1,1) double
@@ -51,7 +51,14 @@ classdef WaitrPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             
             % Create our reachable sets
             self.rsGenerators = struct;
-            self.rsGenerators.jrs = armour.reachsets.JRSGenerator(robot, traj_type=options.traj_type, verboseLevel=options.verboseLevel);
+            switch options.traj_type
+              case 'piecewise'
+                self.rsGenerators.jrs = armour.reachsets.JRS.PiecewiseJRSGen(robot, verboseLevel=options.verboseLevel);
+              case 'bernstein'
+                self.rsGenerators.jrs = armour.reachsets.JRS.BernsteinJRSGen(robot, verboseLevel=options.verboseLevel);
+              case 'twobernstein'
+                self.rsGenerators.jrs = armour.reachsets.JRS.TwoBernsteinJRSGen(robot, verboseLevel=options.verboseLevel);
+            end
             self.rsGenerators.fo = armour.reachsets.FOGenerator(robot, self.rsGenerators.jrs, smooth_obs=options.smooth_obs, verboseLevel=options.verboseLevel);
             if options.input_constraints_flag
                 self.rsGenerators.irs = armour.reachsets.IRSGenerator(robot, self.rsGenerators.jrs, use_robust_input=options.use_robust_input, verboseLevel=options.verboseLevel);
@@ -75,7 +82,6 @@ classdef WaitrPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
             % Create the trajopt object.
             self.trajopt = {rtd.planner.trajopt.RtdTrajOpt( ...
                 trajOptProps,           ...
-                robot,              ...
                 self.rsGenerators,          ...
                 self.objective,              ...
                 self.optimizationEngine,     ...
@@ -88,7 +94,7 @@ classdef WaitrPlanner < rtd.planner.RtdPlanner & rtd.util.mixins.Options
         function [trajectory, info] = planTrajectory(self, robotState, worldState, waypoint)
             arguments
                 self waitr.WaitrPlanner
-                robotState rtd.entity.states.ArmRobotState
+                robotState rtd.entity.states.ArmRobotStateInstance
                 worldState
                 waypoint
             end

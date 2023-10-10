@@ -41,7 +41,7 @@ classdef WaitrDynamics < armour.agent.ArmourDynamics
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.measurement_noise_points
                 options.measurement_noise_pos_sigma
@@ -52,7 +52,7 @@ classdef WaitrDynamics < armour.agent.ArmourDynamics
                 options.u_s
                 options.surf_rad
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             reset@armour.agent.ArmourDynamics(self);
 
             % Grasp constraint parameters
@@ -62,15 +62,23 @@ classdef WaitrDynamics < armour.agent.ArmourDynamics
 
         % Check that the grasp constraints aren't violated
         function out = grasp_constraint_check(self, t_check_step)
+            % if not logging, skip
+            if isempty(self.controller_log)
+                self.vdisp('Not logging controller inputs, skipping grasp checks!', 'INFO');
+                out = false;
+                return
+            end
+
             % retrieve the last log entry
-            entries = self.controller_log.get('input_time', 'input', 'z', flatten=false);
+            entries = self.controller_log.get('input_time', 'input', flatten=false);
             t_input = entries.input_time{end};
-            z = entries.z{end};
-            
             % interpolate for the t_check_step and get agent input
             % trajectory interpolated to time
             t_check = t_input(1):t_check_step:t_input(end);
-            z_check = interp1(t_input, z.', t_check).';
+            states = self.robot_state.get_state(t_check);
+            z_check = states.getStateSpace( ...
+                position_idxs=self.robot_state.position_indices, ...
+                velocity_idxs=self.robot_state.velocity_indices);
             
             % run grasp check
             self.vdisp('Running grasp checks!', 'INFO');
