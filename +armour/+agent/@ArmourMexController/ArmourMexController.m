@@ -7,12 +7,25 @@ classdef ArmourMexController < armour.agent.ArmourController & rtd.util.MexWrapp
 
     methods
         function reset(self, varargin)
-            reset@armour.agent.ArmourController(self, varargin{:})
+            parser = inputParser;
+            parser.KeepUnmatched = true;
+            parser.PartialMatching = false;
+            parser.StructExpand = false;
+            parser.addParameter('robot_file', "kinova_without_gripper.txt");
+            parser.parse(varargin{:})
+
+            robot_file = parser.Results.robot_file;
+            passthrough_args = namedargs2cell(parser.Unmatched);
+
+            reset@armour.agent.ArmourController(self, passthrough_args{:})
 
             % Default model
-            robot_file = fullfile(basepath(self), "kinova_without_gripper.txt");
+%             robot_file = fullfile(basepath(self), "kinova_without_gripper.txt");
+            if ~robot_file.startsWith('/')
+                robot_file = fullfile(basepath(self), robot_file);
+            end
             robot_file = char(robot_file);
-            warning('Current robust controller is hardcoded to use kinova_without_gripper!');
+            self.vdisp(['Using robot file: ', robot_file], "INFO");
 
             model_uncertainty = 0.03;
             warning('Current robust controller is hardcoded to use model uncertainty of 0.03 for all!');
@@ -53,8 +66,9 @@ classdef ArmourMexController < armour.agent.ArmourController & rtd.util.MexWrapp
             velocity = z(self.robot_state.velocity_indices);
 
             % Prepare trajectory
+            trajectory = self.trajectories{end};
             startTime = self.robot_state.get_state().time;
-            target = self.trajectories.getCommand(startTime + t);
+            target = trajectory.getCommand(startTime + t);
 
             % Get the control inputs from the mex controller
             [u, tau, v] = updateKinovaController( ...
