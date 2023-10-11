@@ -1,4 +1,4 @@
-classdef PolyZonoGroup < loaders.RSLoader.Group & handle
+classdef PolyZonoGroup < rtd.util.loaders.RSLoader.Group & handle
 
     properties
         attributes
@@ -53,7 +53,7 @@ classdef PolyZonoGroup < loaders.RSLoader.Group & handle
             
             % If we have an exp group or an id group, load them too
             if ~isempty(self.attributes.exp_id)
-                self.exp_group = loaders.RSLoader.DataGroup(self.loader, self.parent, self.dataset_idxs(self.attributes.exp_id));
+                self.exp_group = rtd.util.loaders.RSLoader.DataGroup(self.loader, self.parent, self.dataset_idxs(self.attributes.exp_id));
                 self.exp_group.load();
                 if self.loader.preload_data
                     self.exp_group.getMatData();
@@ -63,7 +63,7 @@ classdef PolyZonoGroup < loaders.RSLoader.Group & handle
                 end
             end
             if ~isempty(self.attributes.id_id)
-                self.id_group = loaders.RSLoader.DataGroup(self.loader, self.parent, self.dataset_idxs(self.attributes.id_id));
+                self.id_group = rtd.util.loaders.RSLoader.DataGroup(self.loader, self.parent, self.dataset_idxs(self.attributes.id_id));
                 self.id_group.load();
                 if self.loader.preload_data
                     self.id_group.getMatData();
@@ -82,7 +82,7 @@ classdef PolyZonoGroup < loaders.RSLoader.Group & handle
         
         function zonos = getZonos(self, idx)
             arguments
-                self loaders.RSLoader.PolyZonoGroup
+                self rtd.util.loaders.RSLoader.PolyZonoGroup
                 idx (:,1) double = (1:self.attributes.num_sets)-1
             end
             
@@ -187,7 +187,7 @@ classdef PolyZonoGroup < loaders.RSLoader.Group & handle
         
         function rawdata = get_data(self, range)
             arguments
-                self loaders.RSLoader.PolyZonoGroup
+                self rtd.util.loaders.RSLoader.PolyZonoGroup
                 range (1,2) double = [self.attributes.indices(1) self.attributes.indices(end)]
             end
             
