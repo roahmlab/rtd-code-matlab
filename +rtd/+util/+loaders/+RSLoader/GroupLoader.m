@@ -37,7 +37,7 @@ classdef GroupLoader < rtd.util.loaders.RSLoader.Group & handle
 
                 % If we have the polynomial zonotope terminal group
                 case 1
-                    % TODO
+                    group = rtd.util.loaders.RSLoader.PolyZonoGroup(self.loader, self.parent, -self.indices);
 
                 % Unknown set type.
                 otherwise
