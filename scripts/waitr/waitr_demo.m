@@ -54,8 +54,8 @@ if visualize_cad
     camlight
 end
 
-%controller = [];
-controller = 'waitr.agent.WaitrMexController';
+controller = [];
+% controller = 'waitr.agent.WaitrMexController';
 
 % Create
 agent = waitr.WaitrAgent(agent_info, visual=visual, ...
@@ -403,7 +403,7 @@ saved_data.sep = sep;
 saved_data.slip2 = slip2;
 saved_data.tip2 = tip2;
 saved_data.goal_pos = sim.goal_system.goal_position;
-saved_data.obstacles = sim.obstacles;
+% saved_data.obstacles = sim.obstacles;
 savename = sprintf('comparison_result/saved_data_arch_%s.mat', datestr(now,'mm_dd_yyyy_HH_MM_SS'));
 save(savename,"saved_data");
 

@@ -70,7 +70,7 @@ classdef WaitrDynamics < armour.agent.ArmourDynamics
             end
 
             % retrieve the last log entry
-            entries = self.controller_log.get('input_time', 'input', flatten=false);
+            entries = self.controller_log.get('input_time', flatten=false);
             t_input = entries.input_time{end};
             % interpolate for the t_check_step and get agent input
             % trajectory interpolated to time
