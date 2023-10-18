@@ -55,6 +55,9 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             
             % add static or dynamic objects if provided
             self.addObjects(static=objects.static_objects, dynamic=objects.dynamic_objects);
+
+            % Trigger a redraw
+            self.redraw()
         end
             
         function reset(self, optionsStruct, options)
