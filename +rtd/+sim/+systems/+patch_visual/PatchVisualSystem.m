@@ -24,6 +24,10 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             options.time_discretization = 0.1;
             %options.log_collisions = false;
             options.enable_camlight = false;
+            options.xlim = [];
+            options.ylim = [];
+            options.zlim = [];
+            options.view = 3;
             options.verboseLevel = 'INFO';
             options.name = '';
         end
@@ -34,13 +38,17 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             arguments
                 objects.static_objects (1,:) rtd.sim.systems.patch_visual.PatchVisualObject = rtd.sim.systems.patch_visual.PatchVisualObject.empty()
                 objects.dynamic_objects (1,:) rtd.sim.systems.patch_visual.PatchVisualObject = rtd.sim.systems.patch_visual.PatchVisualObject.empty()
-                optionsStruct.optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.enable_camlight
+                options.xlim
+                options.ylim
+                options.zlim
+                options.view
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct.optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Reset first
             self.reset()
@@ -52,13 +60,17 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.enable_camlight
+                options.xlim
+                options.ylim
+                options.zlim
+                options.view
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % if we're going to log, set it up
             %if options.log_collisions
@@ -91,10 +103,17 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             if isempty(self.figure_handle) || ...
                     ~isvalid(self.figure_handle) || ...
                     ~isgraphics(self.figure_handle)
+                % Save the prior figure
+                prev_fig = get(groot,'CurrentFigure');
+                % Setup the new figure
                 self.figure_handle = figure('Name',[self.name, ' - ', self.classname]);
-                view(3);
-                set(self.figure_handle,'KeyPressFcn',@self.set_pause);
-                set(self.figure_handle,'GraphicsSmoothing','off') 
+                set(self.figure_handle,'KeyPressFcn',@self.keypress);
+                set(self.figure_handle,'GraphicsSmoothing','off');
+                % Restore the prior figure
+                try
+                set(groot, 'CurrentFigure', prev_fig);
+                catch
+                end
             end
         end    
         
@@ -155,9 +174,12 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             
             self.vdisp('Running visualization!', 'DEBUG');
             
+            % Save the prior figure
+            prev_fig = get(groot,'CurrentFigure');
+            
             % set the active figure
             try
-                set(0, 'CurrentFigure', self.figure_handle)
+                set(groot, 'CurrentFigure', self.figure_handle)
     
                 % plot each of the times requested
                 for t_plot = t_vec
@@ -169,6 +191,12 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             catch
                 % If reopen on close is enabled
             end
+
+            % Restore the prior figure
+            try
+            set(groot, 'CurrentFigure', prev_fig);
+            catch
+            end
             
             % Save the time change
             self.time = [self.time, t_vec];
@@ -178,25 +206,94 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             self.pause_requested = false;
         end
         
-        function redraw(self, time)
+        function redraw(self, time, options)
             arguments
                 self
                 time = self.time(end)
+                options.xlim = []
+                options.ylim = []
+                options.zlim = []
+                options.view = []
+                options.reset_view = false
             end
+            
             % if the figure handle is deleted, recreate it
             self.validateOrCreateFigure()
+            % Save the prior figure
+            prev_fig = get(groot,'CurrentFigure');
             % set the active figure
-            set(0, 'CurrentFigure', self.figure_handle)
-            % Save the camera view
+            set(groot, 'CurrentFigure', self.figure_handle);
+
+            % Try to save the limits if possible
             try
                 ax = get(self.figure_handle, 'CurrentAxes');
-                [az, el] = view(ax);
-                % clear and reset view
-                clf;view(az, el)
+                if strcmp(ax.XLimMode, 'manual') ...
+                        && isempty(options.xlim)
+                    options.xlim = ax.XLim;
+                end
+                if strcmp(ax.YLimMode, 'manual') ...
+                        && isempty(options.ylim)
+                    options.ylim = ax.YLim;
+                end
+                if strcmp(ax.ZLimMode, 'manual') ...
+                        && isempty(options.zlim)
+                    options.zlim = ax.ZLim;
+                end
             catch
-                clf;view(3)
             end
+
+            % If provided, use the view
+            if options.reset_view
+                clf
+                if iscell(self.getoptions.view)
+                    view(self.getoptions.view{:})
+                else
+                    view(self.getoptions.view)
+                end
+            elseif ~isempty(options.view)
+                clf
+                if iscell(options.view)
+                    view(options.view{:})
+                else
+                    view(options.view)
+                end
+            else
+                % Save the camera view if possible
+                try
+                    ax = get(self.figure_handle, 'CurrentAxes');
+                    [az, el] = view(ax);
+                    % clear and reset view
+                    clf;view(az, el)
+                catch
+                    clf
+                    if iscell(self.getoptions.view)
+                        view(self.getoptions.view{:})
+                    else
+                        view(self.getoptions.view)
+                    end
+                end
+            end
+
             axis equal;grid on
+            % Set limits
+            if ~options.reset_view
+                if ~isempty(options.xlim)
+                    xlim(options.xlim)
+                elseif ~isempty(self.getoptions.xlim)
+                    xlim(self.getoptions.xlim)
+                end
+                if ~isempty(options.ylim)
+                    ylim(options.ylim)
+                elseif ~isempty(self.getoptions.ylim)
+                    ylim(self.getoptions.ylim)
+                end
+                if ~isempty(options.zlim)
+                    zlim(options.zlim)
+                elseif ~isempty(self.getoptions.zlim)
+                    zlim(self.getoptions.zlim)
+                end
+            end
+
             if self.enable_camlight
                 camlight
             end
@@ -209,6 +306,11 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             end
             drawnow limitrate
             %pause(self.draw_time)
+            % Restore the prior figure
+            try
+            set(groot, 'CurrentFigure', prev_fig);
+            catch
+            end
         end
         
         function animate(self, options)
@@ -217,6 +319,11 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
                 options.t_span = [0, self.time(end)]
                 options.time_discretization = self.time_discretization
                 options.pause_time = []
+                options.xlim = []
+                options.ylim = []
+                options.zlim = []
+                options.view = []
+                options.reset_view = false
             end
             
             if isempty(options.pause_time)
@@ -229,7 +336,17 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
             proc_time_start = tic;
             
             % Redraw everything
-            self.redraw(0);
+            self.redraw(0, ...
+                        xlim=options.xlim, ...
+                        ylim=options.ylim, ...
+                        zlim=options.zlim, ...
+                        view=options.view, ...
+                        reset_view=options.reset_view);
+
+            % Save the prior figure
+            prev_fig = get(groot,'CurrentFigure');
+            % set the active figure
+            set(groot, 'CurrentFigure', self.figure_handle);
             
             % Animate the dynamic stuff
             for t_plot = t_vec
@@ -251,13 +368,42 @@ classdef PatchVisualSystem < rtd.sim.systems.SimulationSystem & rtd.util.mixins.
                     self.pause_requested = false;
                 end
             end
+            % Restore the prior figure
+            try
+            set(groot, 'CurrentFigure', prev_fig);
+            catch
+            end
         end
 
-        function set_pause(self, src, event)
+        function keypress(self, src, event)
             if event.Character == "p" && ~self.pause_requested
                 self.vdisp("Pause requested", 'INFO');
                 self.pause_requested = true;
             end
+            if event.Character == "r"
+                self.vdisp("Redraw requested", 'INFO');
+                self.redraw();
+            end
+        end
+
+        function close(self)
+            % try to close
+            try
+                close(self.figure_handle)
+            catch
+            end
+        end
+
+    end
+
+    methods (Static)
+        function [time_discretization, pause_time] = get_discretization_and_pause(framerate, speed)
+            arguments
+                framerate (1,1) double = 30
+                speed (1,1) double = 1
+            end
+            pause_time = 1 / framerate;
+            time_discretization = speed / framerate;
         end
     end
 end

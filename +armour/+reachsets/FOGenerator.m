@@ -20,7 +20,7 @@ classdef FOGenerator < rtd.planner.reachsets.ReachSetGenerator
         function self = FOGenerator(robot, jrsGenerator, options)
             arguments
                 robot armour.ArmourAgent
-                jrsGenerator armour.reachsets.JRSGenerator
+                jrsGenerator armour.reachsets.JRS.OnlineGeneratorBase
                 options.smooth_obs(1,1) logical = false
                 options.obs_frs_combs(1,1) struct = struct('maxcombs', 200, 'combs', [])
                 options.verboseLevel(1,1) rtd.util.types.LogLevel = "DEBUG"
@@ -47,6 +47,11 @@ classdef FOGenerator < rtd.planner.reachsets.ReachSetGenerator
             % First get the JRS (allow the use of a cached value if it
             % exists)
             jrsInstance = self.jrsGenerator.getReachableSet(robotState, ignore_cache=false);
+            % For now, only support 1 problem
+            if length(jrsInstance) > 1
+                error('FOGenerator does not support multiple JRS yet!')
+            end
+            jrsInstance = jrsInstance.rs;
             
             self.vdisp("Generating forward occupancy!", "INFO")
 
@@ -60,7 +65,10 @@ classdef FOGenerator < rtd.planner.reachsets.ReachSetGenerator
                end
             end
             
-            reachableSet = armour.reachsets.FOInstance(self.robot.info, R_w, p_w, FO, jrsInstance, self.smooth_obs, self.obs_frs_combs);
+            rs = armour.reachsets.FOInstance(self.robot.info, R_w, p_w, FO, jrsInstance, self.smooth_obs, self.obs_frs_combs);
+            % Return the 1 RS that we have.
+            reachableSet.rs = rs;
+            reachableSet.id = 1;
         end
     end
 end

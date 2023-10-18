@@ -11,6 +11,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         robot_state = armour.agent.ArmourAgentState.empty()
         
         n_inputs uint32 = 0
+        
+        trajectories
     end
     
     % Extra properties we define
@@ -23,8 +25,6 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         alpha_constant double
         V_max double
         r_norm_threshold double
-        
-        trajectories = {}
     end
     
     methods (Static)
@@ -46,7 +46,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             arguments
                 arm_info armour.agent.ArmourAgentInfo
                 arm_state_component armour.agent.ArmourAgentState
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.use_true_params_for_robust
                 options.use_disturbance_norm
                 options.Kr
@@ -56,7 +56,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Set base variables
             self.robot_info = arm_info;
@@ -69,7 +69,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.use_true_params_for_robust
                 options.use_disturbance_norm
                 options.Kr
@@ -79,7 +79,7 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set component dependent variables
             self.n_inputs = self.robot_info.num_q;
@@ -106,18 +106,19 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             
             % Create the initial trajectory
             initial_traj = armour.trajectory.ZeroHoldArmTrajectory(self.robot_state.get_state);
-            self.trajectories = {initial_traj};
+            self.trajectories.setInitialTrajectory(initial_traj);
+            self.trajectories.clear()
         end
             
         
         function setTrajectory(self, trajectory)
             arguments
                 self
-                trajectory rtd.planner.trajectory.Trajectory
+                trajectory rtd.trajectory.Trajectory
             end
             % Add the trajectory if it is valid
             if trajectory.validate()
-                self.trajectories = [self.trajectories, {trajectory}];
+                self.trajectories.setTrajectory(trajectory);
             end
         end
         
@@ -135,9 +136,8 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             velocity = z(self.robot_state.velocity_indices);
 
             % Prepare trajectory
-            trajectory = self.trajectories{end};
-            startTime = trajectory.startState.time;
-            target = trajectory.getCommand(startTime + t);
+            startTime = self.robot_state.get_state().time;
+            target = self.trajectories.getCommand(startTime + t);
 
             % error terms
             err = target.position - position;
@@ -272,17 +272,16 @@ classdef ArmourController < rtd.entity.components.BaseControllerComponent & rtd.
             t_check = t_input(1):t_check_step:t_input(end);
             u_check = self.robot_state.get_state(t_check);
             % Get the reference trajectory
-            trajectory = self.trajectories{end};
-            reference_trajectory = arrayfun(@(t)trajectory.getCommand(t), t_check);
-            u_pos_ref = [reference_trajectory.q];
-            u_vel_ref = [reference_trajectory.q_dot];
+            reference_trajectory = arrayfun(@(t)self.trajectories.getCommand(t), t_check);
+            u_pos_ref = [reference_trajectory.position];
+            u_vel_ref = [reference_trajectory.velocity];
             
             % check bound satisfaction
             self.vdisp('Running ultimate bound check!', 'INFO');
             
             % Absolute difference
-            u_pos_diff = abs(u_pos_ref - u_check.q);
-            u_vel_diff = abs(u_vel_ref - u_check.q_dot);
+            u_pos_diff = abs(u_pos_ref - [u_check.position]);
+            u_vel_diff = abs(u_vel_ref - [u_check.velocity]);
             position_exceeded = u_pos_diff > self.ultimate_bound_position;
             velocity_exceeded = u_vel_diff > self.ultimate_bound_velocity;
             

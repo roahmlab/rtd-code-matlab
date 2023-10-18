@@ -94,6 +94,7 @@ methods
     % extra functions
     pZ = reduce(pZ,option,order,varargin);
     pZ = polyZonotope_ROAHM(mpz);
+    pZ = tranpose(pZ);
 
 end
 

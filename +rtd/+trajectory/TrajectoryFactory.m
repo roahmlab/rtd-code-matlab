@@ -2,7 +2,7 @@ classdef TrajectoryFactory < handle
 % Base class for the Trajectory factory object
 %
 % This should be used to initialize desired instaces of
-% :mat:class:`+rtd.+planner.+trajectory.Trajectory`.
+% :mat:class:`+rtd.+trajectory.Trajectory`.
 %
 % Note:
 %   `createTrajectory(self, robotState, rsInstances, trajectoryParams,
@@ -13,8 +13,8 @@ classdef TrajectoryFactory < handle
 % Written: 2023-01-25
 % Last Revised: 2023-02-02
 % 
-% See also createTrajectory, rtd.planner.trajectory.Trajectory,
-% rtd.planner.trajopt.TrajOptProps
+% See also createTrajectory, rtd.trajectory.Trajectory,
+% rtd.planner.trajopt.TrajOptProps, rtd.trajectory.TrajectoryContainer
 %
 % --- More Info ---
 % 
@@ -39,7 +39,7 @@ classdef TrajectoryFactory < handle
         %   options: Additional optional keyword arguments if desired
         %
         % Returns:
-        %   rtd.planner.trajectory.Trajectory: Desired Trajectory Object
+        %   rtd.trajectory.Trajectory: Desired Trajectory Object
         %
         trajectory = createTrajectory(self, robotState, rsInstances, trajectoryParams, options)
     end

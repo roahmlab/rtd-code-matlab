@@ -48,13 +48,13 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             arguments
                 collision_system
                 arm_agent
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.face_color
                 options.face_opacity
                 options.edge_color
                 options.edge_opacity
-                options.edge_width
+                options.edge_style
                 options.start_position
                 options.goal_position
                 options.min_dist_start_to_goal
@@ -63,7 +63,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             self.collision_system = collision_system;
             self.arm_agent = arm_agent;
@@ -74,13 +74,13 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.face_color
                 options.face_opacity
                 options.edge_color
                 options.edge_opacity
-                options.edge_width
+                options.edge_style
                 options.start_position
                 options.goal_position
                 options.min_dist_start_to_goal
@@ -89,7 +89,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             self.time_discretization = options.time_discretization;
             
             % Set up verbose output
@@ -109,7 +109,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             self.goal_radius = options.goal_radius;
             
             if isempty(self.start_position)
-                self.start_position = self.arm_agent.state.get_state().q;
+                self.start_position = self.arm_agent.state.get_state().position;
             end
             if isempty(self.min_dist_start_to_goal)
                 pos_limits = [self.arm_agent.info.joints.position_limits];
@@ -151,7 +151,7 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
             
             % Accumulate the return
             goal = false;
-            get_pos = @(t)self.arm_agent.state.get_state(t).q;
+            get_pos = @(t)self.arm_agent.state.get_state(t).position;
             for t_check = t_vec
                 goal = goal || all(abs(get_pos(t_check) - self.goal_position) <= self.goal_radius, 'all');
             end
@@ -202,13 +202,13 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
                 end
 
                 % compute distance to the goal & update time
-                proposed_goal = self.arm_agent.state.get_state().q;
+                proposed_goal = self.arm_agent.state.get_state().position;
                 proposed_goal_dist = norm(self.start_position - proposed_goal);
             end
             if isempty(proposed_goal)
                 self.vdisp('Failed to find collision free goal! Using random goal', 'GENERAL');
                 % Position is already randomized
-                proposed_goal = self.arm_agent.state.get_state().q;
+                proposed_goal = self.arm_agent.state.get_state().position;
             end
             % save and update
             self.goal_position = proposed_goal;
@@ -219,12 +219,17 @@ classdef RandomArmConfigurationGoal < rtd.sim.systems.patch_visual.PatchVisualOb
         
         function resetVisual(self)
             % Generate a visual
+            prev_fig = get(groot,'CurrentFigure');
+            temp_fig = figure;
             self.arm_agent.visual.plot_links(self.goal_position);
             % Extract the data to plot
             faces = {self.arm_agent.visual.plot_data.links.Faces};
             vertices = {self.arm_agent.visual.plot_data.links.Vertices};
             self.link_plot_data.faces = faces;
             self.link_plot_data.vertices = vertices;
+            % restore visual
+            close(temp_fig);
+            set(groot,'CurrentFigure',prev_fig);
         end
         
         function plot(self,options)

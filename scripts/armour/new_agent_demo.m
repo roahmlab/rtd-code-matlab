@@ -102,8 +102,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = true;
-use_robust_input = true;
+input_constraints_flag = false;
+use_robust_input = false;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...
@@ -111,12 +111,12 @@ planner = armour.ArmourPlanner( ...
         input_constraints_flag=input_constraints_flag,...
         use_robust_input=use_robust_input,...
         smooth_obs=smooth_obs, ...
-        traj_type="bernstein", ...
+        traj_type="piecewise", ...
         verboseLevel='DEBUG');
 
-planner = armour.ArmourCudaPlanner( ...
-        trajOptProps, sim.agent, ...
-        verboseLevel='DEBUG');
+% planner = armour.ArmourCudaPlanner( ...
+%         trajOptProps, sim.agent, ...
+%         verboseLevel='DEBUG');
 
 %% HLP stuff to migrate
 HLP = robot_arm_straight_line_HLP();
@@ -159,13 +159,19 @@ pausing = false;
 %     sim.run(max_steps=1);
 %     pause(0.1)
 % end
+% Using callbacks to attach to the sim
 cb = @(sim) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
-sim.run(max_steps=100, pre_step_callback={cb});
+sim.run(max_steps=100, pre_step_callback={cb}, autolog=true);
+
+% % How to use the listeners to attach to the sim instead of callbacks
+% cb = @(sim, event) planner_callback(sim, planner, agent_info, world_info, lookahead, HLP);
+% addlistener(sim, 'Step', cb);
+% sim.run(max_steps=100, autolog=true);
 
 function info = planner_callback(sim, planner, agent_info, world_info, lookahead, HLP)
     % Get the end state
     time = sim.agent.state.time(end);
-    ref_state = sim.agent.controller.trajectories{end}.getCommand(time);
+    ref_state = sim.agent.controller.trajectories.getCommand(time);
     agent_info.state = sim.agent.state.state(:,end);
 
     q_des = HLP.get_waypoint(agent_info,world_info,lookahead);
@@ -175,11 +181,13 @@ function info = planner_callback(sim, planner, agent_info, world_info, lookahead
     end
 
     % get the sensor readings at the time
-    worldState.obstacles = rtd.sim.sensors.zonotope_sensor(sim.world, sim.agent, time);
+    worldState.obstacles = rtd.sim.sensors.zonotope_sensor(sim.world.all_entities, sim.agent, time);
+    a = tic;
     [trajectory, plan_info] = planner.planTrajectory(ref_state, worldState, q_des);
+    toc(a)
     %FO = plan_info.rsInstances{2}.FO;
     %jrsinfo = plan_info.rsInstances{1}.jrs_info;
-    
+
     if ~isempty(trajectory)
         sim.agent.controller.setTrajectory(trajectory)
     end

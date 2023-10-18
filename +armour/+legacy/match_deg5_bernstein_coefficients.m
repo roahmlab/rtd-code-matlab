@@ -21,10 +21,10 @@ function [beta] = match_deg5_bernstein_coefficients(traj_constraints, T)
     beta{6} = q1; % beta_5;
 
     % velocity constraints:
-    beta{2} = q0 + (T*qd0)/5; % beta_1
-    beta{5} = q1 - (T*qd1)/5; % beta_4
+    beta{2} = q0 + (T*qd0) * (1/5); % beta_1
+    beta{5} = q1 - (T*qd1) * (1/5); % beta_4
 
     % acceleration constraints
-    beta{3} = (qdd0*T^2)/20 + (2*qd0*T)/5 + q0; % beta_2
-    beta{4} = (qdd1*T^2)/20 - (2*qd1*T)/5 + q1; % beta_3 
+    beta{3} = (qdd0*T^2)*(1/20) + (2*qd0*T)*(1/5) + q0; % beta_2
+    beta{4} = (qdd1*T^2)*(1/20) - (2*qd1*T)*(1/5) + q1; % beta_3 
 end

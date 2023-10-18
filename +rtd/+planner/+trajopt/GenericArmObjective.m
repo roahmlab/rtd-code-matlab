@@ -34,11 +34,11 @@ classdef GenericArmObjective < rtd.planner.trajopt.Objective
             %
             % Arguments:
             %   trajOptProps (rtd.planner.trajopt.TrajOptProps)
-            %   trajectoryFactory (rtd.planner.trajectory.TrajectoryFactory)
+            %   trajectoryFactory (rtd.trajectory.TrajectoryFactory)
             %
             arguments
                 trajOptProps rtd.planner.trajopt.TrajOptProps
-                trajectoryFactory rtd.planner.trajectory.TrajectoryFactory
+                trajectoryFactory rtd.trajectory.TrajectoryFactory
             end
             self.trajectoryFactory = trajectoryFactory;
             self.t_cost = trajOptProps.timeForCost;
@@ -79,5 +79,5 @@ end
 function [cost] = evalTrajectory(trajectoryParams, trajectoryObj, q_des, t_cost)
     trajectoryObj.setParameters(trajectoryParams);
     plan = trajectoryObj.getCommand(t_cost);
-    cost = sum((plan.q_des - q_des).^2);
+    cost = sum((plan.position - q_des).^2);
 end

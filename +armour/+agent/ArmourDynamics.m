@@ -52,7 +52,7 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
                 arm_info armour.agent.ArmourAgentInfo
                 arm_state_component armour.agent.ArmourAgentState
                 controller_component armour.agent.ArmourController
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.measurement_noise_points
                 options.measurement_noise_pos_sigma
@@ -61,7 +61,7 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % set base variables
             self.robot_info = arm_info;
@@ -74,7 +74,7 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.time_discretization
                 options.measurement_noise_points
                 options.measurement_noise_pos_sigma
@@ -83,7 +83,7 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % if we're going to log, set it up
             if options.log_controller
@@ -118,7 +118,9 @@ classdef ArmourDynamics < rtd.entity.components.BaseDynamicsComponent & rtd.util
             
             % get the current state
             state = self.robot_state.get_state;
-            zcur = state.state;
+            zcur = state.getStateSpace( ...
+                position_idxs=self.robot_state.position_indices, ...
+                velocity_idxs=self.robot_state.velocity_indices);
             
             % call the ode solver to simulate agent
             [tout,zout] = self.integrator(@(t,z) self.dynamics(t,z),...
