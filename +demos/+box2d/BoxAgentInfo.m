@@ -21,12 +21,12 @@ classdef BoxAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mixin
         % constructor
         function self = BoxAgentInfo(optionsStruct, options)
             arguments
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.width {mustBePositive}
                 options.height {mustBePositive}
                 options.color(1,3) {mustBeInRange(options.color,0,1,"inclusive")}
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % initialize
             self.reset();
@@ -37,12 +37,12 @@ classdef BoxAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mixin
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.width {mustBePositive}
                 options.height {mustBePositive}
                 options.color(1,3) {mustBeInRange(options.color,0,1,"inclusive")}
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Save
             self.width = options.width;

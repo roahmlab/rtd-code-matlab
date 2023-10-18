@@ -25,8 +25,7 @@ end
 boxagent.state.get_state()
 
 %% set up visual system and animate
-vs = rtd.sim.systems.patch_visual.PatchVisualSystem(dynamic_objects=boxagent.visual);
-xlim([-5 5])
-ylim([-5 5])
-view(2)
+vs = rtd.sim.systems.patch_visual.PatchVisualSystem(...
+    dynamic_objects=boxagent.visual, ...
+    view=2, xlim=[-5 5], ylim=[-5 5]);
 vs.updateVisual(24.25);   % aniamte the first 24.25 t
