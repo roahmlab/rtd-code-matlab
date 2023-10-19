@@ -43,7 +43,9 @@ classdef ReachSetGenerator < rtd.util.mixins.NamedClass & handle
         %   varargin: Additional optional arguments if desired. Will always be Name-Value arguments.
         % 
         % Returns:
-        %   rtd.planner.reachsets.ReachSetInstance: A new instance of some derived version of `ReachSetInstance`
+        %   struct: A struct array containing the reachable set for the robot state
+        %       provided, where reachableSet.rs is an instance of some derived version
+        %       of `ReachSetInstance` and reachableSet.id is the id of the reachable set.
         %
         reachableSet = generateReachableSet(self, robotState, varargin)
     end
@@ -132,6 +134,11 @@ classdef ReachSetGenerator < rtd.util.mixins.NamedClass & handle
             
             % generate and store.
             reachableSet = generateReachableSet(self, robotState, passthrough_args{:});
+            % verify the output
+            names = fieldnames(reachableSet);
+            if ~any([contains(names, 'id'), contains(names, 'rs')])
+                error('Expected return with id and rs fields!')
+            end
             self.cache{self.cache_index, 1} = hash;
             self.cache{self.cache_index, 2} = reachableSet;
         end

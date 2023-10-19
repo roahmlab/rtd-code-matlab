@@ -27,13 +27,13 @@ classdef GenericEntityState < rtd.entity.components.BaseStateComponent & rtd.uti
         function self = GenericEntityState(entity_info, optionsStruct, options)
             arguments
                 entity_info rtd.entity.components.BaseInfoComponent
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_state
                 options.n_states
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Setup
             self.entity_info = entity_info;
@@ -45,13 +45,13 @@ classdef GenericEntityState < rtd.entity.components.BaseStateComponent & rtd.uti
         function reset(self, optionsStruct, options)
             arguments
                 self rtd.entity.components.GenericEntityState
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_state
                 options.n_states
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set up verbose output
             self.name = options.name;
@@ -101,21 +101,23 @@ classdef GenericEntityState < rtd.entity.components.BaseStateComponent & rtd.uti
             end
         end
         
-        function state = get_state(self, time)
+        function state_out = get_state(self, time)
             arguments
                 self rtd.entity.components.GenericEntityState
-                time = self.time(end)
+                time(1,:) double = self.time(end)
             end
-            state = rtd.entity.states.EntityState();
-            
             % Default to the last time and state
-            state.time = time;
-            state.state = self.state(:,end);
+            state_data = repmat(self.state(:,end),1,length(time));
             
             % If we can and need to interpolate the state, do it
-            if ~(length(self.time) == 1 || time > self.time(end))
-                state.state = interp1(self.time, self.state.', time).';
+            mask = time <= self.time(end);
+            if length(self.time) > 1 && any(mask)
+                state_data(:,mask) = interp1(self.time, self.state.', time).';
             end
+            
+            state_out(length(time)) = rtd.entity.states.GenericEntityStateInstance();
+            state_out.setTimes(time);
+            state_out.setStateSpace(state_data);
         end
         
         function commit_state_data(self,T_state,Z_state)

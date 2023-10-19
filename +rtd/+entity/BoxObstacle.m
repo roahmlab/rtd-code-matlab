@@ -59,12 +59,53 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             arguments
                 center
                 side_lengths
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
             end
             component_options.info.side_lengths = side_lengths;
             component_options.state.initial_state = center;
-            box = rtd.entity.BoxObstacle(optionsStruct=optionsStruct, ...
+            box = rtd.entity.BoxObstacle(options=optionsStruct.options, ...
                               component_options=component_options);
+        end
+
+        function [box, timed_out] = randomizeBox(world_bounds, size_range, options)
+            arguments
+                world_bounds(2,3) double
+                size_range(1,2) double
+                options.creation_buffer(1,1) double = 0
+                options.collision_system(:,1) = []
+                options.timeout(1,1) double = 10
+                options.extra_options(1,1) struct = struct()
+            end
+
+            randomizing = true;
+            start_tic = tic;
+            t_cur = toc(start_tic);
+            while randomizing && t_cur <= options.timeout
+                % create center, side lengths
+                center = ...
+                    rtd.random.deprecation.rand_range( world_bounds(1,:) + size_range(2)/2,...
+                                     world_bounds(2,:) - size_range(2)/2 );
+                side_lengths = ...
+                    rtd.random.deprecation.rand_range(size_range(1),...
+                                          size_range(2),...
+                                          [],[],...
+                                          1, 3); % 3 is the dim of the world in this case
+                % Create obstacle
+                optionsStruct = options.extra_options;
+                optionsStruct.component_options.info.creation_buffer = options.creation_buffer;
+                prop_box = rtd.entity.BoxObstacle.makeBox(center, side_lengths, options=optionsStruct);
+
+                % test it if we have a collision system
+                if ~isempty(options.collision_system)
+                    proposal_collision = prop_box.collision.getCollisionObject(buffered=true);
+                    [randomizing, ~] = options.collision_system.checkCollisionObject(proposal_collision);
+                else
+                    randomizing = false;
+                end
+                t_cur = toc(start_tic);
+            end
+            box = prop_box;
+            timed_out = t_cur > options.timeout;
         end
     end
     
@@ -77,7 +118,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
                 components.collision = []
                 components.visual = []
                 components.representation = []
-                optionsStruct.optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.components
                 options.component_options
                 options.component_logLevelOverride
@@ -88,7 +129,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             override_options = rtd.sim.world.WorldEntity.get_componentOverrideOptions(components);
 
             % Merge all options
-            self.mergeoptions(optionsStruct.optionsStruct, options, override_options);
+            self.mergeoptions(optionsStruct.options, options, override_options);
             
             % (Re)construct all components for consistency
             self.construct_component('info');
@@ -105,7 +146,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.component_options
                 options.component_logLevelOverride
                 options.verboseLevel
@@ -113,7 +154,7 @@ classdef BoxObstacle < rtd.sim.world.WorldEntity & handle
             end
             % Perform an internal update, then merge in options
             self.getoptions();
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
                         
             % reset all components
             self.reset_components()

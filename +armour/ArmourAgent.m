@@ -83,7 +83,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
         
         function self = from_options(robot, params, options)
             a = armour.agent.ArmourAgentInfo(robot, params, options.component_options.info);
-            self = armour.ArmourAgent(a, optionsStruct=options);
+            self = armour.ArmourAgent(a, options=options);
         end
     end
     
@@ -98,7 +98,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
                 components.dynamics = []
                 components.collision = []
                 components.visual = []
-                optionsStruct.optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.components
                 options.component_options
                 options.component_logLevelOverride
@@ -110,7 +110,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
             override_options = rtd.sim.world.WorldEntity.get_componentOverrideOptions(components);
 
             % Merge all options
-            self.mergeoptions(optionsStruct.optionsStruct, options, override_options);
+            self.mergeoptions(optionsStruct.options, options, override_options);
             
             % Set components and (Re)construct dependent components for
             % consistency
@@ -130,7 +130,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.component_options
                 options.component_logLevelOverride
                 options.verboseLevel
@@ -138,7 +138,7 @@ classdef ArmourAgent < rtd.sim.world.WorldEntity & handle
             end
             % Perform an internal update, then merge in options
             self.getoptions();
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % reset all components
             self.reset_components()

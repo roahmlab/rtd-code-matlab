@@ -17,7 +17,7 @@ classdef JLSGenerator < rtd.planner.reachsets.ReachSetGenerator
         function self = JLSGenerator(robot, jrsGenerator, options)
             arguments
                 robot armour.ArmourAgent
-                jrsGenerator armour.reachsets.JRSGenerator
+                jrsGenerator armour.reachsets.JRS.OnlineGeneratorBase
                 options.verboseLevel(1,1) rtd.util.types.LogLevel = "DEBUG"
             end
             self.robot = robot;
@@ -36,6 +36,11 @@ classdef JLSGenerator < rtd.planner.reachsets.ReachSetGenerator
             % First get the JRS (allow the use of a cached value if it
             % exists)
             jrsInstance = self.jrsGenerator.getReachableSet(robotState, ignore_cache=false);
+            % For now, only support 1 problem
+            if length(jrsInstance) > 1
+                error('FOGenerator does not support multiple JRS yet!')
+            end
+            jrsInstance = jrsInstance.rs;
 
             joint_state_limits = [self.robot.info.joints.position_limits];
             joint_speed_limits = [self.robot.info.joints.velocity_limits];
@@ -65,7 +70,10 @@ classdef JLSGenerator < rtd.planner.reachsets.ReachSetGenerator
             end
             
             % Save the generated reachable sets into the IRSInstance
-            reachableSet = armour.reachsets.JLSInstance(q_ub, q_lb, dq_ub, dq_lb, jrsInstance, self.get_vdisplevel);
+            rs = armour.reachsets.JLSInstance(q_ub, q_lb, dq_ub, dq_lb, jrsInstance, self.get_vdisplevel);
+            % Return the 1 RS that we have.
+            reachableSet.rs = rs;
+            reachableSet.id = 1;
         end
     end
 end

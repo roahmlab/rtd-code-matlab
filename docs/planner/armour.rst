@@ -1,10 +1,8 @@
 Example RTD Planner Implementation of ARMOUR
 ============================================
 
-ArmourPlanner and these related components define the ARMOUR planner
-as described by Michaux et. al. in a to be published paper. This planner
-requires the use of the matching robust controller.
-
+ArmourPlanner and these related components define the ARMOUR planner as described by Michaux et. al. in https://arxiv.org/abs/2301.13308.
+This planner requires the use of the matching robust controller.
 
 The Base ARMOUR Planner
 -----------------------
@@ -13,15 +11,15 @@ The Base ARMOUR Planner
    :members:
    :undoc-members:
 
-Reachable Sets Generation
--------------------------
+Reachable Set Generation
+------------------------
 .. mat:automodule:: +armour.+reachsets
    :show-inheritance:
    :members:
    :undoc-members:
 
-Trajectory Types
-----------------
+Trajectory Types and Factory
+----------------------------
 .. mat:automodule:: +armour.+trajectory
    :show-inheritance:
    :members:

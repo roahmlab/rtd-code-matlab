@@ -20,6 +20,7 @@ for i = 1:robot.NumBodies
         bounds = [-0.05, 0.05; 
                   -0.05, 0.05; 
                   -0.05, 0.05];
+        mesh{i, 1} = [];
     end
     
     c = (bounds(:, 1) + bounds(:, 2))./2;

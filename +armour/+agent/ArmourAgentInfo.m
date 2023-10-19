@@ -56,7 +56,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
             arguments
                 robot rigidBodyTree
                 params
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.M_min_eigenvalue
                 options.gravity
                 options.joint_velocity_limits
@@ -64,7 +64,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
                 options.transmission_inertia
                 options.buffer_dist
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % we need the robot to have the column dataformat to work with
             % our code, so set that. Gravity is an option so set that
@@ -81,7 +81,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.M_min_eigenvalue
                 options.gravity
                 options.joint_velocity_limits
@@ -89,7 +89,7 @@ classdef ArmourAgentInfo < rtd.entity.components.BaseInfoComponent & rtd.util.mi
                 options.transmission_inertia
                 options.buffer_dist
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             if isempty(options.joint_velocity_limits)
                 error("Must pass in joint_velocity_limits externally!")
             end

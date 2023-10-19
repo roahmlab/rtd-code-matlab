@@ -42,7 +42,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
                 arm_info armour.agent.ArmourAgentInfo
                 arm_state_component armour.agent.ArmourAgentState
                 kinematics_component armour.agent.ArmKinematics
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.face_color
                 options.face_opacity
                 options.edge_color
@@ -53,7 +53,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             self.arm_info = arm_info;
             self.arm_state = arm_state_component;
@@ -65,7 +65,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.face_color
                 options.face_opacity
                 options.edge_color
@@ -76,7 +76,7 @@ classdef ArmourPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rt
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set up verbose output
             self.name = options.name;

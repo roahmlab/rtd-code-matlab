@@ -18,18 +18,23 @@ Base Components
    :members:
    :undoc-members:
 
-Armour Components
------------------
-.. mat:automodule:: +armour.+agent
-   :show-inheritance:
-   :members:
-   :undoc-members:
-   :exclude-members: ArmourAgent
-
 Box Obstacle Components
 -----------------------
 .. mat:automodule:: +rtd.+entity.+box_obstacle
    :show-inheritance:
    :members:
    :undoc-members:
-   :exclude-members: BoxObstacle
+
+Armour Components
+-----------------
+.. mat:automodule:: +armour.+agent
+   :show-inheritance:
+   :members:
+   :undoc-members:
+
+Waitr Components
+-----------------
+.. mat:automodule:: +waitr.+agent
+   :show-inheritance:
+   :members:
+   :undoc-members:

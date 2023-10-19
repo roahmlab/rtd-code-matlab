@@ -37,7 +37,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
             arguments
                 box_info rtd.entity.box_obstacle.BoxObstacleInfo
                 box_state_component rtd.entity.components.GenericEntityState
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.face_color
                 options.face_opacity
                 options.edge_color
@@ -48,7 +48,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             self.box_info = box_info;
             self.box_state = box_state_component;
@@ -59,7 +59,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.face_color
                 options.face_opacity
                 options.edge_color
@@ -70,7 +70,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set up verbose output
             self.name = options.name;
@@ -121,7 +121,7 @@ classdef BoxPatchVisual < rtd.sim.systems.patch_visual.PatchVisualObject & rtd.u
             state = self.box_state.get_state(options.time);
             
             % Shift the patch points
-            V = self.plot_patch_data.vertices + state.state.';
+            V = self.plot_patch_data.vertices + state.state_data.';
             F = self.plot_patch_data.faces;
             
             % Plot/update them

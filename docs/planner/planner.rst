@@ -7,6 +7,7 @@ RTD Base Planner and Implementations
    
    base
    armour
+   waitr
 
 * :ref:`genindex`
 * :ref:`mat-modindex`

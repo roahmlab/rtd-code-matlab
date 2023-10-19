@@ -40,13 +40,13 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
         function self = ArmourAgentState(arm_info, optionsStruct, options)
             arguments
                 arm_info armour.agent.ArmourAgentInfo
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_position
                 options.initial_velocity
                 options.verboseLevel
                 options.name
             end
-            self.mergeoptions(optionsStruct, options);
+            self.mergeoptions(optionsStruct.options, options);
             
             % Setup
             self.entity_info = arm_info;
@@ -58,13 +58,13 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
         function reset(self, optionsStruct, options)
             arguments
                 self
-                optionsStruct struct = struct()
+                optionsStruct.options struct = struct()
                 options.initial_position
                 options.initial_velocity
                 options.verboseLevel
                 options.name
             end
-            options = self.mergeoptions(optionsStruct, options);
+            options = self.mergeoptions(optionsStruct.options, options);
             
             % Set component dependent properties
             self.n_states = 2 * self.entity_info.num_q;
@@ -149,22 +149,25 @@ classdef ArmourAgentState < rtd.entity.components.BaseStateComponent & rtd.util.
             end
         end
         
-        function state = get_state(self, time)
+        function state_out = get_state(self, time)
             arguments
-                self
-                time = self.time(end);
+                self armour.agent.ArmourAgentState
+                time(1,:) double = self.time(end);
             end
-            state = rtd.entity.states.ArmRobotState(self.position_indices, self.velocity_indices);
-            
             % Default to the last time and state
-            state.time = time;
-            state.state = repmat(self.state(:,end),1,length(time));
+            state_data = repmat(self.state(:,end),1,length(time));
             
             % If we can and need to interpolate the state, do it
             mask = time <= self.time(end);
             if length(self.time) > 1 && any(mask)
-                state.state(:,mask) = interp1(self.time, self.state.', time(mask)).';
+                state_data(:,mask) = interp1(self.time, self.state.', time(mask)).';
             end
+            
+            state_out(length(time)) = rtd.entity.states.ArmRobotStateInstance();
+            state_out.setTimes(time);
+            state_out.setStateSpace(state_data, ...
+                position_idxs=self.position_indices, ...
+                velocity_idxs=self.velocity_indices);
         end
         
         % function state = get_step_states(self, step)
