@@ -11,17 +11,17 @@ classdef TwoBernsteinArmTrajectory < rtd.trajectory.Trajectory
 % position from the major bernstein polynomial.
 %
 % The trajectory is parameterized by the following:
-%   startState: The start state of the trajectory. This is used to
-%       specify the initial position, velocity, and acceleration of the trajectory.
-%   planTime: The time at which the major trajectory should stop being executed, and
-%       the minor trajectory should start being executed. This is used to
-%       specify the active duration of the major trajectory.
-%   horizonTime: The time at which the overall trajectory should end. This is
-%       used to specify the duration of the trajectory.
-%   params: The desired final position of each polynomial relative to (1) the start
-%       position for the major polynomial and (2) the position at planTime for the
-%       minor polynomial. The relative position can also be scaled, which then
-%       paramScale is used to scale it back to the desired position.
+%  * `startState`: The start state of the trajectory. This is used to
+%    specify the initial position, velocity, and acceleration of the trajectory.
+%  * `planTime`: The time at which the major trajectory should stop being executed, and
+%    the minor trajectory should start being executed. This is used to
+%    specify the active duration of the major trajectory.
+%  * `horizonTime`: The time at which the overall trajectory should end. This is
+%    used to specify the duration of the trajectory.
+%  * `params`: The desired final position of each polynomial relative to (1) the start
+%    position for the major polynomial and (2) the position at planTime for the
+%    minor polynomial. The relative position can also be scaled, which then
+%    paramScale is used to scale it back to the desired position.
 %
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
@@ -63,14 +63,22 @@ classdef TwoBernsteinArmTrajectory < rtd.trajectory.Trajectory
 
     % Internal properties
     properties (SetAccess=private)
-        % the alpha coefficients for the bernstein polynomial
+        % the alpha coefficients for the major bernstein polynomial
         alpha(:,6) double
+
+        % the alpha coefficients for the minor bernstein polynomial
         alpha2(:,6) double
 
         % The calculated final position of the trajectory
         q_end(:,1) double
+
+        % The position where the minor polynomial takes over
         q_plan(:,1) double
+
+        % The velocity where the minor polynomial takes over
         qd_plan(:,1) double
+        
+        % The acceleration where the minor polynomial takes over
         qdd_plan(:,1) double
     end
 
@@ -185,8 +193,7 @@ classdef TwoBernsteinArmTrajectory < rtd.trajectory.Trajectory
             %       Defaults to false.
             %
             % Returns:
-            %   valid (logical): True if the trajectory parameters are valid.
-            %       False otherwise.
+            %   valid (logical): Whether or not the trajectory parameters are valid.
             %
             % Raises:
             %   InvalidTrajectory: If the current trajectory is not valid and

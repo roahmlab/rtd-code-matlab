@@ -9,14 +9,14 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
 % the trajectory.
 %
 % The trajectory is parameterized by the following:
-%   startState: The start state of the trajectory. This is used to
-%       specify the initial position, velocity, and acceleration of the trajectory.
-%   horizonTime: The time at which the trajectory should end. This is
-%       used to specify the duration of the trajectory.
-%   params: The desired final position of the trajectory relative to the start position.
-%       This is used to specify the final position of the trajectory. The relative position
-%       can also be scaled, which then paramScale is used to scale it back to the
-%       desired position.
+%  * `startState`: The start state of the trajectory. This is used to
+%    specify the initial position, velocity, and acceleration of the trajectory.
+%  * `horizonTime`: The time at which the trajectory should end. This is
+%    used to specify the duration of the trajectory.
+%  * `params`: The desired final position of the trajectory relative to the start position.
+%    This is used to specify the final position of the trajectory. The relative position
+%    can also be scaled, which then paramScale is used to scale it back to the
+%    desired position.
 %
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
@@ -123,7 +123,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             %       used to specify the duration of the trajectory.
             %   numParams (double): The number of parameters for the trajectory. This is
             %       used to specify the number of parameters for the trajectory.
-            %  paramScale (rtd.util.RangeScaler): The parameter scaling to use.
+            %   paramScale (rtd.util.RangeScaler): The parameter scaling to use.
             %       This is used to scale the relative position to the desired
             %       position.
             %
@@ -162,8 +162,7 @@ classdef BernsteinArmTrajectory < rtd.trajectory.Trajectory
             %       Defaults to false.
             %
             % Returns:
-            %   valid (logical): True if the trajectory parameters are valid.
-            %       False otherwise.
+            %   valid (logical): Whether or not the trajectory parameters are valid.
             %
             % Raises:
             %   InvalidTrajectory: If the current trajectory is not valid and

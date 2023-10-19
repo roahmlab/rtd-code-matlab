@@ -1,12 +1,12 @@
 Introduction
 ============
 
-The current version of the rewritten codebase you are looking at is v0.1.0. It is subject to
+The current version of the rewritten codebase you are looking at is v0.2.0. It is subject to
 significant changes in the near futures which may need code rewrites. This MATLAB implementation
 supports r2021b and later. 
 
-In here, the code is split up into many different, with a flattened out structure. Changing out
-smaller behaviors of an agent or simulator now involves looking at files that pertain to that
+In here, the code is split up into many different packages, with a somewhat flattened out structure.
+Changing out smaller behaviors of an agent or simulator now involves looking at files that pertain to that
 specific behavior instead of the whole simulator or agent.
 
 Additionally, the code is written with the intention of making it more explicit. For example,

@@ -5,11 +5,6 @@ classdef VarLogger < handle
 % validation and return flattened or stepwise data for analysis later or
 % for summarizing.
 %
-% Warning:
-%     The current documentation engine is unable to document the `get`
-%     method of this class. Please check the source for how to use it!
-%     https://github.com/sphinx-contrib/matlabdomain/issues/151
-%
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
 % Written: 2022-12-10

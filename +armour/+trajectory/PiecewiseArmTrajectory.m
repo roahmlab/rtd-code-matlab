@@ -8,12 +8,12 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
 % state of the robot.
 %
 % The trajectory is parameterized by the following:
-%   startState: the initial state of the robot
-%   planTime: the time to accelerate for
-%   horizonTime: the time after starting that the robot should be stopped by
-%   params: the parameters of the trajectory, which are the accelerations
-%       during the plan time. This can also be scaled by a RangeScaler
-%       object.
+%  * `startState`: the initial state of the robot
+%  * `planTime`: the time to accelerate for
+%  * `horizonTime`: the time after starting that the robot should be stopped by
+%  * `params`: the parameters of the trajectory, which are the accelerations
+%    during the plan time. This can also be scaled by a RangeScaler
+%    object.
 %
 % --- More Info ---
 % Author: Adam Li (adamli@umich.edu)
@@ -171,8 +171,7 @@ classdef PiecewiseArmTrajectory < rtd.trajectory.Trajectory
             %       Defaults to false.
             %
             % Returns:
-            %   valid (logical): True if the trajectory parameters are valid.
-            %       False otherwise.
+            %   valid (logical): Whether or not the trajectory parameters are valid.
             %
             % Raises:
             %   InvalidTrajectory: If the current trajectory is not valid and

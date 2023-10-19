@@ -49,8 +49,8 @@ if visualize_cad
     camlight
 end
 
-%controller = [];
-controller = 'armour.agent.ArmourMexController';
+controller = [];
+% controller = 'armour.agent.ArmourMexController';
 
 % Create
 agent = armour.ArmourAgent(agent_info, visual=visual, ...

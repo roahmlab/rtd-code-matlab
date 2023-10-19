@@ -84,8 +84,7 @@ classdef ZeroHoldArmTrajectory < rtd.trajectory.Trajectory
             %       Defaults to false.
             %
             % Returns:
-            %   valid (logical): True if the trajectory parameters are valid.
-            %       False otherwise.
+            %   valid (logical): Whether or not the trajectory parameters are valid.
             %
             % Raises:
             %   InvalidTrajectory: If the current trajectory is not valid and

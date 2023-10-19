@@ -8,14 +8,7 @@ RTD Simulation Reference
    entities
    components
    systems
-
-
-Simulation
-----------
-.. mat:autoclass:: +rtd.+sim.Simulation
-   :show-inheritance:
-   :members:
-   :undoc-members:
+   simulations
 
 
 * :ref:`genindex`
