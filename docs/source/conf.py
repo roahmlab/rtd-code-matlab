@@ -3,25 +3,37 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
-project = 'RTD-code'
-copyright = '2023, ROAHMLab'
-author = 'ROAHMLab'
-release = 'release'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = [  'sphinxcontrib.matlab', 
-                'sphinx.ext.autodoc',
-                'sphinx.ext.duration',
-                'sphinx.ext.napoleon',
-                'sphinx.ext.viewcode']
+extensions = [
+    'sphinxcontrib.matlab', 
+    'sphinx.ext.autodoc',
+    "sphinx.ext.autosummary",
+    'sphinx.ext.duration',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
+    "sphinxcontrib.katex",
+    "sphinx.ext.autosectionlabel",
+    "sphinx_copybutton",
+    "myst_parser",
+    "sphinx_design",
+]
+myst_enable_extensions = [
+    "colon_fence",
+    "deflist",
+    "substitution",
+    "html_image",
+]
+
+sd_fontawesome_latex = False
+
+katex_prerender = True
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+autosummary_generate = True  # Turn on sphinx.ext.autosummary
 
 # -- Napoleon Docstrings Configuration --------------------------------------
 
@@ -33,7 +45,7 @@ napoleon_use_keyword = False
 import os
 
 pwd = os.path.dirname(os.path.abspath(__file__))
-matlab_src_dir = os.path.abspath(os.path.join(pwd, '..'))
+matlab_src_dir = os.path.abspath(os.path.join(pwd, '../..'))
 matlab_keep_package_prefix = False
 #primary_domain='mat'
 autodoc_member_order='groupwise'
@@ -57,3 +69,25 @@ def setup(app):
     # after lines that contain the word IGNORE
     app.connect('autodoc-process-docstring', between('^.*--- More Info ---.*$', exclude=True))
     return app
+
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+VERSION = os.environ.get("VERSION", 'dev')
+
+if VERSION == 'dev':
+    project = 'RTD-code MATLAB (dev)'
+    version = 'development version'
+    version_match = 'dev'
+else:
+    project = 'RTD-code MATLAB'
+    version = VERSION
+    version_match = VERSION
+
+copyright = '2024, ROAHM Lab'
+author = 'ROAHM Lab'
+release = version
+html_title = f'{project} {version}'
+
+# TODO Add version selector
+

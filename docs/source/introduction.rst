@@ -1,9 +1,8 @@
 Introduction
 ============
 
-The current version of the rewritten codebase you are looking at is v0.2.0. It is subject to
-significant changes in the near futures which may need code rewrites. This MATLAB implementation
-supports r2021b and later. 
+This codebase is subject to significant changes in the near futures which may need code rewrites.
+This MATLAB implementation supports r2021b and later. 
 
 In here, the code is split up into many different packages, with a somewhat flattened out structure.
 Changing out smaller behaviors of an agent or simulator now involves looking at files that pertain to that

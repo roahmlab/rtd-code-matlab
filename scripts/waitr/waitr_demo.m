@@ -54,8 +54,8 @@ if visualize_cad
     camlight
 end
 
-controller = [];
-% controller = 'waitr.agent.WaitrMexController';
+% controller = [];
+controller = 'waitr.agent.WaitrMexController';
 
 % Create
 agent = waitr.WaitrAgent(agent_info, visual=visual, ...

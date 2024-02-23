@@ -49,8 +49,8 @@ if visualize_cad
     camlight
 end
 
-controller = [];
-% controller = 'armour.agent.ArmourMexController';
+% controller = [];
+controller = 'armour.agent.ArmourMexController';
 
 % Create
 agent = armour.ArmourAgent(agent_info, visual=visual, ...
@@ -102,8 +102,8 @@ trajOptProps.timeoutTime = 0.5;
 trajOptProps.randomInit = true;
 trajOptProps.timeForCost = 1.0;
 
-input_constraints_flag = false;
-use_robust_input = false;
+input_constraints_flag = true;
+use_robust_input = true;
 smooth_obs = false;
 
 planner = armour.ArmourPlanner( ...

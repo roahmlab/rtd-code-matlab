@@ -30,8 +30,19 @@ codegen/
 # Octave session info
 octave-workspace
 
-# Sphinx build docs
+# Generated documentation
 _build/
+docs/build/
+docs/source/generated/
+docs/_site
+_site
+docs/dev
+
+# MACOS
+.ds_store
+.DS_Store
+.DS_STORE
+
 
 # tar.gz for coinhsl
 *.tar.gz
