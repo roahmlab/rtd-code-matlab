@@ -26,18 +26,21 @@ using Interval = bn::interval<
         > 
     >;
 
-namespace Eigen {
-  namespace internal {
-    template<typename X, typename S, typename P>
-    struct is_convertible<X, bn::interval<S,P> > {
-      enum { value = is_convertible<X,S>::value };
-    };
+#if EIGEN_HAS_CXX11
+namespace std
+#else
+namespace Eigen::internal
+#endif
+{
+  template<typename X, typename S, typename P>
+  struct std::is_convertible<X, bn::interval<S,P> > {
+    enum { value = std::is_convertible<X,S>::value };
+  };
 
-    template<typename S, typename P1, typename P2>
-    struct is_convertible<bn::interval<S,P1>, bn::interval<S,P2> > {
-      enum { value = true };
-    };
-  }
+  template<typename S, typename P1, typename P2>
+  struct std::is_convertible<bn::interval<S,P1>, bn::interval<S,P2> > {
+    enum { value = true };
+  };
 }
 
 typedef Eigen::Matrix<Interval, Eigen::Dynamic, 1> VectorXint;
