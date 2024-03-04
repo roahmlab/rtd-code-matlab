@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example RTD Planner Implementation of WAITR &mdash; RTD-code MATLAB v0.2.0-docs</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=10b7111e"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RTD Simulation Reference" href="../simulation/simulation.html" />
+    <link rel="prev" title="Example RTD Planner Implementation of ARMOUR" href="armour.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RTD-code MATLAB
+          </a>
+              <div class="version">
+                v0.2.0-docs
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="planner.html">RTD Base Planner and Implementations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="base.html#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="armour.html">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="armour.html#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="armour.html#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="armour.html#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simulation/simulation.html">RTD Simulation Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/entities.html">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/components.html">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/systems.html">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTD-code MATLAB</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="planner.html">RTD Base Planner and Implementations</a></li>
+      <li class="breadcrumb-item active">Example RTD Planner Implementation of WAITR</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/planner/waitr.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-rtd-planner-implementation-of-waitr">
+<h1>Example RTD Planner Implementation of WAITR<a class="headerlink" href="#example-rtd-planner-implementation-of-waitr" title="Permalink to this heading"></a></h1>
+<p>WaitrPlanner and these related components define the WAITR planner as described by Brei et. al. in <a class="reference external" href="https://arxiv.org/abs/2309.03111">https://arxiv.org/abs/2309.03111</a>.
+This planner extends ArmourPlanner and requires the use of the matching robust controller.
+It still uses the same sets of trajectories that ARMOUR has.</p>
+<section id="the-base-waitr-planner">
+<h2>The Base WAITR Planner<a class="headerlink" href="#the-base-waitr-planner" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.</span></span><span class="sig-name descname"><span class="pre">WaitrPlanner</span></span><a class="headerlink" href="#waitr.WaitrPlanner" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.RtdPlanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.WaitrPlanner">
+<span class="sig-name descname"><span class="pre">WaitrPlanner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajOptProps</span></em>, <em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.WaitrPlanner.WaitrPlanner" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.objective">
+<span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#waitr.WaitrPlanner.objective" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.optimizationEngine">
+<span class="sig-name descname"><span class="pre">optimizationEngine</span></span><a class="headerlink" href="#waitr.WaitrPlanner.optimizationEngine" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.rsGenerators">
+<span class="sig-name descname"><span class="pre">rsGenerators</span></span><a class="headerlink" href="#waitr.WaitrPlanner.rsGenerators" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.trajectoryFactory">
+<span class="sig-name descname"><span class="pre">trajectoryFactory</span></span><a class="headerlink" href="#waitr.WaitrPlanner.trajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.trajopt">
+<span class="sig-name descname"><span class="pre">trajopt</span></span><a class="headerlink" href="#waitr.WaitrPlanner.trajopt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waitr.WaitrPlanner.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.WaitrPlanner.planTrajectory">
+<span class="sig-name descname"><span class="pre">planTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotState</span></em>, <em class="sig-param"><span class="pre">worldState</span></em>, <em class="sig-param"><span class="pre">waypoint</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.WaitrPlanner.planTrajectory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+waitr.+reachsets">
+<span id="extra-reachable-sets-not-in-armour"></span><h2>Extra Reachable Sets not in ARMOUR<a class="headerlink" href="#module-+waitr.+reachsets" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.reachsets.</span></span><span class="sig-name descname"><span class="pre">EEInstance</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetInstance</span></code></p>
+<p>EEInstance
+This is just an individual instance of an original ARMTD EE.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.EEInstance">
+<span class="sig-name descname"><span class="pre">EEInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">sep_poly</span></em>, <em class="sig-param"><span class="pre">slip_poly</span></em>, <em class="sig-param"><span class="pre">tip_poly</span></em>, <em class="sig-param"><span class="pre">jrsInstance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.reachsets.EEInstance.EEInstance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.input_range">
+<span class="sig-name descname"><span class="pre">input_range</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.input_range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.n_q">
+<span class="sig-name descname"><span class="pre">n_q</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.n_q" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.n_t">
+<span class="sig-name descname"><span class="pre">n_t</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.n_t" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.num_parameters">
+<span class="sig-name descname"><span class="pre">num_parameters</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.num_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.output_range">
+<span class="sig-name descname"><span class="pre">output_range</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.output_range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.sep_poly">
+<span class="sig-name descname"><span class="pre">sep_poly</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.sep_poly" title="Permalink to this definition"></a></dt>
+<dd><p>properties carried over from the original implementation</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.slip_poly">
+<span class="sig-name descname"><span class="pre">slip_poly</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.slip_poly" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.tip_poly">
+<span class="sig-name descname"><span class="pre">tip_poly</span></span><a class="headerlink" href="#waitr.reachsets.EEInstance.tip_poly" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEInstance.genNLConstraint">
+<span class="sig-name descname"><span class="pre">genNLConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">worldState</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.reachsets.EEInstance.genNLConstraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.reachsets.</span></span><span class="sig-name descname"><span class="pre">EEGenerator</span></span><a class="headerlink" href="#waitr.reachsets.EEGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetGenerator</span></code></p>
+<p>ArmTdForwardOccupancy
+This either encapsulates the reachable sets in memory, or enables the
+online computation of reachable sets. It acts as a generator for a
+single instance of ReachableSet</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator.EEGenerator">
+<span class="sig-name descname"><span class="pre">EEGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">jrsGenerator</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.reachsets.EEGenerator.EEGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator.cache_max_size">
+<span class="sig-name descname"><span class="pre">cache_max_size</span></span><a class="headerlink" href="#waitr.reachsets.EEGenerator.cache_max_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator.jrsGenerator">
+<span class="sig-name descname"><span class="pre">jrsGenerator</span></span><a class="headerlink" href="#waitr.reachsets.EEGenerator.jrsGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator.robot">
+<span class="sig-name descname"><span class="pre">robot</span></span><a class="headerlink" href="#waitr.reachsets.EEGenerator.robot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator.surf_rad">
+<span class="sig-name descname"><span class="pre">surf_rad</span></span><a class="headerlink" href="#waitr.reachsets.EEGenerator.surf_rad" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.reachsets.EEGenerator.u_s">
+<span class="sig-name descname"><span class="pre">u_s</span></span><a class="headerlink" href="#waitr.reachsets.EEGenerator.u_s" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="armour.html" class="btn btn-neutral float-left" title="Example RTD Planner Implementation of ARMOUR" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../simulation/simulation.html" class="btn btn-neutral float-right" title="RTD Simulation Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

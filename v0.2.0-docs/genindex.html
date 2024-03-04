@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Index &mdash; RTD-code MATLAB v0.2.0-docs</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=10b7111e"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/design-tabs.js?v=36754332"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            RTD-code MATLAB
+          </a>
+              <div class="version">
+                v0.2.0-docs
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="planner/planner.html">RTD Base Planner and Implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="planner/base.html">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="planner/base.html#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planner/base.html#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planner/base.html#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planner/base.html#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="planner/armour.html">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="planner/armour.html#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planner/armour.html#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planner/armour.html#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="planner/waitr.html">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="planner/waitr.html#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planner/waitr.html#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simulation/simulation.html">RTD Simulation Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulation/entities.html">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulation/entities.html#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/entities.html#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/entities.html#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/entities.html#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simulation/components.html">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulation/components.html#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/components.html#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/components.html#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/components.html#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simulation/systems.html">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulation/systems.html#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/systems.html#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/systems.html#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simulation/simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulation/simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulation/simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">RTD-code MATLAB</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Index</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.add">add() (rtd.util.containers.VarLogger method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.addEntity">addEntity() (rtd.sim.world.WorldModel method)</a>
+</li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.addKeys">addKeys() (rtd.util.containers.VarLogger method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.addObjects">addObjects() (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.addObjects">(rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      </ul></li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.addStruct">addStruct() (rtd.util.containers.VarLogger method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.addSystem">addSystem() (rtd.sim.world.WorldModel method)</a>
+</li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.agent">agent (armour.ArmourSimulation attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.all_entities">all_entities (rtd.sim.world.WorldModel attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.alpha">alpha (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.alpha">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.alpha2">alpha2 (armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.alpha_constant">alpha_constant (armour.agent.ArmourController attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.animate">animate() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.animation_view">animation_view (armour.agent.ArmourPatchVisual attribute)</a>
+
+      <ul>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.animation_view">(demos.box2d.BoxAgentVisual attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.animation_view">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.arm_agent">arm_agent (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.arm_info">arm_info (armour.agent.ArmKinematics attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.arm_info">(armour.agent.ArmourPatchCollision attribute)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.arm_info">(armour.agent.ArmourPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.arm_state">arm_state (armour.agent.ArmKinematics attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.arm_state">(armour.agent.ArmourPatchCollision attribute)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.arm_state">(armour.agent.ArmourPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics">ArmKinematics (class in armour.agent)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.ArmKinematics">ArmKinematics() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#module-+armour.+agent">armour.agent (module)</a>
+</li>
+      <li><a href="planner/armour.html#module-+armour.+reachsets">armour.reachsets (module)</a>
+</li>
+      <li><a href="planner/armour.html#module-+armour.+trajectory">armour.trajectory (module)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent">ArmourAgent (class in armour)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.ArmourAgent">ArmourAgent() (armour.ArmourAgent method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo">ArmourAgentInfo (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.ArmourAgentInfo">ArmourAgentInfo() (armour.agent.ArmourAgentInfo method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState">ArmourAgentState (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.ArmourAgentState">ArmourAgentState() (armour.agent.ArmourAgentState method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourCadPatchVisual">ArmourCadPatchVisual (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController">ArmourController (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.ArmourController">ArmourController() (armour.agent.ArmourController method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics">ArmourDynamics (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.ArmourDynamics">ArmourDynamics() (armour.agent.ArmourDynamics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision">ArmourPatchCollision (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.ArmourPatchCollision">ArmourPatchCollision() (armour.agent.ArmourPatchCollision method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual">ArmourPatchVisual (class in armour.agent)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.ArmourPatchVisual">ArmourPatchVisual() (armour.agent.ArmourPatchVisual method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.ArmourPlanner">ArmourPlanner (class in armour)</a>
+</li>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.ArmourPlanner">ArmourPlanner() (armour.ArmourPlanner method)</a>
+</li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation">ArmourSimulation (class in armour)</a>
+</li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.ArmourSimulation">ArmourSimulation() (armour.ArmourSimulation method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.ArmTrajectoryFactory">ArmTrajectoryFactory (class in armour.trajectory)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.ArmTrajectoryFactory.ArmTrajectoryFactory">ArmTrajectoryFactory() (armour.trajectory.ArmTrajectoryFactory method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope.base_zonotope">base_zonotope (rtd.entity.box_obstacle.BoxObstacleZonotope attribute)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.BaseControllerComponent">BaseControllerComponent (class in rtd.entity.components)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.BaseDynamicsComponent">BaseDynamicsComponent (class in rtd.entity.components)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.BaseInfoComponent">BaseInfoComponent (class in rtd.entity.components)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.baseoptions">baseoptions() (rtd.sim.world.WorldEntity static method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation">BaseSimulation (class in rtd.sim)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.BaseStateComponent">BaseStateComponent (class in rtd.entity.components)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory">BernsteinArmTrajectory (class in armour.trajectory)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.BernsteinArmTrajectory">BernsteinArmTrajectory() (armour.trajectory.BernsteinArmTrajectory method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.body_joint_index">body_joint_index (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.box_info">box_info (demos.box2d.BoxAgentVisual attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope.box_info">(rtd.entity.box_obstacle.BoxObstacleZonotope attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.box_info">(rtd.entity.box_obstacle.BoxPatchCollision attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.box_info">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.box_state">box_state (demos.box2d.BoxAgentVisual attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope.box_state">(rtd.entity.box_obstacle.BoxObstacleZonotope attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.box_state">(rtd.entity.box_obstacle.BoxPatchCollision attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.box_state">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent">BoxAgent (class in demos.box2d)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent.BoxAgent">BoxAgent() (demos.box2d.BoxAgent method)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo">BoxAgentInfo (class in demos.box2d)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.BoxAgentInfo">BoxAgentInfo() (demos.box2d.BoxAgentInfo method)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual">BoxAgentVisual (class in demos.box2d)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.BoxAgentVisual">BoxAgentVisual() (demos.box2d.BoxAgentVisual method)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle">BoxObstacle (class in rtd.entity)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.BoxObstacle">BoxObstacle() (rtd.entity.BoxObstacle method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo">BoxObstacleInfo (class in rtd.entity.box_obstacle)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.BoxObstacleInfo">BoxObstacleInfo() (rtd.entity.box_obstacle.BoxObstacleInfo method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope">BoxObstacleZonotope (class in rtd.entity.box_obstacle)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope.BoxObstacleZonotope">BoxObstacleZonotope() (rtd.entity.box_obstacle.BoxObstacleZonotope method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision">BoxPatchCollision (class in rtd.entity.box_obstacle)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.BoxPatchCollision">BoxPatchCollision() (rtd.entity.box_obstacle.BoxPatchCollision method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual">BoxPatchVisual (class in rtd.entity.box_obstacle)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.BoxPatchVisual">BoxPatchVisual() (rtd.entity.box_obstacle.BoxPatchVisual method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.buffer_dist">buffer_dist (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetGenerator.cache">cache (rtd.planner.reachsets.ReachSetGenerator attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetGenerator.cache_index">cache_index (rtd.planner.reachsets.ReachSetGenerator attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOGenerator.cache_max_size">cache_max_size (armour.reachsets.FOGenerator attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.IRSGenerator.cache_max_size">(armour.reachsets.IRSGenerator attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.JLSGenerator.cache_max_size">(armour.reachsets.JLSGenerator attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetGenerator.cache_max_size">(rtd.planner.reachsets.ReachSetGenerator attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator.cache_max_size">(waitr.reachsets.EEGenerator attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetGenerator.cache_size">cache_size (rtd.planner.reachsets.ReachSetGenerator attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.calculate_dynamics">calculate_dynamics() (armour.agent.ArmourDynamics method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.centers">centers (rtd.sim.systems.patch3d_collision.Patch3dObject attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.checkCollisionAtTime">checkCollisionAtTime() (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.checkCollisionObject">checkCollisionObject() (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.checkTimeSync">checkTimeSync() (rtd.sim.world.WorldModel method)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.classname">classname (rtd.util.mixins.NamedClass attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.clear">clear() (rtd.trajectory.TrajectoryContainer method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.close">close() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.collision">collision (armour.ArmourAgent attribute)</a>
+
+      <ul>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.collision">(rtd.entity.BoxObstacle attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.collision_patch_data">collision_patch_data (armour.agent.ArmourPatchCollision attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.collision_patch_data">(rtd.entity.box_obstacle.BoxPatchCollision attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.collision_system">collision_system (armour.ArmourSimulation attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.collision_system">(armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.color">color (demos.box2d.BoxAgentInfo attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.commit_state_data">commit_state_data() (armour.agent.ArmourAgentState method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.commit_state_data">(rtd.entity.components.GenericEntityState method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.construct_component">construct_component() (rtd.sim.world.WorldEntity method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.controller">controller (armour.agent.ArmourDynamics attribute)</a>
+
+      <ul>
+        <li><a href="simulation/entities.html#armour.ArmourAgent.controller">(armour.ArmourAgent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseDynamicsComponent.controller">(rtd.entity.components.BaseDynamicsComponent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.controller_input_check">controller_input_check() (armour.agent.ArmourDynamics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.controller_log">controller_log (armour.agent.ArmourDynamics attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.create_baselink_plot_patch_data">create_baselink_plot_patch_data() (armour.agent.ArmourPatchVisual method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.create_collision_check_patch_data">create_collision_check_patch_data() (armour.agent.ArmourPatchCollision method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.create_collision_check_patch_data">(rtd.entity.box_obstacle.BoxPatchCollision method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourCadPatchVisual.create_link_plot_patch_data">create_link_plot_patch_data() (armour.agent.ArmourCadPatchVisual method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.create_link_plot_patch_data">(armour.agent.ArmourPatchVisual method)</a>
+</li>
+      </ul></li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.create_plot_patch_data">create_plot_patch_data() (demos.box2d.BoxAgentVisual method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.create_plot_patch_data">(rtd.entity.box_obstacle.BoxPatchVisual method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.createGoal">createGoal() (armour.deprecation.RandomArmConfigurationGoal method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.ArmTrajectoryFactory.createTrajectory">createTrajectory() (armour.trajectory.ArmTrajectoryFactory method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.creation_buffer">creation_buffer (rtd.entity.box_obstacle.BoxObstacleInfo attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.defaultoptions">defaultoptions() (armour.agent.ArmKinematics static method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.defaultoptions">(armour.agent.ArmourAgentInfo static method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourAgentState.defaultoptions">(armour.agent.ArmourAgentState static method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourCadPatchVisual.defaultoptions">(armour.agent.ArmourCadPatchVisual static method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourController.defaultoptions">(armour.agent.ArmourController static method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourDynamics.defaultoptions">(armour.agent.ArmourDynamics static method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.defaultoptions">(armour.agent.ArmourPatchVisual static method)</a>
+</li>
+        <li><a href="simulation/entities.html#armour.ArmourAgent.defaultoptions">(armour.ArmourAgent static method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.ArmourPlanner.defaultoptions">(armour.ArmourPlanner static method)</a>
+</li>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.defaultoptions">(armour.deprecation.RandomArmConfigurationGoal static method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent.defaultoptions">(demos.box2d.BoxAgent static method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.defaultoptions">(demos.box2d.BoxAgentInfo static method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.defaultoptions">(demos.box2d.BoxAgentVisual static method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.defaultoptions">(rtd.entity.box_obstacle.BoxObstacleInfo static method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.defaultoptions">(rtd.entity.box_obstacle.BoxPatchVisual static method)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.defaultoptions">(rtd.entity.BoxObstacle static method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.defaultoptions">(rtd.entity.components.GenericEntityState static method)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.defaultoptions">(rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem static method)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.defaultoptions">(rtd.sim.systems.patch_visual.PatchVisualSystem static method)</a>
+</li>
+        <li><a href="simulation/components.html#waitr.agent.WaitrDynamics.defaultoptions">(waitr.agent.WaitrDynamics static method)</a>
+</li>
+        <li><a href="simulation/entities.html#waitr.WaitrAgent.defaultoptions">(waitr.WaitrAgent static method)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.defaultoptions">(waitr.WaitrPlanner static method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.dimension">dimension (armour.agent.ArmourAgentInfo attribute)</a>
+
+      <ul>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.dimension">(demos.box2d.BoxAgentInfo attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.dimension">(rtd.entity.box_obstacle.BoxObstacleInfo attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseInfoComponent.dimension">(rtd.entity.components.BaseInfoComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.EmptyEntityInfo.dimension">(rtd.entity.components.EmptyEntityInfo attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps.doTimeout">doTimeout (rtd.planner.trajopt.TrajOptProps attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.JLSInstance.dq_lb">dq_lb (armour.reachsets.JLSInstance attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.JLSInstance.dq_ub">dq_ub (armour.reachsets.JLSInstance attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.draw_time">draw_time (rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.dynamic_entities">dynamic_entities (rtd.sim.world.WorldModel attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.dynamic_objects">dynamic_objects (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.dynamic_objects">(rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.dynamics">dynamics (armour.ArmourAgent attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.dynamics">dynamics() (armour.agent.ArmourDynamics method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator">EEGenerator (class in waitr.reachsets)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator.EEGenerator">EEGenerator() (waitr.reachsets.EEGenerator method)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEInstance">EEInstance (class in waitr.reachsets)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.EEInstance">EEInstance() (waitr.reachsets.EEInstance method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.EmptyEntityInfo">EmptyEntityInfo (class in rtd.entity.components)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject">EmptyPatch3dDynamicObject (class in rtd.sim.systems.patch3d_collision)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.EmptyPatchVisualObject">EmptyPatchVisualObject (class in rtd.sim.systems.patch_visual)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.enable_camlight">enable_camlight (rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.entity_info">entity_info (armour.agent.ArmourAgentState attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseStateComponent.entity_info">(rtd.entity.components.BaseStateComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.entity_info">(rtd.entity.components.GenericEntityState attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.export">export() (rtd.sim.BaseSimulation method)</a>
+
+      <ul>
+        <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.export">(rtd.sim.world.WorldModel method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.faces">faces (rtd.sim.systems.patch3d_collision.Patch3dObject attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.figure_handle">figure_handle (rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.FminconOptimizationEngine">FminconOptimizationEngine (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.FminconOptimizationEngine.FminconOptimizationEngine">FminconOptimizationEngine() (rtd.planner.trajopt.FminconOptimizationEngine method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.FO">FO (armour.reachsets.FOInstance attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOGenerator">FOGenerator (class in armour.reachsets)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.reachsets.FOGenerator.FOGenerator">FOGenerator() (armour.reachsets.FOGenerator method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance">FOInstance (class in armour.reachsets)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.FOInstance">FOInstance() (armour.reachsets.FOInstance method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.forward_kinematics">forward_kinematics() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.forward_kinematics_end_effector">forward_kinematics_end_effector() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.from_options">from_options() (armour.ArmourAgent static method)</a>
+
+      <ul>
+        <li><a href="simulation/entities.html#waitr.WaitrAgent.from_options">(waitr.WaitrAgent static method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.generate_measurement_noise">generate_measurement_noise() (armour.agent.ArmourDynamics method)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.GenericArmObjective">GenericArmObjective (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.GenericArmObjective.GenericArmObjective">GenericArmObjective() (rtd.planner.trajopt.GenericArmObjective method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState">GenericEntityState (class in rtd.entity.components)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.GenericEntityState">GenericEntityState() (rtd.entity.components.GenericEntityState method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.genNLConstraint">genNLConstraint() (armour.reachsets.FOInstance method)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.IRSInstance.genNLConstraint">(armour.reachsets.IRSInstance method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.JLSInstance.genNLConstraint">(armour.reachsets.JLSInstance method)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.genNLConstraint">(waitr.reachsets.EEInstance method)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.GenericArmObjective.genObjective">genObjective() (rtd.planner.trajopt.GenericArmObjective method)</a>
+</li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.get">get() (rtd.util.containers.VarLogger method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.get_axis_lims">get_axis_lims() (armour.agent.ArmourPatchVisual method)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.get_componentOverrideOptions">get_componentOverrideOptions() (rtd.sim.world.WorldEntity static method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.get_discretization_and_pause">get_discretization_and_pause() (rtd.sim.systems.patch_visual.PatchVisualSystem static method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.get_end_effector_location">get_end_effector_location() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.get_joint_locations">get_joint_locations() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.get_joint_locations_from_configuration">get_joint_locations_from_configuration() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.get_link_rotations_and_translations">get_link_rotations_and_translations() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.get_measurement_noise">get_measurement_noise() (armour.agent.ArmourDynamics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.get_state">get_state() (armour.agent.ArmourAgentState method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.get_state">(rtd.entity.components.GenericEntityState method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.get_vdisplevel">get_vdisplevel() (rtd.util.mixins.NamedClass method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope.get_zonotope">get_zonotope() (rtd.entity.box_obstacle.BoxObstacleZonotope method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.getCollisionObject">getCollisionObject() (armour.agent.ArmourPatchCollision method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.getCollisionObject">(rtd.entity.box_obstacle.BoxPatchCollision method)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject.getCollisionObject">(rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.getCommand">getCommand() (armour.trajectory.BernsteinArmTrajectory method)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.getCommand">(armour.trajectory.PiecewiseArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.getCommand">(armour.trajectory.TwoBernsteinArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory.getCommand">(armour.trajectory.ZeroHoldArmTrajectory method)</a>
+</li>
+        <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.getCommand">(rtd.trajectory.TrajectoryContainer method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.getControlInputs">getControlInputs() (armour.agent.ArmourController method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#waitr.agent.WaitrMexController.getControlInputs">(waitr.agent.WaitrMexController method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.getEntityComponent">getEntityComponent() (rtd.sim.world.WorldModel method)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.getoptions">getoptions() (rtd.sim.world.WorldEntity method)</a>
+
+      <ul>
+        <li><a href="utilities/mixins.html#rtd.util.mixins.Options.getoptions">(rtd.util.mixins.Options method)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetGenerator.getReachableSet">getReachableSet() (rtd.planner.reachsets.ReachSetGenerator method)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.goal_creation_timeout">goal_creation_timeout (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.goal_position">goal_position (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.goal_radius">goal_radius (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.goal_system">goal_system (armour.ArmourSimulation attribute)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrDynamics.grasp_constraint_check">grasp_constraint_check() (waitr.agent.WaitrDynamics method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.group_ends">group_ends (rtd.sim.systems.patch3d_collision.Patch3dObject attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.height">height (demos.box2d.BoxAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.horizonTime">horizonTime (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.horizonTime">(armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.horizonTime">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps.horizonTime">(rtd.planner.trajopt.TrajOptProps attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.import">import() (armour.ArmourSimulation method)</a>
+
+      <ul>
+        <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.import">(rtd.sim.world.WorldModel static method)</a>
+</li>
+      </ul></li>
+      <li><a href="utilities/utilities.html#rtd.util.RangeScaler.in_range">in_range (rtd.util.RangeScaler attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.inCollision">inCollision() (rtd.sim.systems.patch3d_collision.Patch3dObject method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.indiv_obs_constraint">indiv_obs_constraint() (armour.reachsets.FOInstance method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.indiv_smooth_obs_constraint">indiv_smooth_obs_constraint() (armour.reachsets.FOInstance method)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.info">info (armour.ArmourAgent attribute)</a>
+
+      <ul>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent.info">(demos.box2d.BoxAgent attribute)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.info">(rtd.entity.BoxObstacle attribute)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.info">(rtd.sim.world.WorldEntity attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.initialize">initialize() (armour.ArmourSimulation method)</a>
+
+      <ul>
+        <li><a href="simulation/simulations.html#waitr.WaitrSimulation.initialize">(waitr.WaitrSimulation method)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.input_range">input_range (armour.reachsets.FOInstance attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.IRSInstance.input_range">(armour.reachsets.IRSInstance attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.JLSInstance.input_range">(armour.reachsets.JLSInstance attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetInstance.input_range">(rtd.planner.reachsets.ReachSetInstance attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.input_range">(waitr.reachsets.EEInstance attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.Options.instanceOptions">instanceOptions (rtd.util.mixins.Options attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.integrator">integrator() (armour.agent.ArmourDynamics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.inverse_kinematics">inverse_kinematics() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.inverse_kinematics_end_effector">inverse_kinematics_end_effector() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.inverse_kinematics_joint_locations">inverse_kinematics_joint_locations() (armour.agent.ArmKinematics method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSGenerator">IRSGenerator (class in armour.reachsets)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSGenerator.IRSGenerator">IRSGenerator() (armour.reachsets.IRSGenerator method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSInstance">IRSInstance (class in armour.reachsets)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSInstance.IRSInstance">IRSInstance() (armour.reachsets.IRSInstance method)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.is_base_obstacle">is_base_obstacle (rtd.entity.box_obstacle.BoxObstacleInfo attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualObject.isPlotDataValid">isPlotDataValid() (rtd.sim.systems.patch_visual.PatchVisualObject method)</a>
+</li>
+      <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.isValid">isValid() (rtd.trajectory.TrajectoryContainer method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.reachsets.JLSGenerator">JLSGenerator (class in armour.reachsets)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.JLSGenerator.JLSGenerator">JLSGenerator() (armour.reachsets.JLSGenerator method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.JLSInstance">JLSInstance (class in armour.reachsets)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.JLSInstance.JLSInstance">JLSInstance() (armour.reachsets.JLSInstance method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.joint_limit_check">joint_limit_check() (armour.agent.ArmourAgentState method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.joints">joints (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOGenerator.jrsGenerator">jrsGenerator (armour.reachsets.FOGenerator attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.IRSGenerator.jrsGenerator">(armour.reachsets.IRSGenerator attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.JLSGenerator.jrsGenerator">(armour.reachsets.JLSGenerator attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator.jrsGenerator">(waitr.reachsets.EEGenerator attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.jrsInstance">jrsInstance (armour.reachsets.FOInstance attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.keypress">keypress() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.keys">keys() (rtd.util.containers.VarLogger method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.kinematic_chain">kinematic_chain (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.kinematics">kinematics (armour.agent.ArmourPatchCollision attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.kinematics">(armour.agent.ArmourPatchVisual attribute)</a>
+</li>
+        <li><a href="simulation/entities.html#armour.ArmourAgent.kinematics">(armour.ArmourAgent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.Kr">Kr (armour.agent.ArmourController attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.link_plot_data">link_plot_data (armour.agent.ArmourPatchVisual attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.link_plot_data">(armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.links">links (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.log_entries">log_entries (rtd.util.containers.VarLogger attribute)</a>
+</li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.log_validateKeys">log_validateKeys (rtd.util.containers.VarLogger attribute)</a>
+</li>
+      <li><a href="utilities/types.html#rtd.util.types.LogLevel">LogLevel (class in rtd.util.types)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.M_min_eigenvalue">M_min_eigenvalue (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.makeBox">makeBox() (rtd.entity.BoxObstacle static method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.measurement_noise">measurement_noise (armour.agent.ArmourDynamics attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.mergeFromNode">mergeFromNode() (rtd.sim.world.WorldModel method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.mergeFromXML">mergeFromXML() (rtd.sim.world.WorldModel method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.Options.mergeoptions">mergeoptions() (rtd.util.mixins.Options method)</a>
+</li>
+      <li><a href="utilities/utilities.html#rtd.util.MexWrapper">MexWrapper (class in rtd.util)</a>
+</li>
+      <li><a href="utilities/utilities.html#rtd.util.MexWrapper.MexWrapper">MexWrapper() (rtd.util.MexWrapper method)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.min_dist_start_to_goal">min_dist_start_to_goal (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.move">move() (armour.agent.ArmourDynamics method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.n_inputs">n_inputs (armour.agent.ArmourController attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseControllerComponent.n_inputs">(rtd.entity.components.BaseControllerComponent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.n_links_and_joints">n_links_and_joints (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSInstance.n_q">n_q (armour.reachsets.IRSInstance attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.JLSInstance.n_q">(armour.reachsets.JLSInstance attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.n_q">(waitr.reachsets.EEInstance attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.n_states">n_states (armour.agent.ArmourAgentState attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseStateComponent.n_states">(rtd.entity.components.BaseStateComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.n_states">(rtd.entity.components.GenericEntityState attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSInstance.n_t">n_t (armour.reachsets.IRSInstance attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.JLSInstance.n_t">(armour.reachsets.JLSInstance attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.n_t">(waitr.reachsets.EEInstance attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.name">name (rtd.util.mixins.NamedClass attribute)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass">NamedClass (class in rtd.util.mixins)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.NamedClass">NamedClass() (rtd.util.mixins.NamedClass method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.num_parameters">num_parameters (armour.reachsets.FOInstance attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.IRSInstance.num_parameters">(armour.reachsets.IRSInstance attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.JLSInstance.num_parameters">(armour.reachsets.JLSInstance attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetInstance.num_parameters">(rtd.planner.reachsets.ReachSetInstance attribute)</a>
+</li>
+        <li><a href="utilities/utilities.html#rtd.util.RangeScaler.num_parameters">(rtd.util.RangeScaler attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.num_parameters">(waitr.reachsets.EEInstance attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.num_q">num_q (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.numParams">numParams (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.numParams">(armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.numParams">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.objective">objective (armour.ArmourPlanner attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.Objective">Objective (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.objective">objective (rtd.planner.trajopt.RtdTrajOpt attribute)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.objective">(waitr.WaitrPlanner attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.reachsets.FOGenerator.obs_frs_combs">obs_frs_combs (armour.reachsets.FOGenerator attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.FOInstance.obs_frs_combs">(armour.reachsets.FOInstance attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.optimizationEngine">optimizationEngine (armour.ArmourPlanner attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/base.html#rtd.planner.trajopt.OptimizationEngine">OptimizationEngine (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.optimizationEngine">optimizationEngine (rtd.planner.trajopt.RtdTrajOpt attribute)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.optimizationEngine">(waitr.WaitrPlanner attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.Options">Options (class in rtd.util.mixins)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.FminconOptimizationEngine.options">options (rtd.planner.trajopt.FminconOptimizationEngine attribute)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.Options.Options">Options() (rtd.util.mixins.Options method)</a>
+</li>
+      <li><a href="utilities/utilities.html#rtd.util.RangeScaler.out_range">out_range (rtd.util.RangeScaler attribute)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.output_range">output_range (waitr.reachsets.EEInstance attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.p_w">p_w (armour.reachsets.FOInstance attribute)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.packagename">packagename (rtd.util.mixins.NamedClass attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.params">params (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.paramScale">paramScale (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.paramScale">(armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.paramScale">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.parent_uuid">parent_uuid (rtd.sim.systems.patch3d_collision.Patch3dObject attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem">Patch3dCollisionSystem (class in rtd.sim.systems.patch3d_collision)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.Patch3dCollisionSystem">Patch3dCollisionSystem() (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dDynamicObject">Patch3dDynamicObject (class in rtd.sim.systems.patch3d_collision)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject">Patch3dObject (class in rtd.sim.systems.patch3d_collision)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.Patch3dObject">Patch3dObject() (rtd.sim.systems.patch3d_collision.Patch3dObject method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.patch_style">patch_style (armour.agent.ArmourPatchVisual attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.patch_style">(armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.patch_style">(demos.box2d.BoxAgentVisual attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.patch_style">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualObject">PatchVisualObject (class in rtd.sim.systems.patch_visual)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem">PatchVisualSystem (class in rtd.sim.systems.patch_visual)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.PatchVisualSystem">PatchVisualSystem() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.pause_requested">pause_requested (rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.FminconOptimizationEngine.performOptimization">performOptimization() (rtd.planner.trajopt.FminconOptimizationEngine method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory">PiecewiseArmTrajectory (class in armour.trajectory)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.PiecewiseArmTrajectory">PiecewiseArmTrajectory() (armour.trajectory.PiecewiseArmTrajectory method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.planTime">planTime (armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.planTime">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps.planTime">(rtd.planner.trajopt.TrajOptProps attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.planTrajectory">planTrajectory() (armour.ArmourPlanner method)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.planTrajectory">(waitr.WaitrPlanner method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.plot">plot() (armour.agent.ArmourPatchVisual method)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.plot">(armour.deprecation.RandomArmConfigurationGoal method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.plot">(demos.box2d.BoxAgentVisual method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.plot">(rtd.entity.box_obstacle.BoxPatchVisual method)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.EmptyPatchVisualObject.plot">(rtd.sim.systems.patch_visual.EmptyPatchVisualObject method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.plot_at_time">plot_at_time() (armour.agent.ArmourPatchVisual method)</a>
+
+      <ul>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.plot_at_time">(demos.box2d.BoxAgentVisual method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.plot_at_time">(rtd.entity.box_obstacle.BoxPatchVisual method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.plot_baselink">plot_baselink() (armour.agent.ArmourPatchVisual method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.plot_data">plot_data (armour.agent.ArmourPatchVisual attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.plot_data">(armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.plot_data">(demos.box2d.BoxAgentVisual attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.plot_data">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.EmptyPatchVisualObject.plot_data">(rtd.sim.systems.patch_visual.EmptyPatchVisualObject attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualObject.plot_data">(rtd.sim.systems.patch_visual.PatchVisualObject attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.plot_links">plot_links() (armour.agent.ArmourPatchVisual method)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.plot_patch_data">plot_patch_data (demos.box2d.BoxAgentVisual attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.plot_patch_data">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.position">position (armour.agent.ArmourAgentState attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.position_indices">position_indices (armour.agent.ArmourAgentState attribute)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.post_checks">post_checks() (rtd.entity.BoxObstacle method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.post_step">post_step() (rtd.sim.BaseSimulation method)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.pre_checks">pre_checks() (rtd.entity.BoxObstacle method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.pre_step">pre_step() (rtd.sim.BaseSimulation method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.q_ddot">q_ddot (armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.q_ddot_to_stop">q_ddot_to_stop (armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.q_dot_peak">q_dot_peak (armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.q_end">q_end (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.q_end">(armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.q_end">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.reachsets.JLSInstance.q_lb">q_lb (armour.reachsets.JLSInstance attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.q_peak">q_peak (armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.q_plan">q_plan (armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.JLSInstance.q_ub">q_ub (armour.reachsets.JLSInstance attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.qd_plan">qd_plan (armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.qdd_plan">qdd_plan (armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.r_norm_threshold">r_norm_threshold (armour.agent.ArmourController attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.R_w">R_w (armour.reachsets.FOInstance attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.random_init">random_init() (armour.agent.ArmourAgentState method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.random_init">(rtd.entity.components.GenericEntityState method)</a>
+</li>
+        <li><a href="simulation/components.html#waitr.agent.WaitrAgentState.random_init">(waitr.agent.WaitrAgentState method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal">RandomArmConfigurationGoal (class in armour.deprecation)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.RandomArmConfigurationGoal">RandomArmConfigurationGoal() (armour.deprecation.RandomArmConfigurationGoal method)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps.randomInit">randomInit (rtd.planner.trajopt.TrajOptProps attribute)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.randomizeBox">randomizeBox() (rtd.entity.BoxObstacle static method)</a>
+</li>
+      <li><a href="utilities/utilities.html#rtd.util.RangeScaler">RangeScaler (class in rtd.util)</a>
+</li>
+      <li><a href="utilities/utilities.html#rtd.util.RangeScaler.RangeScaler">RangeScaler() (rtd.util.RangeScaler method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.reach_limits">reach_limits (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.reachableSets">reachableSets (rtd.planner.trajopt.RtdTrajOpt attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetGenerator">ReachSetGenerator (class in rtd.planner.reachsets)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.reachsets.ReachSetInstance">ReachSetInstance (class in rtd.planner.reachsets)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.redraw">redraw() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.remove">remove() (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.remove">(rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.representation">representation (rtd.entity.BoxObstacle attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmKinematics.reset">reset() (armour.agent.ArmKinematics method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.reset">(armour.agent.ArmourAgentInfo method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourAgentState.reset">(armour.agent.ArmourAgentState method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourController.reset">(armour.agent.ArmourController method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourDynamics.reset">(armour.agent.ArmourDynamics method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchCollision.reset">(armour.agent.ArmourPatchCollision method)</a>
+</li>
+        <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.reset">(armour.agent.ArmourPatchVisual method)</a>
+</li>
+        <li><a href="simulation/entities.html#armour.ArmourAgent.reset">(armour.ArmourAgent method)</a>
+</li>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.reset">(armour.deprecation.RandomArmConfigurationGoal method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent.reset">(demos.box2d.BoxAgent method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.reset">(demos.box2d.BoxAgentInfo method)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.reset">(demos.box2d.BoxAgentVisual method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.reset">(rtd.entity.box_obstacle.BoxObstacleInfo method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleZonotope.reset">(rtd.entity.box_obstacle.BoxObstacleZonotope method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchCollision.reset">(rtd.entity.box_obstacle.BoxPatchCollision method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.reset">(rtd.entity.box_obstacle.BoxPatchVisual method)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.reset">(rtd.entity.BoxObstacle method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.EmptyEntityInfo.reset">(rtd.entity.components.EmptyEntityInfo method)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.reset">(rtd.entity.components.GenericEntityState method)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.reset">(rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.reset">(rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+        <li><a href="simulation/components.html#waitr.agent.WaitrDynamics.reset">(waitr.agent.WaitrDynamics method)</a>
+</li>
+        <li><a href="simulation/components.html#waitr.agent.WaitrMexController.reset">(waitr.agent.WaitrMexController method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.reset_components">reset_components() (rtd.sim.world.WorldEntity method)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.resetVisual">resetVisual() (armour.deprecation.RandomArmConfigurationGoal method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.rnea">rnea() (armour.agent.ArmourController method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.robot">robot (armour.agent.ArmourAgentInfo attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.FOGenerator.robot">(armour.reachsets.FOGenerator attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.IRSGenerator.robot">(armour.reachsets.IRSGenerator attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.reachsets.JLSGenerator.robot">(armour.reachsets.JLSGenerator attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator.robot">(waitr.reachsets.EEGenerator attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.robot_info">robot_info (armour.agent.ArmourController attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourDynamics.robot_info">(armour.agent.ArmourDynamics attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseControllerComponent.robot_info">(rtd.entity.components.BaseControllerComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseDynamicsComponent.robot_info">(rtd.entity.components.BaseDynamicsComponent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.robot_state">robot_state (armour.agent.ArmourController attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#armour.agent.ArmourDynamics.robot_state">(armour.agent.ArmourDynamics attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseControllerComponent.robot_state">(rtd.entity.components.BaseControllerComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseDynamicsComponent.robot_state">(rtd.entity.components.BaseDynamicsComponent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.reachsets.FOInstance.robotInfo">robotInfo (armour.reachsets.FOInstance attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.rsGenerators">rsGenerators (armour.ArmourPlanner attribute)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.rsGenerators">(waitr.WaitrPlanner attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#module-+rtd.+entity.+box_obstacle">rtd.entity.box_obstacle (module)</a>
+</li>
+      <li><a href="simulation/components.html#module-+rtd.+entity.+components">rtd.entity.components (module)</a>
+</li>
+      <li><a href="planner/base.html#module-+rtd.+planner.+reachsets">rtd.planner.reachsets (module)</a>
+</li>
+      <li><a href="planner/base.html#module-+rtd.+planner.+trajopt">rtd.planner.trajopt (module)</a>
+</li>
+      <li><a href="simulation/systems.html#module-+rtd.+sim.+systems.+patch3d_collision">rtd.sim.systems.patch3d_collision (module)</a>
+</li>
+      <li><a href="simulation/systems.html#module-+rtd.+sim.+systems.+patch_visual">rtd.sim.systems.patch_visual (module)</a>
+</li>
+      <li><a href="planner/base.html#module-+rtd.+trajectory">rtd.trajectory (module)</a>
+</li>
+      <li><a href="utilities/utilities.html#module-+rtd.+util">rtd.util (module)</a>
+</li>
+      <li><a href="utilities/types.html#module-+rtd.+util.+types">rtd.util.types (module)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.RtdPlanner">RtdPlanner (class in rtd.planner)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt">RtdTrajOpt (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.RtdTrajOpt">RtdTrajOpt() (rtd.planner.trajopt.RtdTrajOpt method)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.run">run() (rtd.sim.BaseSimulation method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utilities/utilities.html#rtd.util.RangeScaler.scalein">scalein() (rtd.util.RangeScaler method)</a>
+</li>
+      <li><a href="utilities/utilities.html#rtd.util.RangeScaler.scaleout">scaleout() (rtd.util.RangeScaler method)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.sep_poly">sep_poly (waitr.reachsets.EEInstance attribute)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.set_state">set_state() (rtd.entity.components.GenericEntityState method)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.set_vdisplevel">set_vdisplevel() (rtd.util.mixins.NamedClass method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourPatchVisual.set_view_when_animating">set_view_when_animating (armour.agent.ArmourPatchVisual attribute)</a>
+
+      <ul>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentVisual.set_view_when_animating">(demos.box2d.BoxAgentVisual attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxPatchVisual.set_view_when_animating">(rtd.entity.box_obstacle.BoxPatchVisual attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.setInitialTrajectory">setInitialTrajectory() (rtd.trajectory.TrajectoryContainer method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.setParameters">setParameters() (armour.trajectory.BernsteinArmTrajectory method)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.setParameters">(armour.trajectory.PiecewiseArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.setParameters">(armour.trajectory.TwoBernsteinArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory.setParameters">(armour.trajectory.ZeroHoldArmTrajectory method)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.setParamScale">setParamScale() (armour.trajectory.BernsteinArmTrajectory method)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.setParamScale">(armour.trajectory.PiecewiseArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.setParamScale">(armour.trajectory.TwoBernsteinArmTrajectory method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.setTrajectory">setTrajectory() (armour.agent.ArmourController method)</a>
+
+      <ul>
+        <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.setTrajectory">(rtd.trajectory.TrajectoryContainer method)</a>
+</li>
+        <li><a href="simulation/components.html#waitr.agent.WaitrMexController.setTrajectory">(waitr.agent.WaitrMexController method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.setup">setup() (armour.ArmourSimulation method)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.show_packagename">show_packagename (rtd.util.mixins.NamedClass attribute)</a>
+</li>
+      <li><a href="simulation/components.html#rtd.entity.box_obstacle.BoxObstacleInfo.side_lengths">side_lengths (rtd.entity.box_obstacle.BoxObstacleInfo attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.simulation_log">simulation_log (rtd.sim.BaseSimulation attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.simulation_state">simulation_state (rtd.sim.BaseSimulation attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.simulation_time">simulation_time (rtd.sim.BaseSimulation attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.simulation_timestep">simulation_timestep (armour.ArmourSimulation attribute)</a>
+
+      <ul>
+        <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.simulation_timestep">(rtd.sim.BaseSimulation attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.slip_poly">slip_poly (waitr.reachsets.EEInstance attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.reachsets.FOGenerator.smooth_obs">smooth_obs (armour.reachsets.FOGenerator attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.reachsets.FOInstance.smooth_obs">(armour.reachsets.FOInstance attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.solveTrajOpt">solveTrajOpt() (rtd.planner.trajopt.RtdTrajOpt method)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.start_position">start_position (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.startState">startState (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.startState">(armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.startState">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory.startState">(armour.trajectory.ZeroHoldArmTrajectory attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.trajectory.Trajectory.startTime">startTime (rtd.trajectory.Trajectory attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.startTimes">startTimes (rtd.trajectory.TrajectoryContainer attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.state">state (armour.agent.ArmourAgentState attribute)</a>
+
+      <ul>
+        <li><a href="simulation/entities.html#armour.ArmourAgent.state">(armour.ArmourAgent attribute)</a>
+</li>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent.state">(demos.box2d.BoxAgent attribute)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.state">(rtd.entity.BoxObstacle attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseStateComponent.state">(rtd.entity.components.BaseStateComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.state">(rtd.entity.components.GenericEntityState attribute)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.state">(rtd.sim.world.WorldEntity attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.static_entities">static_entities (rtd.sim.world.WorldModel attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.static_objects">static_objects (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.static_objects">(rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.step">step() (rtd.sim.BaseSimulation method)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.step_start_idxs">step_start_idxs (armour.agent.ArmourAgentState attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.summary">summary() (rtd.sim.BaseSimulation method)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrDynamics.surf_rad">surf_rad (waitr.agent.WaitrDynamics attribute)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator.surf_rad">(waitr.reachsets.EEGenerator attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.system_log">system_log (armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.system_log">(rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.system_log">(rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel.systems">systems (rtd.sim.world.WorldModel attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/base.html#rtd.planner.trajopt.GenericArmObjective.t_cost">t_cost (rtd.planner.trajopt.GenericArmObjective attribute)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.tablevel">tablevel (rtd.util.mixins.NamedClass attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.time">time (armour.agent.ArmourAgentState attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.time">(armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseStateComponent.time">(rtd.entity.components.BaseStateComponent attribute)</a>
+</li>
+        <li><a href="simulation/components.html#rtd.entity.components.GenericEntityState.time">(rtd.entity.components.GenericEntityState attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.time">(rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.time">(rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourDynamics.time_discretization">time_discretization (armour.agent.ArmourDynamics attribute)</a>
+
+      <ul>
+        <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.time_discretization">(armour.deprecation.RandomArmConfigurationGoal attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.time_discretization">(rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem attribute)</a>
+</li>
+        <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.time_discretization">(rtd.sim.systems.patch_visual.PatchVisualSystem attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps.timeForCost">timeForCost (rtd.planner.trajopt.TrajOptProps attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.FminconOptimizationEngine.timeout_fcn">timeout_fcn() (rtd.planner.trajopt.FminconOptimizationEngine method)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps.timeoutTime">timeoutTime (rtd.planner.trajopt.TrajOptProps attribute)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.reachsets.EEInstance.tip_poly">tip_poly (waitr.reachsets.EEInstance attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.ArmTrajectoryFactory.traj_type">traj_type (armour.trajectory.ArmTrajectoryFactory attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.trajectories">trajectories (armour.agent.ArmourController attribute)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#rtd.entity.components.BaseControllerComponent.trajectories">(rtd.entity.components.BaseControllerComponent attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer.trajectories">(rtd.trajectory.TrajectoryContainer attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/base.html#rtd.trajectory.Trajectory">Trajectory (class in rtd.trajectory)</a>
+</li>
+      <li><a href="planner/base.html#rtd.trajectory.TrajectoryContainer">TrajectoryContainer (class in rtd.trajectory)</a>
+</li>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.trajectoryFactory">trajectoryFactory (armour.ArmourPlanner attribute)</a>
+</li>
+      <li><a href="planner/base.html#rtd.trajectory.TrajectoryFactory">TrajectoryFactory (class in rtd.trajectory)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.GenericArmObjective.trajectoryFactory">trajectoryFactory (rtd.planner.trajopt.GenericArmObjective attribute)</a>
+
+      <ul>
+        <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.trajectoryFactory">(rtd.planner.trajopt.RtdTrajOpt attribute)</a>
+</li>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.trajectoryFactory">(waitr.WaitrPlanner attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.trajectory.Trajectory.trajectoryParams">trajectoryParams (rtd.trajectory.Trajectory attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.ArmourPlanner.trajopt">trajopt (armour.ArmourPlanner attribute)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.WaitrPlanner.trajopt">(waitr.WaitrPlanner attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.TrajOptProps">TrajOptProps (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.FminconOptimizationEngine.trajOptProps">trajOptProps (rtd.planner.trajopt.FminconOptimizationEngine attribute)</a>
+
+      <ul>
+        <li><a href="planner/base.html#rtd.planner.trajopt.RtdTrajOpt.trajOptProps">(rtd.planner.trajopt.RtdTrajOpt attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.trajectory.TrajectoryFactory.trajOptProps">(rtd.trajectory.TrajectoryFactory attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentInfo.transmission_inertia">transmission_inertia (armour.agent.ArmourAgentInfo attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory">TwoBernsteinArmTrajectory (class in armour.trajectory)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.TwoBernsteinArmTrajectory">TwoBernsteinArmTrajectory() (armour.trajectory.TwoBernsteinArmTrajectory method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.reachsets.IRSInstance.u_lb">u_lb (armour.reachsets.IRSInstance attribute)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrDynamics.u_s">u_s (waitr.agent.WaitrDynamics attribute)</a>
+
+      <ul>
+        <li><a href="planner/waitr.html#waitr.reachsets.EEGenerator.u_s">(waitr.reachsets.EEGenerator attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSInstance.u_ub">u_ub (armour.reachsets.IRSInstance attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.ultimate_bound">ultimate_bound (armour.agent.ArmourController attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.ultimate_bound_check">ultimate_bound_check() (armour.agent.ArmourController method)</a>
+
+      <ul>
+        <li><a href="simulation/components.html#waitr.agent.WaitrMexController.ultimate_bound_check">(waitr.agent.WaitrMexController method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.ultimate_bound_position">ultimate_bound_position (armour.agent.ArmourController attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.ultimate_bound_velocity">ultimate_bound_velocity (armour.agent.ArmourController attribute)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.update">update() (armour.ArmourAgent method)</a>
+
+      <ul>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.update">(rtd.entity.BoxObstacle method)</a>
+</li>
+        <li><a href="simulation/entities.html#waitr.WaitrAgent.update">(waitr.WaitrAgent method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.update_name">update_name() (rtd.sim.world.WorldEntity method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.updateCollision">updateCollision() (rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem method)</a>
+</li>
+      <li><a href="simulation/systems.html#armour.deprecation.RandomArmConfigurationGoal.updateGoal">updateGoal() (armour.deprecation.RandomArmConfigurationGoal method)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.updateVisual">updateVisual() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.reachsets.IRSGenerator.use_robust_input">use_robust_input (armour.reachsets.IRSGenerator attribute)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.UUID">UUID (class in rtd.util.mixins)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity.uuid">uuid (rtd.sim.world.WorldEntity attribute)</a>
+
+      <ul>
+        <li><a href="utilities/mixins.html#rtd.util.mixins.UUID.uuid">(rtd.util.mixins.UUID attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.UUID.UUID">UUID() (rtd.util.mixins.UUID method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourController.V_max">V_max (armour.agent.ArmourController attribute)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.validate">validate() (armour.trajectory.BernsteinArmTrajectory method)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.validate">(armour.trajectory.PiecewiseArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.validate">(armour.trajectory.TwoBernsteinArmTrajectory method)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory.validate">(armour.trajectory.ZeroHoldArmTrajectory method)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch_visual.PatchVisualSystem.validateOrCreateFigure">validateOrCreateFigure() (rtd.sim.systems.patch_visual.PatchVisualSystem method)</a>
+</li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger">VarLogger (class in rtd.util.containers)</a>
+</li>
+      <li><a href="utilities/containers.html#rtd.util.containers.VarLogger.VarLogger">VarLogger() (rtd.util.containers.VarLogger method)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.vdisp">vdisp() (rtd.util.mixins.NamedClass method)</a>
+</li>
+      <li><a href="planner/armour.html#armour.trajectory.BernsteinArmTrajectory.vectorized">vectorized (armour.trajectory.BernsteinArmTrajectory attribute)</a>
+
+      <ul>
+        <li><a href="planner/armour.html#armour.trajectory.PiecewiseArmTrajectory.vectorized">(armour.trajectory.PiecewiseArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.TwoBernsteinArmTrajectory.vectorized">(armour.trajectory.TwoBernsteinArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory.vectorized">(armour.trajectory.ZeroHoldArmTrajectory attribute)</a>
+</li>
+        <li><a href="planner/base.html#rtd.trajectory.Trajectory.vectorized">(rtd.trajectory.Trajectory attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.velocity">velocity (armour.agent.ArmourAgentState attribute)</a>
+</li>
+      <li><a href="simulation/components.html#armour.agent.ArmourAgentState.velocity_indices">velocity_indices (armour.agent.ArmourAgentState attribute)</a>
+</li>
+      <li><a href="utilities/mixins.html#rtd.util.mixins.NamedClass.verboseLevel">verboseLevel (rtd.util.mixins.NamedClass attribute)</a>
+</li>
+      <li><a href="simulation/systems.html#rtd.sim.systems.patch3d_collision.Patch3dObject.vertices">vertices (rtd.sim.systems.patch3d_collision.Patch3dObject attribute)</a>
+</li>
+      <li><a href="simulation/entities.html#armour.ArmourAgent.visual">visual (armour.ArmourAgent attribute)</a>
+
+      <ul>
+        <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgent.visual">(demos.box2d.BoxAgent attribute)</a>
+</li>
+        <li><a href="simulation/entities.html#rtd.entity.BoxObstacle.visual">(rtd.entity.BoxObstacle attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="simulation/simulations.html#armour.ArmourSimulation.visual_system">visual_system (armour.ArmourSimulation attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="simulation/components.html#module-+waitr.+agent">waitr.agent (module)</a>
+</li>
+      <li><a href="planner/waitr.html#module-+waitr.+reachsets">waitr.reachsets (module)</a>
+</li>
+      <li><a href="simulation/entities.html#waitr.WaitrAgent">WaitrAgent (class in waitr)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrAgentState">WaitrAgentState (class in waitr.agent)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrDynamics">WaitrDynamics (class in waitr.agent)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrDynamics.WaitrDynamics">WaitrDynamics() (waitr.agent.WaitrDynamics method)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrMexController">WaitrMexController (class in waitr.agent)</a>
+</li>
+      <li><a href="simulation/components.html#waitr.agent.WaitrMexController.WaitrMexController">WaitrMexController() (waitr.agent.WaitrMexController method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/waitr.html#waitr.WaitrPlanner">WaitrPlanner (class in waitr)</a>
+</li>
+      <li><a href="planner/waitr.html#waitr.WaitrPlanner.WaitrPlanner">WaitrPlanner() (waitr.WaitrPlanner method)</a>
+</li>
+      <li><a href="simulation/simulations.html#waitr.WaitrSimulation">WaitrSimulation (class in waitr)</a>
+</li>
+      <li><a href="planner/base.html#rtd.planner.trajopt.Waypoint">Waypoint (class in rtd.planner.trajopt)</a>
+</li>
+      <li><a href="examples/sim/box2d_agent.html#demos.box2d.BoxAgentInfo.width">width (demos.box2d.BoxAgentInfo attribute)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.BaseSimulation.world">world (rtd.sim.BaseSimulation attribute)</a>
+</li>
+      <li><a href="simulation/entities.html#rtd.sim.world.WorldEntity">WorldEntity (class in rtd.sim.world)</a>
+</li>
+      <li><a href="simulation/simulations.html#rtd.sim.world.WorldModel">WorldModel (class in rtd.sim.world)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory">ZeroHoldArmTrajectory (class in armour.trajectory)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="planner/armour.html#armour.trajectory.ZeroHoldArmTrajectory.ZeroHoldArmTrajectory">ZeroHoldArmTrajectory() (armour.trajectory.ZeroHoldArmTrajectory method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+[
+    {
+        "name": "devel",
+        "version": "dev",
+        "url": "https://roahmlab.github.io/rtd-code-matlab/dev/"
+    },
+    {
+        "name": "latest (v0.2.0-docs)",
+        "version": "v0.2.0-docs",
+        "url": "https://roahmlab.github.io/rtd-code-matlab/v0.2.0-docs/",
+        "preferred": true
+    }
+]

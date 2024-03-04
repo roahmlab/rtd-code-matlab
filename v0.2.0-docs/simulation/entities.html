@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entities and Agents &mdash; RTD-code MATLAB v0.2.0-docs</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=10b7111e"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Components for Entities and Agents" href="components.html" />
+    <link rel="prev" title="RTD Simulation Reference" href="simulation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RTD-code MATLAB
+          </a>
+              <div class="version">
+                v0.2.0-docs
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../planner/planner.html">RTD Base Planner and Implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../planner/base.html">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../planner/armour.html">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../planner/waitr.html">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/waitr.html#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/waitr.html#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="simulation.html">RTD Simulation Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="systems.html">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="systems.html#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="systems.html#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="systems.html#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTD-code MATLAB</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="simulation.html">RTD Simulation Reference</a></li>
+      <li class="breadcrumb-item active">Entities and Agents</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/simulation/entities.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="entities-and-agents">
+<h1>Entities and Agents<a class="headerlink" href="#entities-and-agents" title="Permalink to this heading"></a></h1>
+<p>Entities define objects that exist in the simulated world with a variety of properties.
+This simulator works on mixed Entity-Component (EC) and Entity-Component-System (ECS)
+architecture. Each entity aggregates a few core components with special cases aggregating
+any additional necessary components. Entity data purely exists in the components. Components
+can be categorized as Data Components, Data + Behavior Components, and Behavior Components.</p>
+<p>To see a demo for making your own basic entity, refer to the Box2D Agent example in the <a class="reference internal" href="../examples/sim/box2d_agent.html"><span class="doc">Box2D Agent example</span></a>.</p>
+<section id="base-entity-class-worldentity">
+<h2>Base Entity Class (WorldEntity)<a class="headerlink" href="#base-entity-class-worldentity" title="Permalink to this heading"></a></h2>
+<p>All entities derive from the WorldEntity, which prescribes the requirement for some info component and state component.
+WorldEntity also provides a handful of utility functions to assist with the composition of each entity.
+Additional components can be added as desired, and this is demonstrated in the following concrete entities.</p>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.world.</span></span><span class="sig-name descname"><span class="pre">WorldEntity</span></span><a class="headerlink" href="#rtd.sim.world.WorldEntity" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">matlab.mixin.Heterogeneous</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>WorldEntity is the base class for all entities in the world. It is
+responsible for managing the state and info of the entity, as well as
+providing a common interface for interacting with the entity.</p>
+<p>It is also responsible for managing the options of the entity, and
+providing a common interface for interacting with the options.</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.info">
+<span class="sig-name descname"><span class="pre">info</span></span><a class="headerlink" href="#rtd.sim.world.WorldEntity.info" title="Permalink to this definition"></a></dt>
+<dd><p>Intrinsic properties of the entity which generally do not change</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#rtd.sim.world.WorldEntity.state" title="Permalink to this definition"></a></dt>
+<dd><p>Internal state of the entity which changes over time</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.uuid">
+<span class="sig-name descname"><span class="pre">uuid</span></span><a class="headerlink" href="#rtd.sim.world.WorldEntity.uuid" title="Permalink to this definition"></a></dt>
+<dd><p>UUID of the entity from the info</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.baseoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">baseoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.world.WorldEntity.baseoptions" title="Permalink to this definition"></a></dt>
+<dd><p>Base options for any world entity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Options for the entity and its components</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>options (struct)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.construct_component">
+<span class="sig-name descname"><span class="pre">construct_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.world.WorldEntity.construct_component" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a component with the given name and arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Name of the component</p></li>
+<li><p><strong>varargin</strong> – Arguments to pass to the component</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Constructed component</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>component</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.get_componentOverrideOptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_componentOverrideOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">components</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.world.WorldEntity.get_componentOverrideOptions" title="Permalink to this definition"></a></dt>
+<dd><p>Gets options for provided components if they are already constructed or the default options if they aren’t
+and returns them in a partial options struct for the entity to merge in as overrides</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>components</strong> (<em>struct</em>) – Struct of components to generate override options for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Partial struct of WorldEntity options for the just the components provided</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>options (struct)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.getoptions">
+<span class="sig-name descname"><span class="pre">getoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.world.WorldEntity.getoptions" title="Permalink to this definition"></a></dt>
+<dd><p>Get the options for the entity and all of its components
+Also performs an internal update of the options</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Options for the entity and its components</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>options (struct)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.reset_components">
+<span class="sig-name descname"><span class="pre">reset_components</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.world.WorldEntity.reset_components" title="Permalink to this definition"></a></dt>
+<dd><p>Reset all components of the entity</p>
+<p>TODO add inclusion, exclusion options</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.world.WorldEntity.update_name">
+<span class="sig-name descname"><span class="pre">update_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.world.WorldEntity.update_name" title="Permalink to this definition"></a></dt>
+<dd><p>Update the name of the entity and all of its components</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – Name of the entity</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="box-obstacle-entity">
+<h2>Box Obstacle Entity<a class="headerlink" href="#box-obstacle-entity" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.</span></span><span class="sig-name descname"><span class="pre">BoxObstacle</span></span><a class="headerlink" href="#rtd.entity.BoxObstacle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.world.WorldEntity</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>BoxObstacle
+The Agent with the robust controller for ARMOUR
+Left to do are the helper safety check functions like check input limits
+and glueing this together
+Required Abstract Properties</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.BoxObstacle">
+<span class="sig-name descname"><span class="pre">BoxObstacle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">components</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.BoxObstacle" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.collision">
+<span class="sig-name descname"><span class="pre">collision</span></span><a class="headerlink" href="#rtd.entity.BoxObstacle.collision" title="Permalink to this definition"></a></dt>
+<dd><p>What is the geometry that is actually relevant to the collision
+system or is the agent in collision?</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.info">
+<span class="sig-name descname"><span class="pre">info</span></span><a class="headerlink" href="#rtd.entity.BoxObstacle.info" title="Permalink to this definition"></a></dt>
+<dd><p>Core data to describe the agent.
+Should be mostly invariant.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.representation">
+<span class="sig-name descname"><span class="pre">representation</span></span><a class="headerlink" href="#rtd.entity.BoxObstacle.representation" title="Permalink to this definition"></a></dt>
+<dd><p>Generate our desired representation for this obstacle</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#rtd.entity.BoxObstacle.state" title="Permalink to this definition"></a></dt>
+<dd><p>The changing values and their history that fully describe the
+state of the agent at any given (valid) point in time</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.visual">
+<span class="sig-name descname"><span class="pre">visual</span></span><a class="headerlink" href="#rtd.entity.BoxObstacle.visual" title="Permalink to this definition"></a></dt>
+<dd><p>What is the resulting visual geometry or rendered result for
+whatever visualization system we are using?</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.makeBox">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">makeBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">center</span></em>, <em class="sig-param"><span class="pre">side_lengths</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.makeBox" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.post_checks">
+<span class="sig-name descname"><span class="pre">post_checks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.post_checks" title="Permalink to this definition"></a></dt>
+<dd><p>TODO make this addable, and check across? Maybe not (reasons
+not are obfuscation)
+true means an issue happened!</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.pre_checks">
+<span class="sig-name descname"><span class="pre">pre_checks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.pre_checks" title="Permalink to this definition"></a></dt>
+<dd><p>This would run before the update in each world step.</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.randomizeBox">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">randomizeBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">world_bounds</span></em>, <em class="sig-param"><span class="pre">size_range</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.randomizeBox" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.BoxObstacle.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_move</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.BoxObstacle.update" title="Permalink to this definition"></a></dt>
+<dd><p>NOP</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="armour-agent">
+<h2>Armour Agent<a class="headerlink" href="#armour-agent" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.ArmourAgent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.</span></span><span class="sig-name descname"><span class="pre">ArmourAgent</span></span><a class="headerlink" href="#armour.ArmourAgent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.world.WorldEntity</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>The Agent with the robust controller for ARMOUR
+Left to do are the helper safety check functions like check input limits
+and glueing this together
+Required Abstract Properties</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.ArmourAgent">
+<span class="sig-name descname"><span class="pre">ArmourAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">info</span></em>, <em class="sig-param"><span class="pre">components</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourAgent.ArmourAgent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.collision">
+<span class="sig-name descname"><span class="pre">collision</span></span><a class="headerlink" href="#armour.ArmourAgent.collision" title="Permalink to this definition"></a></dt>
+<dd><p>What is the geometry that is actually relevant to the collision
+system or is the agent in collision?</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.controller">
+<span class="sig-name descname"><span class="pre">controller</span></span><a class="headerlink" href="#armour.ArmourAgent.controller" title="Permalink to this definition"></a></dt>
+<dd><p>What is the control input(s) to this agent for a chosen
+trajectory or similar?
+This also stores relevant controller info and history of
+trajectories if applicable.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.dynamics">
+<span class="sig-name descname"><span class="pre">dynamics</span></span><a class="headerlink" href="#armour.ArmourAgent.dynamics" title="Permalink to this definition"></a></dt>
+<dd><p>What is the evolution of the agent’s state given some control
+input?
+This stores the history of the control inputs used for the
+dynamics.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.info">
+<span class="sig-name descname"><span class="pre">info</span></span><a class="headerlink" href="#armour.ArmourAgent.info" title="Permalink to this definition"></a></dt>
+<dd><p>Core data to describe the agent.
+Should be mostly invariant.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.kinematics">
+<span class="sig-name descname"><span class="pre">kinematics</span></span><a class="headerlink" href="#armour.ArmourAgent.kinematics" title="Permalink to this definition"></a></dt>
+<dd><p>How do we calculate the forward and inverse kinematics for the
+agent?</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#armour.ArmourAgent.state" title="Permalink to this definition"></a></dt>
+<dd><p>The changing values and their history that fully describe the
+state of the agent at any given (valid) point in time</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.visual">
+<span class="sig-name descname"><span class="pre">visual</span></span><a class="headerlink" href="#armour.ArmourAgent.visual" title="Permalink to this definition"></a></dt>
+<dd><p>What is the resulting visual geometry or rendered result for
+whatever visualization system we are using?</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourAgent.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.from_options">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">params</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourAgent.from_options" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourAgent.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.ArmourAgent.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_move</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourAgent.update" title="Permalink to this definition"></a></dt>
+<dd><p>First move</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="waitr-agent">
+<h2>Waitr Agent<a class="headerlink" href="#waitr-agent" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.WaitrAgent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.</span></span><span class="sig-name descname"><span class="pre">WaitrAgent</span></span><a class="headerlink" href="#waitr.WaitrAgent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">armour.ArmourAgent</span></code></p>
+<p>The Agent with the robust controller for ARMOUR
+Left to do are the helper safety check functions like check input limits
+and glueing this together</p>
+<div class="members docutils container">
+<dl>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="waitr.WaitrAgent.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waitr.WaitrAgent.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="waitr.WaitrAgent.from_options">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">from_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">params</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.WaitrAgent.from_options" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.WaitrAgent.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_move</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.WaitrAgent.update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simulation.html" class="btn btn-neutral float-left" title="RTD Simulation Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="components.html" class="btn btn-neutral float-right" title="Components for Entities and Agents" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

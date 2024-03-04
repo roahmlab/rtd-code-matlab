@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation Systems &mdash; RTD-code MATLAB v0.2.0-docs</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=10b7111e"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Simulation Files and World Container" href="simulations.html" />
+    <link rel="prev" title="Components for Entities and Agents" href="components.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RTD-code MATLAB
+          </a>
+              <div class="version">
+                v0.2.0-docs
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../planner/planner.html">RTD Base Planner and Implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../planner/base.html">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../planner/armour.html">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../planner/waitr.html">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/waitr.html#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/waitr.html#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="simulation.html">RTD Simulation Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="entities.html">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="components.html">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="components.html#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTD-code MATLAB</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="simulation.html">RTD Simulation Reference</a></li>
+      <li class="breadcrumb-item active">Simulation Systems</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/simulation/systems.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simulation-systems">
+<h1>Simulation Systems<a class="headerlink" href="#simulation-systems" title="Permalink to this heading"></a></h1>
+<p>Components that are more tailored to the ECS architecture adapt data for
+simulation systems that run during the simulation loop, separate of each
+entity. These systems are all expected to track time as well to ensure
+the simulation retains time synchronization while enabling flexibility
+to call systems whenever relevant.</p>
+<section id="module-+rtd.+sim.+systems.+patch3d_collision">
+<span id="patch3dcollisionsystem"></span><h2>Patch3dCollisionSystem<a class="headerlink" href="#module-+rtd.+sim.+systems.+patch3d_collision" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dDynamicObject">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch3d_collision.</span></span><span class="sig-name descname"><span class="pre">Patch3dDynamicObject</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dDynamicObject" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">matlab.mixin.Heterogeneous</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch3d_collision.</span></span><span class="sig-name descname"><span class="pre">EmptyPatch3dDynamicObject</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch3d_collision.Patch3dDynamicObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject.getCollisionObject">
+<span class="sig-name descname"><span class="pre">getCollisionObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.EmptyPatch3dDynamicObject.getCollisionObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch3d_collision.</span></span><span class="sig-name descname"><span class="pre">Patch3dCollisionSystem</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.SimulationSystem</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Required inherited properties</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.Patch3dCollisionSystem">
+<span class="sig-name descname"><span class="pre">Patch3dCollisionSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">objects</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.Patch3dCollisionSystem" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.dynamic_objects">
+<span class="sig-name descname"><span class="pre">dynamic_objects</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.dynamic_objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.static_objects">
+<span class="sig-name descname"><span class="pre">static_objects</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.static_objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.system_log">
+<span class="sig-name descname"><span class="pre">system_log</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.system_log" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.time_discretization">
+<span class="sig-name descname"><span class="pre">time_discretization</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.time_discretization" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.addObjects">
+<span class="sig-name descname"><span class="pre">addObjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">objects</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.addObjects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.checkCollisionAtTime">
+<span class="sig-name descname"><span class="pre">checkCollisionAtTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.checkCollisionAtTime" title="Permalink to this definition"></a></dt>
+<dd><p>Lazy method. Check each dynamic object against the static
+objects and each other
+Adding some sort of space partitioning would be much better.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.checkCollisionObject">
+<span class="sig-name descname"><span class="pre">checkCollisionObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">collision_obj</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.checkCollisionObject" title="Permalink to this definition"></a></dt>
+<dd><p>Lazy method. Check collision object against the static
+objects and dynamic objects (like a proposal object)
+Adding some sort of space partitioning would be much better.</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.remove" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.updateCollision">
+<span class="sig-name descname"><span class="pre">updateCollision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_update</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dCollisionSystem.updateCollision" title="Permalink to this definition"></a></dt>
+<dd><p>Perform the collision check for t_update
+Why is this update passed in as part of the function?
+It means we can split the system up as much as we want, say
+one step of the simulation is 4 seconds, but we want to call
+all the systems at .5 second update steps. This makes that
+possible.
+We can call system 1 and 2 alternatingly until 4 seconds.
+TODO: fix eventual discretization bug
+nevermind, instead ensure each class has a time element and
+ensure synchrony in the simulator. If synchronization is
+lost, request a check to the discretization values and step
+values.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch3d_collision.</span></span><span class="sig-name descname"><span class="pre">Patch3dObject</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.UUID</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.Patch3dObject">
+<span class="sig-name descname"><span class="pre">Patch3dObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">parent_uuid</span></em>, <em class="sig-param"><span class="pre">faces</span></em>, <em class="sig-param"><span class="pre">vertices</span></em>, <em class="sig-param"><span class="pre">group_ends</span></em>, <em class="sig-param"><span class="pre">centers</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.Patch3dObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.centers">
+<span class="sig-name descname"><span class="pre">centers</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.centers" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.faces">
+<span class="sig-name descname"><span class="pre">faces</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.faces" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.group_ends">
+<span class="sig-name descname"><span class="pre">group_ends</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.group_ends" title="Permalink to this definition"></a></dt>
+<dd><p>the end of vertex groups</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.parent_uuid">
+<span class="sig-name descname"><span class="pre">parent_uuid</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.parent_uuid" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.vertices">
+<span class="sig-name descname"><span class="pre">vertices</span></span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.vertices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch3d_collision.Patch3dObject.inCollision">
+<span class="sig-name descname"><span class="pre">inCollision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">other</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch3d_collision.Patch3dObject.inCollision" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+rtd.+sim.+systems.+patch_visual">
+<span id="patchvisualsystem"></span><h2>PatchVisualSystem<a class="headerlink" href="#module-+rtd.+sim.+systems.+patch_visual" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.EmptyPatchVisualObject">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch_visual.</span></span><span class="sig-name descname"><span class="pre">EmptyPatchVisualObject</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.EmptyPatchVisualObject" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch_visual.PatchVisualObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.EmptyPatchVisualObject.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.EmptyPatchVisualObject.plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.EmptyPatchVisualObject.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.EmptyPatchVisualObject.plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualObject">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch_visual.</span></span><span class="sig-name descname"><span class="pre">PatchVisualObject</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualObject" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">matlab.mixin.Heterogeneous</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualObject.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualObject.plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualObject.isPlotDataValid">
+<span class="sig-name descname"><span class="pre">isPlotDataValid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">fieldname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualObject.isPlotDataValid" title="Permalink to this definition"></a></dt>
+<dd><p>Adapted from check_if_plot_is_available
+out = check_if_plot_is_available(simulator_object,fieldname)</p>
+<p>Given a simulator object (agent, world, or planner), and a fieldname
+of object.plot_data, check if that fieldname (and the corresponding
+plot data) is available. Also check if a figure is up in the global
+figure root. If both the figure and the object’s plot data are
+available, return true.</p>
+<p>If simulator_object.plot_data.(fieldname) contains a cell array of
+n plotted object handles, this function checks each object in the
+cell array.</p>
+<p>Author: Shreyas Kousik
+Created: shrug
+Updated: 19 Mar 2020
+Make it so we can initialize it</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.sim.systems.patch_visual.</span></span><span class="sig-name descname"><span class="pre">PatchVisualSystem</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.SimulationSystem</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>TODO incorporate axes so that it’s actually plotting everything
+without deleting stuff or requiring hold on</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.PatchVisualSystem">
+<span class="sig-name descname"><span class="pre">PatchVisualSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">objects</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.PatchVisualSystem" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.draw_time">
+<span class="sig-name descname"><span class="pre">draw_time</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.draw_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.dynamic_objects">
+<span class="sig-name descname"><span class="pre">dynamic_objects</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.dynamic_objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.enable_camlight">
+<span class="sig-name descname"><span class="pre">enable_camlight</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.enable_camlight" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.figure_handle">
+<span class="sig-name descname"><span class="pre">figure_handle</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.figure_handle" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.pause_requested">
+<span class="sig-name descname"><span class="pre">pause_requested</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.pause_requested" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.static_objects">
+<span class="sig-name descname"><span class="pre">static_objects</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.static_objects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.system_log">
+<span class="sig-name descname"><span class="pre">system_log</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.system_log" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.time_discretization">
+<span class="sig-name descname"><span class="pre">time_discretization</span></span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.time_discretization" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.addObjects">
+<span class="sig-name descname"><span class="pre">addObjects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">objects</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.addObjects" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.animate">
+<span class="sig-name descname"><span class="pre">animate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.animate" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.close" title="Permalink to this definition"></a></dt>
+<dd><p>try to close</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.get_discretization_and_pause">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_discretization_and_pause</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">framerate</span></em>, <em class="sig-param"><span class="pre">speed</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.get_discretization_and_pause" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.keypress">
+<span class="sig-name descname"><span class="pre">keypress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">src</span></em>, <em class="sig-param"><span class="pre">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.keypress" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.redraw">
+<span class="sig-name descname"><span class="pre">redraw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.redraw" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.remove" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.updateVisual">
+<span class="sig-name descname"><span class="pre">updateVisual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_update</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.updateVisual" title="Permalink to this definition"></a></dt>
+<dd><p>Perform the collision check for t_update
+Why is this update passed in as part of the function?
+It means we can split the system up as much as we want, say
+one step of the simulation is 4 seconds, but we want to call
+all the systems at .5 second update steps. This makes that
+possible.
+We can call system 1 and 2 alternatingly until 4 seconds.
+TODO: fix eventual discretization bug
+nevermind, instead ensure each class has a time element and
+ensure synchrony in the simulator. If synchronization is
+lost, request a check to the discretization values and step
+values.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.sim.systems.patch_visual.PatchVisualSystem.validateOrCreateFigure">
+<span class="sig-name descname"><span class="pre">validateOrCreateFigure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.sim.systems.patch_visual.PatchVisualSystem.validateOrCreateFigure" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new figure if the current figure handle is bad.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="randomarmconfigurationgoal">
+<h2>RandomArmConfigurationGoal<a class="headerlink" href="#randomarmconfigurationgoal" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.deprecation.</span></span><span class="sig-name descname"><span class="pre">RandomArmConfigurationGoal</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch_visual.PatchVisualObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.SimulationSystem</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Required properties from SimulationSystem
+This class will be replaced soon with a agent-specific component to
+better handle goal checking.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.RandomArmConfigurationGoal">
+<span class="sig-name descname"><span class="pre">RandomArmConfigurationGoal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">collision_system</span></em>, <em class="sig-param"><span class="pre">arm_agent</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.RandomArmConfigurationGoal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.arm_agent">
+<span class="sig-name descname"><span class="pre">arm_agent</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.arm_agent" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.collision_system">
+<span class="sig-name descname"><span class="pre">collision_system</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.collision_system" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.goal_creation_timeout">
+<span class="sig-name descname"><span class="pre">goal_creation_timeout</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.goal_creation_timeout" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.goal_position">
+<span class="sig-name descname"><span class="pre">goal_position</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.goal_position" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.goal_radius">
+<span class="sig-name descname"><span class="pre">goal_radius</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.goal_radius" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.link_plot_data">
+<span class="sig-name descname"><span class="pre">link_plot_data</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.link_plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.min_dist_start_to_goal">
+<span class="sig-name descname"><span class="pre">min_dist_start_to_goal</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.min_dist_start_to_goal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.patch_style">
+<span class="sig-name descname"><span class="pre">patch_style</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.patch_style" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.start_position">
+<span class="sig-name descname"><span class="pre">start_position</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.start_position" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.system_log">
+<span class="sig-name descname"><span class="pre">system_log</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.system_log" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.time_discretization">
+<span class="sig-name descname"><span class="pre">time_discretization</span></span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.time_discretization" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.createGoal">
+<span class="sig-name descname"><span class="pre">createGoal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">position</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.createGoal" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.resetVisual">
+<span class="sig-name descname"><span class="pre">resetVisual</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.resetVisual" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a visual</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.deprecation.RandomArmConfigurationGoal.updateGoal">
+<span class="sig-name descname"><span class="pre">updateGoal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_update</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.deprecation.RandomArmConfigurationGoal.updateGoal" title="Permalink to this definition"></a></dt>
+<dd><p>Perform the collision check for t_update
+Why is this update passed in as part of the function?
+It means we can split the system up as much as we want, say
+one step of the simulation is 4 seconds, but we want to call
+all the systems at .5 second update steps. This makes that
+possible.
+We can call system 1 and 2 alternatingly until 4 seconds.
+TODO: fix eventual discretization bug
+nevermind, instead ensure each class has a time element and
+ensure synchrony in the simulator. If synchronization is
+lost, request a check to the discretization values and step
+values.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="components.html" class="btn btn-neutral float-left" title="Components for Entities and Agents" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simulations.html" class="btn btn-neutral float-right" title="Simulation Files and World Container" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example RTD Planner Implementation of ARMOUR &mdash; RTD-code MATLAB v0.2.0-docs</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=10b7111e"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example RTD Planner Implementation of WAITR" href="waitr.html" />
+    <link rel="prev" title="RTD Planner Interfaces and Base Classes" href="base.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RTD-code MATLAB
+          </a>
+              <div class="version">
+                v0.2.0-docs
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="planner.html">RTD Base Planner and Implementations</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="base.html#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base.html#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="waitr.html">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="waitr.html#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waitr.html#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simulation/simulation.html">RTD Simulation Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/entities.html">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/components.html">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/systems.html">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTD-code MATLAB</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="planner.html">RTD Base Planner and Implementations</a></li>
+      <li class="breadcrumb-item active">Example RTD Planner Implementation of ARMOUR</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/planner/armour.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="example-rtd-planner-implementation-of-armour">
+<h1>Example RTD Planner Implementation of ARMOUR<a class="headerlink" href="#example-rtd-planner-implementation-of-armour" title="Permalink to this heading"></a></h1>
+<p>ArmourPlanner and these related components define the ARMOUR planner as described by Michaux et. al. in <a class="reference external" href="https://arxiv.org/abs/2301.13308">https://arxiv.org/abs/2301.13308</a>.
+This planner requires the use of the matching robust controller.</p>
+<section id="the-base-armour-planner">
+<h2>The Base ARMOUR Planner<a class="headerlink" href="#the-base-armour-planner" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.</span></span><span class="sig-name descname"><span class="pre">ArmourPlanner</span></span><a class="headerlink" href="#armour.ArmourPlanner" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.RtdPlanner</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.ArmourPlanner">
+<span class="sig-name descname"><span class="pre">ArmourPlanner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajOptProps</span></em>, <em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourPlanner.ArmourPlanner" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.objective">
+<span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#armour.ArmourPlanner.objective" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.optimizationEngine">
+<span class="sig-name descname"><span class="pre">optimizationEngine</span></span><a class="headerlink" href="#armour.ArmourPlanner.optimizationEngine" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.rsGenerators">
+<span class="sig-name descname"><span class="pre">rsGenerators</span></span><a class="headerlink" href="#armour.ArmourPlanner.rsGenerators" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.trajectoryFactory">
+<span class="sig-name descname"><span class="pre">trajectoryFactory</span></span><a class="headerlink" href="#armour.ArmourPlanner.trajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.trajopt">
+<span class="sig-name descname"><span class="pre">trajopt</span></span><a class="headerlink" href="#armour.ArmourPlanner.trajopt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourPlanner.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.ArmourPlanner.planTrajectory">
+<span class="sig-name descname"><span class="pre">planTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotState</span></em>, <em class="sig-param"><span class="pre">worldState</span></em>, <em class="sig-param"><span class="pre">waypoint</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.ArmourPlanner.planTrajectory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+armour.+reachsets">
+<span id="reachable-set-generation"></span><h2>Reachable Set Generation<a class="headerlink" href="#module-+armour.+reachsets" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.reachsets.</span></span><span class="sig-name descname"><span class="pre">FOGenerator</span></span><a class="headerlink" href="#armour.reachsets.FOGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetGenerator</span></code></p>
+<p>ForwardOccupancy
+This acts as a generator for a single instance of a
+ForwardReachableSet, and return FOInstance</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator.FOGenerator">
+<span class="sig-name descname"><span class="pre">FOGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">jrsGenerator</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.FOGenerator.FOGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator.cache_max_size">
+<span class="sig-name descname"><span class="pre">cache_max_size</span></span><a class="headerlink" href="#armour.reachsets.FOGenerator.cache_max_size" title="Permalink to this definition"></a></dt>
+<dd><p>We don’t want to cache any forward occupancy instances</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator.jrsGenerator">
+<span class="sig-name descname"><span class="pre">jrsGenerator</span></span><a class="headerlink" href="#armour.reachsets.FOGenerator.jrsGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator.obs_frs_combs">
+<span class="sig-name descname"><span class="pre">obs_frs_combs</span></span><a class="headerlink" href="#armour.reachsets.FOGenerator.obs_frs_combs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator.robot">
+<span class="sig-name descname"><span class="pre">robot</span></span><a class="headerlink" href="#armour.reachsets.FOGenerator.robot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOGenerator.smooth_obs">
+<span class="sig-name descname"><span class="pre">smooth_obs</span></span><a class="headerlink" href="#armour.reachsets.FOGenerator.smooth_obs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.reachsets.</span></span><span class="sig-name descname"><span class="pre">FOInstance</span></span><a class="headerlink" href="#armour.reachsets.FOInstance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetInstance</span></code></p>
+<p>FOInstance
+This is just an individual instance of an original ARMTD FO
+generation.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.FOInstance">
+<span class="sig-name descname"><span class="pre">FOInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotInfo</span></em>, <em class="sig-param"><span class="pre">R_w</span></em>, <em class="sig-param"><span class="pre">p_w</span></em>, <em class="sig-param"><span class="pre">FO</span></em>, <em class="sig-param"><span class="pre">jrsInstance</span></em>, <em class="sig-param"><span class="pre">smooth_obs</span></em>, <em class="sig-param"><span class="pre">obs_frs_combs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.FOInstance.FOInstance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.FO">
+<span class="sig-name descname"><span class="pre">FO</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.FO" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.R_w">
+<span class="sig-name descname"><span class="pre">R_w</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.R_w" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.input_range">
+<span class="sig-name descname"><span class="pre">input_range</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.input_range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.jrsInstance">
+<span class="sig-name descname"><span class="pre">jrsInstance</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.jrsInstance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.num_parameters">
+<span class="sig-name descname"><span class="pre">num_parameters</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.num_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.obs_frs_combs">
+<span class="sig-name descname"><span class="pre">obs_frs_combs</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.obs_frs_combs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.p_w">
+<span class="sig-name descname"><span class="pre">p_w</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.p_w" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.robotInfo">
+<span class="sig-name descname"><span class="pre">robotInfo</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.robotInfo" title="Permalink to this definition"></a></dt>
+<dd><p>properties carried over from the original implementation</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.smooth_obs">
+<span class="sig-name descname"><span class="pre">smooth_obs</span></span><a class="headerlink" href="#armour.reachsets.FOInstance.smooth_obs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.genNLConstraint">
+<span class="sig-name descname"><span class="pre">genNLConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">worldState</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.FOInstance.genNLConstraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.indiv_obs_constraint">
+<span class="sig-name descname"><span class="pre">indiv_obs_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">c</span></em>, <em class="sig-param"><span class="pre">grad_c</span></em>, <em class="sig-param"><span class="pre">k</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.FOInstance.indiv_obs_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>made a separate function to handle the obstacle constraints,
+because the gradient requires knowing the index causing
+the max of the constraints</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.FOInstance.indiv_smooth_obs_constraint">
+<span class="sig-name descname"><span class="pre">indiv_smooth_obs_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">c</span></em>, <em class="sig-param"><span class="pre">grad_c</span></em>, <em class="sig-param"><span class="pre">k</span></em>, <em class="sig-param"><span class="pre">lambda</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.FOInstance.indiv_smooth_obs_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>for evaluating smooth obs constraints, where lambda is introduced
+as extra decision variables to avoid taking a max.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.reachsets.</span></span><span class="sig-name descname"><span class="pre">JLSInstance</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetInstance</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code></p>
+<p>IRSInstance
+This is just an individual instance of input reachable set from
+armour.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.JLSInstance">
+<span class="sig-name descname"><span class="pre">JLSInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">q_ub</span></em>, <em class="sig-param"><span class="pre">q_lb</span></em>, <em class="sig-param"><span class="pre">dq_ub</span></em>, <em class="sig-param"><span class="pre">dq_lb</span></em>, <em class="sig-param"><span class="pre">jrsInstance</span></em>, <em class="sig-param"><span class="pre">verbosity</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.JLSInstance.JLSInstance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.dq_lb">
+<span class="sig-name descname"><span class="pre">dq_lb</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.dq_lb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.dq_ub">
+<span class="sig-name descname"><span class="pre">dq_ub</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.dq_ub" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.input_range">
+<span class="sig-name descname"><span class="pre">input_range</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.input_range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.n_q">
+<span class="sig-name descname"><span class="pre">n_q</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.n_q" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.n_t">
+<span class="sig-name descname"><span class="pre">n_t</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.n_t" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.num_parameters">
+<span class="sig-name descname"><span class="pre">num_parameters</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.num_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.q_lb">
+<span class="sig-name descname"><span class="pre">q_lb</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.q_lb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.q_ub">
+<span class="sig-name descname"><span class="pre">q_ub</span></span><a class="headerlink" href="#armour.reachsets.JLSInstance.q_ub" title="Permalink to this definition"></a></dt>
+<dd><p>properties carried over from the original implementation</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSInstance.genNLConstraint">
+<span class="sig-name descname"><span class="pre">genNLConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">worldState</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.JLSInstance.genNLConstraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.reachsets.</span></span><span class="sig-name descname"><span class="pre">IRSInstance</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetInstance</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code></p>
+<p>IRSInstance
+This is just an individual instance of input reachable set from
+armour.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.IRSInstance">
+<span class="sig-name descname"><span class="pre">IRSInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">u_ub</span></em>, <em class="sig-param"><span class="pre">u_lb</span></em>, <em class="sig-param"><span class="pre">jrsInstance</span></em>, <em class="sig-param"><span class="pre">verbosity</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.IRSInstance.IRSInstance" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.input_range">
+<span class="sig-name descname"><span class="pre">input_range</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance.input_range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.n_q">
+<span class="sig-name descname"><span class="pre">n_q</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance.n_q" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.n_t">
+<span class="sig-name descname"><span class="pre">n_t</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance.n_t" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.num_parameters">
+<span class="sig-name descname"><span class="pre">num_parameters</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance.num_parameters" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.u_lb">
+<span class="sig-name descname"><span class="pre">u_lb</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance.u_lb" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.u_ub">
+<span class="sig-name descname"><span class="pre">u_ub</span></span><a class="headerlink" href="#armour.reachsets.IRSInstance.u_ub" title="Permalink to this definition"></a></dt>
+<dd><p>properties carried over from the original implementation</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSInstance.genNLConstraint">
+<span class="sig-name descname"><span class="pre">genNLConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">worldState</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.IRSInstance.genNLConstraint" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSGenerator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.reachsets.</span></span><span class="sig-name descname"><span class="pre">IRSGenerator</span></span><a class="headerlink" href="#armour.reachsets.IRSGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetGenerator</span></code></p>
+<p>InputReachableSet
+This generates the upper and lower bound reachable sets on the input,
+and creates an IRSInstance object.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSGenerator.IRSGenerator">
+<span class="sig-name descname"><span class="pre">IRSGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">jrsGenerator</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.IRSGenerator.IRSGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSGenerator.cache_max_size">
+<span class="sig-name descname"><span class="pre">cache_max_size</span></span><a class="headerlink" href="#armour.reachsets.IRSGenerator.cache_max_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSGenerator.jrsGenerator">
+<span class="sig-name descname"><span class="pre">jrsGenerator</span></span><a class="headerlink" href="#armour.reachsets.IRSGenerator.jrsGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSGenerator.robot">
+<span class="sig-name descname"><span class="pre">robot</span></span><a class="headerlink" href="#armour.reachsets.IRSGenerator.robot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.IRSGenerator.use_robust_input">
+<span class="sig-name descname"><span class="pre">use_robust_input</span></span><a class="headerlink" href="#armour.reachsets.IRSGenerator.use_robust_input" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSGenerator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.reachsets.</span></span><span class="sig-name descname"><span class="pre">JLSGenerator</span></span><a class="headerlink" href="#armour.reachsets.JLSGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetGenerator</span></code></p>
+<p>InputReachableSet
+This generates the upper and lower bound reachable sets on the input,
+and creates an IRSInstance object.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSGenerator.JLSGenerator">
+<span class="sig-name descname"><span class="pre">JLSGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">jrsGenerator</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.reachsets.JLSGenerator.JLSGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSGenerator.cache_max_size">
+<span class="sig-name descname"><span class="pre">cache_max_size</span></span><a class="headerlink" href="#armour.reachsets.JLSGenerator.cache_max_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSGenerator.jrsGenerator">
+<span class="sig-name descname"><span class="pre">jrsGenerator</span></span><a class="headerlink" href="#armour.reachsets.JLSGenerator.jrsGenerator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.reachsets.JLSGenerator.robot">
+<span class="sig-name descname"><span class="pre">robot</span></span><a class="headerlink" href="#armour.reachsets.JLSGenerator.robot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+armour.+trajectory">
+<span id="trajectory-types-and-factory"></span><h2>Trajectory Types and Factory<a class="headerlink" href="#module-+armour.+trajectory" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.trajectory.</span></span><span class="sig-name descname"><span class="pre">BernsteinArmTrajectory</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.trajectory.Trajectory</span></code></p>
+<p>5th Degree Bernstein Polynomial Trajectory for arm robots</p>
+<p>This trajectory is a 5th degree Bernstein polynomial trajectory for
+arm robots. It is parameterized by the start state, the horizon time,
+and the desired final position. The trajectory is generated by
+calculating the 5th degree Bernstein polynomial coefficients for the
+start and end positions, and then using those coefficients to generate
+the trajectory.</p>
+<dl class="simple">
+<dt>The trajectory is parameterized by the following:</dt><dd><ul class="simple">
+<li><p><cite>startState</cite>: The start state of the trajectory. This is used to
+specify the initial position, velocity, and acceleration of the trajectory.</p></li>
+<li><p><cite>horizonTime</cite>: The time at which the trajectory should end. This is
+used to specify the duration of the trajectory.</p></li>
+<li><p><cite>params</cite>: The desired final position of the trajectory relative to the start position.
+This is used to specify the final position of the trajectory. The relative position
+can also be scaled, which then paramScale is used to scale it back to the
+desired position.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.BernsteinArmTrajectory">
+<span class="sig-name descname"><span class="pre">BernsteinArmTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">startState</span></em>, <em class="sig-param"><span class="pre">horizonTime</span></em>, <em class="sig-param"><span class="pre">numParams</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.BernsteinArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Constructor for the BernsteinArmTrajectory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>startState</strong> – The start state of the trajectory. This is used to
+specify the initial position, velocity, and acceleration of the trajectory.</p></li>
+<li><p><strong>horizonTime</strong> – The time at which the trajectory should end. This is
+used to specify the duration of the trajectory.</p></li>
+<li><p><strong>numParams</strong> – The number of parameters for the trajectory. This is
+used to specify the number of parameters for the trajectory.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.alpha" title="Permalink to this definition"></a></dt>
+<dd><p>the alpha coefficients for the bernstein polynomial</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.horizonTime">
+<span class="sig-name descname"><span class="pre">horizonTime</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.horizonTime" title="Permalink to this definition"></a></dt>
+<dd><p>The duration of the trajectory, after which the trajectory will
+hold the final position</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.numParams">
+<span class="sig-name descname"><span class="pre">numParams</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.numParams" title="Permalink to this definition"></a></dt>
+<dd><p>The number of parameters for the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.paramScale">
+<span class="sig-name descname"><span class="pre">paramScale</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.paramScale" title="Permalink to this definition"></a></dt>
+<dd><p>Extra properties to scale the parameters</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.q_end">
+<span class="sig-name descname"><span class="pre">q_end</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.q_end" title="Permalink to this definition"></a></dt>
+<dd><p>The calculated final position of the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.startState">
+<span class="sig-name descname"><span class="pre">startState</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.startState" title="Permalink to this definition"></a></dt>
+<dd><p>The initial state of the trajectory. These are initial parameters
+from the robot used to calculate the desired bernstein coefficients</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.vectorized">
+<span class="sig-name descname"><span class="pre">vectorized</span></span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.vectorized" title="Permalink to this definition"></a></dt>
+<dd><p>True as this trajectory supports getting commands for a time vector</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.getCommand">
+<span class="sig-name descname"><span class="pre">getCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.getCommand" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the command for the given time.</p>
+<p>This function gets the command for the given time. The command is
+generated by calculating the position, velocity, and acceleration
+for the given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time</strong> (<em>double</em>) – The time to get the command for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The command for the given time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>command (rtd.entity.states.ArmRobotStateInstance)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid.</p></li>
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTime</span></code></span> – If the time is invalid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.setParamScale">
+<span class="sig-name descname"><span class="pre">setParamScale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">paramScale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.setParamScale" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the parameter scaling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>paramScale</strong> (<em>rtd.util.RangeScaler</em>) – The parameter scaling to use.
+This is used to scale the relative position to the desired
+position. If not provided, then paramScale is reset to empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.setParameters">
+<span class="sig-name descname"><span class="pre">setParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectoryParams</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.setParameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the parameters for the trajectory.</p>
+<p>After setting the parameters, it attempts to internally update the trajectory
+to reduce long term calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectoryParams</strong> (<em>double</em>) – The parameters for the trajectory. This is
+used to specify the relative position of the trajectory.
+The relative position can also be scaled, which then
+paramScale is used to scale it back to the desired position.</p></li>
+<li><p><strong>options</strong> – Keyword arguments. See Below.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>startState</strong> (<em>rtd.entity.states.ArmRobotStateInstance</em>) – The start state of the trajectory. This is used to
+specify the initial position, velocity, and acceleration of the trajectory.</p></li>
+<li><p><strong>horizonTime</strong> (<em>double</em>) – The time at which the trajectory should end. This is
+used to specify the duration of the trajectory.</p></li>
+<li><p><strong>numParams</strong> (<em>double</em>) – The number of parameters for the trajectory. This is
+used to specify the number of parameters for the trajectory.</p></li>
+<li><p><strong>paramScale</strong> (<em>rtd.util.RangeScaler</em>) – The parameter scaling to use.
+This is used to scale the relative position to the desired
+position.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.BernsteinArmTrajectory.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">throwOnError</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.BernsteinArmTrajectory.validate" title="Permalink to this definition"></a></dt>
+<dd><p>Validates the trajectory parameters.</p>
+<p>This function ensures that the trajectory parameters are valid and fully
+specified. If the trajectory parameters are invalid, then it either throws
+an error or returns false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>throwOnError</strong> (<em>logical, optional</em>) – If true, then throws an error if the
+trajectory parameters are invalid. Otherwise, returns false.
+Defaults to false.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether or not the trajectory parameters are valid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>valid (logical)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid and
+    throwOnError is true.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.trajectory.ArmTrajectoryFactory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.trajectory.</span></span><span class="sig-name descname"><span class="pre">ArmTrajectoryFactory</span></span><a class="headerlink" href="#armour.trajectory.ArmTrajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.trajectory.TrajectoryFactory</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Factory for creating trajectories for the arm as used in ARMOUR</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.ArmTrajectoryFactory.ArmTrajectoryFactory">
+<span class="sig-name descname"><span class="pre">ArmTrajectoryFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajOptProps</span></em>, <em class="sig-param"><span class="pre">traj_type</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.ArmTrajectoryFactory.ArmTrajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Constructor for the ArmTrajectoryFactory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajOptProps</strong> (<em>rtd.planner.trajopt.TrajOptProps</em>) – Trajectory optimization properties</p></li>
+<li><p><strong>traj_type</strong> (<em>str</em>) – The type of trajectory to use. Must be one of
+‘piecewise’, ‘bernstein’, ‘twobernstein’, or ‘zerohold’</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.ArmTrajectoryFactory.traj_type">
+<span class="sig-name descname"><span class="pre">traj_type</span></span><a class="headerlink" href="#armour.trajectory.ArmTrajectoryFactory.traj_type" title="Permalink to this definition"></a></dt>
+<dd><p>the default trajectory type to use</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.ArmTrajectoryFactory.createTrajectory">
+<span class="sig-name descname"><span class="pre">createTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotState</span></em>, <em class="sig-param"><span class="pre">rsInstances</span></em>, <em class="sig-param"><span class="pre">trajectoryParams</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.ArmTrajectoryFactory.createTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new trajectory object for the given state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>robotState</strong> (<em>rtd.entity.states.ArmRobotStateInstance</em>) – The robot state</p></li>
+<li><p><strong>rsInstances</strong> (<em>struct, optional</em>) – The reach set instances</p></li>
+<li><p><strong>trajectoryParams</strong> (<em>double, optional</em>) – The trajectory parameters</p></li>
+<li><p><strong>options</strong> – Keyword arguments. See Below.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>jrsInstance</strong> (<em>armour.reachsets.JRSInstance</em>) – The joint reach set instance</p></li>
+<li><p><strong>traj_type</strong> (<em>str</em>) – The type of trajectory to use. Must be one of
+‘piecewise’, ‘bernstein’, ‘twobernstein’, or ‘zerohold’. If not specified, the
+default trajectory type is used.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The trajectory object</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>trajectory (rtd.trajectory.Trajectory)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.trajectory.</span></span><span class="sig-name descname"><span class="pre">PiecewiseArmTrajectory</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.trajectory.Trajectory</span></code></p>
+<p>Piecewise parameterized trajectory for the arm robot</p>
+<p>This trajectory is a piecewise trajectory with a plan time and a horizon
+time. The trajectory accelerates for the plan time, and then decelerates
+until the horizon time. The trajectory is parameterized by the acceleration
+during the plan time, and the trajectory is computed from the initial
+state of the robot.</p>
+<dl class="simple">
+<dt>The trajectory is parameterized by the following:</dt><dd><ul class="simple">
+<li><p><cite>startState</cite>: the initial state of the robot</p></li>
+<li><p><cite>planTime</cite>: the time to accelerate for</p></li>
+<li><p><cite>horizonTime</cite>: the time after starting that the robot should be stopped by</p></li>
+<li><p><cite>params</cite>: the parameters of the trajectory, which are the accelerations
+during the plan time. This can also be scaled by a RangeScaler
+object.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.PiecewiseArmTrajectory">
+<span class="sig-name descname"><span class="pre">PiecewiseArmTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">startState</span></em>, <em class="sig-param"><span class="pre">planTime</span></em>, <em class="sig-param"><span class="pre">horizonTime</span></em>, <em class="sig-param"><span class="pre">numParams</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.PiecewiseArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Constructor for the PiecewiseArmTrajectory class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>startState</strong> (<em>rtd.entity.states.ArmRobotStateInstance</em>) – the initial state of the robot</p></li>
+<li><p><strong>planTime</strong> (<em>double</em>) – the time to accelerate for</p></li>
+<li><p><strong>horizonTime</strong> (<em>double</em>) – the time after starting that the robot should be stopped by</p></li>
+<li><p><strong>numParams</strong> (<em>uint32</em>) – the number of parameters to use for the trajectory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.horizonTime">
+<span class="sig-name descname"><span class="pre">horizonTime</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.horizonTime" title="Permalink to this definition"></a></dt>
+<dd><p>The horizon time is the time at which the trajectory will stop
+after starting, after which the trajectory will hold the final
+position.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.numParams">
+<span class="sig-name descname"><span class="pre">numParams</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.numParams" title="Permalink to this definition"></a></dt>
+<dd><p>the number of parameters to use for the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.paramScale">
+<span class="sig-name descname"><span class="pre">paramScale</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.paramScale" title="Permalink to this definition"></a></dt>
+<dd><p>Range scaling object for the trajectory parameters</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.planTime">
+<span class="sig-name descname"><span class="pre">planTime</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.planTime" title="Permalink to this definition"></a></dt>
+<dd><p>The plan time is the duration the trajectory accelerates at the
+parameterized value for before executing the braking action.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.q_ddot">
+<span class="sig-name descname"><span class="pre">q_ddot</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.q_ddot" title="Permalink to this definition"></a></dt>
+<dd><p>the acceleration for the plan time portion of the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.q_ddot_to_stop">
+<span class="sig-name descname"><span class="pre">q_ddot_to_stop</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.q_ddot_to_stop" title="Permalink to this definition"></a></dt>
+<dd><p>the acceleration for the stopping portion of the trajectory (horizon time - plan time)</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.q_dot_peak">
+<span class="sig-name descname"><span class="pre">q_dot_peak</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.q_dot_peak" title="Permalink to this definition"></a></dt>
+<dd><p>the peak velocity of the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.q_end">
+<span class="sig-name descname"><span class="pre">q_end</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.q_end" title="Permalink to this definition"></a></dt>
+<dd><p>the end position of the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.q_peak">
+<span class="sig-name descname"><span class="pre">q_peak</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.q_peak" title="Permalink to this definition"></a></dt>
+<dd><p>the peak position of the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.startState">
+<span class="sig-name descname"><span class="pre">startState</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.startState" title="Permalink to this definition"></a></dt>
+<dd><p>The initial state of the trajectory. These are initial parameters
+from the robot used to compute the trajectory.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.vectorized">
+<span class="sig-name descname"><span class="pre">vectorized</span></span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.vectorized" title="Permalink to this definition"></a></dt>
+<dd><p>True as this trajectory supports vectorized computation</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.getCommand">
+<span class="sig-name descname"><span class="pre">getCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.getCommand" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the command for the given time.</p>
+<p>This function gets the command for the given time. The command is
+generated by calculating the position, velocity, and acceleration
+for the given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time</strong> (<em>double</em>) – The time to get the command for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The command for the given time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>command (rtd.entity.states.ArmRobotStateInstance)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid.</p></li>
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTime</span></code></span> – If the time is invalid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.setParamScale">
+<span class="sig-name descname"><span class="pre">setParamScale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">paramScale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.setParamScale" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the parameter scaling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>paramScale</strong> (<em>rtd.util.RangeScaler</em>) – The parameter scaling to use.
+This is used to scale the relative position to the desired
+position. If not provided, then paramScale is reset to empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.setParameters">
+<span class="sig-name descname"><span class="pre">setParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectoryParams</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.setParameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the parameters of the trajectory</p>
+<p>After setting the parameters, the internal parameters are
+updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectoryParams</strong> (<em>double</em>) – the parameters of the trajectory, which are the
+accelerations during the plan time. This can also be scaled by
+a RangeScaler object.</p></li>
+<li><p><strong>options</strong> – Keyword Arguments. See below.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>startState</strong> (<em>rtd.entity.states.ArmRobotStateInstance</em>) – the initial state of the robot</p></li>
+<li><p><strong>planTime</strong> (<em>double</em>) – the time to accelerate for</p></li>
+<li><p><strong>horizonTime</strong> (<em>double</em>) – the time after starting that the robot should be stopped by</p></li>
+<li><p><strong>numParams</strong> (<em>uint32</em>) – the number of parameters to use for the trajectory</p></li>
+<li><p><strong>paramScale</strong> (<em>rtd.util.RangeScaler</em>) – The parameter scaling to use.
+This is used to scale the relative position to the desired position.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.PiecewiseArmTrajectory.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">throwOnError</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.PiecewiseArmTrajectory.validate" title="Permalink to this definition"></a></dt>
+<dd><p>Validates the trajectory parameters.</p>
+<p>This function ensures that the trajectory parameters are valid and fully
+specified. If the trajectory parameters are invalid, then it either throws
+an error or returns false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>throwOnError</strong> (<em>logical, optional</em>) – If true, then throws an error if the
+trajectory parameters are invalid. Otherwise, returns false.
+Defaults to false.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether or not the trajectory parameters are valid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>valid (logical)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid and
+    throwOnError is true.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.trajectory.</span></span><span class="sig-name descname"><span class="pre">TwoBernsteinArmTrajectory</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.trajectory.Trajectory</span></code></p>
+<p>Trajectory utilizing two 5th Degree Bernstein Polynomials for arm robots</p>
+<p>This trajectory uses two 5th degree Bernstein polynomials to generate
+a trajectory for arm robots. It is parameterized by the start state,
+the plan time, the horizon time, and the desired final position. The
+major bernstein polynomial is used to generate the trajectory from the
+start state to the plan time, but is characterized by the horizon time.
+The minor bernstein polynomial is used to generate the trajectory from
+the plan time to the horizon time and takes the place of the final
+position from the major bernstein polynomial.</p>
+<dl class="simple">
+<dt>The trajectory is parameterized by the following:</dt><dd><ul class="simple">
+<li><p><cite>startState</cite>: The start state of the trajectory. This is used to
+specify the initial position, velocity, and acceleration of the trajectory.</p></li>
+<li><p><cite>planTime</cite>: The time at which the major trajectory should stop being executed, and
+the minor trajectory should start being executed. This is used to
+specify the active duration of the major trajectory.</p></li>
+<li><p><cite>horizonTime</cite>: The time at which the overall trajectory should end. This is
+used to specify the duration of the trajectory.</p></li>
+<li><p><cite>params</cite>: The desired final position of each polynomial relative to (1) the start
+position for the major polynomial and (2) the position at planTime for the
+minor polynomial. The relative position can also be scaled, which then
+paramScale is used to scale it back to the desired position.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.TwoBernsteinArmTrajectory">
+<span class="sig-name descname"><span class="pre">TwoBernsteinArmTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">startState</span></em>, <em class="sig-param"><span class="pre">planTime</span></em>, <em class="sig-param"><span class="pre">horizonTime</span></em>, <em class="sig-param"><span class="pre">numParams</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.TwoBernsteinArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Constructor for the BernsteinArmTrajectory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>startState</strong> – The start state of the trajectory. This is used to
+specify the initial position, velocity, and acceleration of the trajectory.</p></li>
+<li><p><strong>planTime</strong> – The time at which the major trajectory should stop being executed, and
+the minor trajectory should start being executed. This is used to
+specify the active duration of the major polynomial.</p></li>
+<li><p><strong>horizonTime</strong> – The time at which the overall trajectory should end. This is
+used to specify the duration of the overall trajectory.</p></li>
+<li><p><strong>numParams</strong> – The number of parameters for the trajectory. This is
+used to specify the number of parameters for the trajectory.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.alpha" title="Permalink to this definition"></a></dt>
+<dd><p>the alpha coefficients for the major bernstein polynomial</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.alpha2">
+<span class="sig-name descname"><span class="pre">alpha2</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.alpha2" title="Permalink to this definition"></a></dt>
+<dd><p>the alpha coefficients for the minor bernstein polynomial</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.horizonTime">
+<span class="sig-name descname"><span class="pre">horizonTime</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.horizonTime" title="Permalink to this definition"></a></dt>
+<dd><p>The duration of the trajectory, after which the trajectory will
+hold the final position</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.numParams">
+<span class="sig-name descname"><span class="pre">numParams</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.numParams" title="Permalink to this definition"></a></dt>
+<dd><p>The number of parameters for the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.paramScale">
+<span class="sig-name descname"><span class="pre">paramScale</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.paramScale" title="Permalink to this definition"></a></dt>
+<dd><p>Extra properties to scale the parameters</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.planTime">
+<span class="sig-name descname"><span class="pre">planTime</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.planTime" title="Permalink to this definition"></a></dt>
+<dd><p>The duration of the trajectory, after which the trajectory will
+hold the final position</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.q_end">
+<span class="sig-name descname"><span class="pre">q_end</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.q_end" title="Permalink to this definition"></a></dt>
+<dd><p>The calculated final position of the trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.q_plan">
+<span class="sig-name descname"><span class="pre">q_plan</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.q_plan" title="Permalink to this definition"></a></dt>
+<dd><p>The position where the minor polynomial takes over</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.qd_plan">
+<span class="sig-name descname"><span class="pre">qd_plan</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.qd_plan" title="Permalink to this definition"></a></dt>
+<dd><p>The velocity where the minor polynomial takes over</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.qdd_plan">
+<span class="sig-name descname"><span class="pre">qdd_plan</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.qdd_plan" title="Permalink to this definition"></a></dt>
+<dd><p>The acceleration where the minor polynomial takes over</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.startState">
+<span class="sig-name descname"><span class="pre">startState</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.startState" title="Permalink to this definition"></a></dt>
+<dd><p>The initial state of the trajectory. These are initial parameters
+from the robot used to calculate the desired bernstein coefficients</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.vectorized">
+<span class="sig-name descname"><span class="pre">vectorized</span></span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.vectorized" title="Permalink to this definition"></a></dt>
+<dd><p>This does not support vectorized calls</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.getCommand">
+<span class="sig-name descname"><span class="pre">getCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.getCommand" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the command for the given time.</p>
+<p>This function gets the command for the given time. The command is
+generated by calculating the position, velocity, and acceleration
+for the given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time</strong> (<em>double</em>) – The time to get the command for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The command for the given time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>command (rtd.entity.states.ArmRobotStateInstance)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid.</p></li>
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTime</span></code></span> – If the time is invalid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.setParamScale">
+<span class="sig-name descname"><span class="pre">setParamScale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">paramScale</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.setParamScale" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the parameter scaling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>paramScale</strong> (<em>rtd.util.RangeScaler</em>) – The parameter scaling to use.
+This is used to scale the relative position to the desired
+position. If not provided, then paramScale is reset to empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.setParameters">
+<span class="sig-name descname"><span class="pre">setParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectoryParams</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.setParameters" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the parameters for the trajectory.</p>
+<p>After setting the parameters, it attempts to internally update the trajectory
+to reduce long term calculations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectoryParams</strong> (<em>double</em>) – The parameters for the trajectory. This is
+used to specify the relative position of the trajectory.
+The relative position can also be scaled, which then
+paramScale is used to scale it back to the desired position.</p></li>
+<li><p><strong>options</strong> – Keyword arguments. See Below.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>startState</strong> (<em>rtd.entity.states.ArmRobotStateInstance</em>) – The start state of the trajectory. This is used to
+specify the initial position, velocity, and acceleration of the trajectory.</p></li>
+<li><p><strong>planTime</strong> (<em>double</em>) – The time at which the major trajectory should stop being executed, and
+the minor trajectory should start being executed. This is used to
+specify the active duration of the major polynomial.</p></li>
+<li><p><strong>horizonTime</strong> (<em>double</em>) – The time at which the overall trajectory should end. This is
+used to specify the duration of the overall trajectory.</p></li>
+<li><p><strong>numParams</strong> (<em>double</em>) – The number of parameters for the trajectory. This is
+used to specify the number of parameters for the trajectory.</p></li>
+<li><p><strong>paramScale</strong> (<em>rtd.util.RangeScaler</em>) – The parameter scaling to use.
+This is used to scale the relative position to the desired
+position.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.TwoBernsteinArmTrajectory.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">throwOnError</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.TwoBernsteinArmTrajectory.validate" title="Permalink to this definition"></a></dt>
+<dd><p>Validates the trajectory parameters.</p>
+<p>This function ensures that the trajectory parameters are valid and fully
+specified. If the trajectory parameters are invalid, then it either throws
+an error or returns false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>throwOnError</strong> (<em>logical, optional</em>) – If true, then throws an error if the
+trajectory parameters are invalid. Otherwise, returns false.
+Defaults to false.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether or not the trajectory parameters are valid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>valid (logical)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid and
+    throwOnError is true.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.trajectory.</span></span><span class="sig-name descname"><span class="pre">ZeroHoldArmTrajectory</span></span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.trajectory.Trajectory</span></code></p>
+<p>An arm trajectory that holds the arm at a fixed position and zero velocity/acceleration.</p>
+<p>This acts as the initial trajectory for the arm, and is used to hold the
+arm in place while the robot is waiting for the user to start the
+trajectory.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory.ZeroHoldArmTrajectory">
+<span class="sig-name descname"><span class="pre">ZeroHoldArmTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">startState</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory.ZeroHoldArmTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>The constructor for the ZeroHoldArmTrajectory class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>startState</strong> – The initial state of the trajectory. This is the state that the
+trajectory will hold the arm position at.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory.startState">
+<span class="sig-name descname"><span class="pre">startState</span></span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory.startState" title="Permalink to this definition"></a></dt>
+<dd><p>The initial state of the trajectory. This is the state that the
+trajectory will hold the arm position at.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory.vectorized">
+<span class="sig-name descname"><span class="pre">vectorized</span></span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory.vectorized" title="Permalink to this definition"></a></dt>
+<dd><p>True as this trajectory supports vectorized computation</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory.getCommand">
+<span class="sig-name descname"><span class="pre">getCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory.getCommand" title="Permalink to this definition"></a></dt>
+<dd><p>Gets the command for the given time.</p>
+<p>This function gets the command for the given time. The command is
+generated by calculating the position, velocity, and acceleration
+for the given time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time</strong> (<em>double</em>) – The time to get the command for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The command for the given time.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>command (rtd.entity.states.ArmRobotStateInstance)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid.</p></li>
+<li><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTime</span></code></span> – If the time is invalid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory.setParameters">
+<span class="sig-name descname"><span class="pre">setParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectoryParams</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory.setParameters" title="Permalink to this definition"></a></dt>
+<dd><p>Set the parameters of the trajectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectoryParams</strong> – The parameters of the trajectory, which is ignored
+for this trajectory.</p></li>
+<li><p><strong>options</strong> – Keyword arguments. See below.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>startState</strong> – The initial state of the trajectory. This is the state that the
+trajectory will hold the arm position at.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.trajectory.ZeroHoldArmTrajectory.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">throwOnError</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.trajectory.ZeroHoldArmTrajectory.validate" title="Permalink to this definition"></a></dt>
+<dd><p>Validates the trajectory parameters.</p>
+<p>This function ensures that the trajectory parameters are valid and fully
+specified. If the trajectory parameters are invalid, then it either throws
+an error or returns false.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>throwOnError</strong> (<em>logical, optional</em>) – If true, then throws an error if the
+trajectory parameters are invalid. Otherwise, returns false.
+Defaults to false.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether or not the trajectory parameters are valid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>valid (logical)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the current trajectory is not valid and
+    throwOnError is true.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="base.html" class="btn btn-neutral float-left" title="RTD Planner Interfaces and Base Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="waitr.html" class="btn btn-neutral float-right" title="Example RTD Planner Implementation of WAITR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
