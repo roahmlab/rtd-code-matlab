@@ -11,6 +11,7 @@ Welcome to RTD-code's documentation!
    :caption: Contents:
    
    introduction
+   setup
    examples/examples
    planner/planner
    simulation/simulation
