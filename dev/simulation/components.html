@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Components for Entities and Agents &mdash; RTD-code MATLAB (dev) development version</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7aecf6dd"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Simulation Systems" href="systems.html" />
+    <link rel="prev" title="Entities and Agents" href="entities.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RTD-code MATLAB (dev)
+          </a>
+              <div class="version">
+                development version
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../planner/planner.html">RTD Base Planner and Implementations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../planner/base.html">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/base.html#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../planner/armour.html">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/armour.html#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../planner/waitr.html">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../planner/waitr.html#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../planner/waitr.html#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="simulation.html">RTD Simulation Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="entities.html">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="entities.html#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="systems.html">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="systems.html#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="systems.html#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="systems.html#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTD-code MATLAB (dev)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="simulation.html">RTD Simulation Reference</a></li>
+      <li class="breadcrumb-item active">Components for Entities and Agents</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/simulation/components.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="components-for-entities-and-agents">
+<h1>Components for Entities and Agents<a class="headerlink" href="#components-for-entities-and-agents" title="Permalink to this heading"></a></h1>
+<p>Components can be categorized as Data Components, Data + Behavior Components, and Behavior
+Components. Components should have specific purposes such as holding intrinsic data, or
+defining entity dynamics. All behavior components transform entity data for use by either
+another component or system and may or may not update entity data at the same time.</p>
+<p>Entity-component modeled components are behavior or data-behavior components which should be
+explicitly called by the entity update functions. Entity-component-system modeled components
+are behavior or data-behavior components which are used by a system which should be explicitly
+updated at any point of the simulation loop.</p>
+<section id="module-+rtd.+entity.+components">
+<span id="base-components"></span><h2>Base Components<a class="headerlink" href="#module-+rtd.+entity.+components" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseStateComponent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.components.</span></span><span class="sig-name descname"><span class="pre">BaseStateComponent</span></span><a class="headerlink" href="#rtd.entity.components.BaseStateComponent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>EntityState Interface for some Entity state</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseStateComponent.entity_info">
+<span class="sig-name descname"><span class="pre">entity_info</span></span><a class="headerlink" href="#rtd.entity.components.BaseStateComponent.entity_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseStateComponent.n_states">
+<span class="sig-name descname"><span class="pre">n_states</span></span><a class="headerlink" href="#rtd.entity.components.BaseStateComponent.n_states" title="Permalink to this definition"></a></dt>
+<dd><p>state space representation</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseStateComponent.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#rtd.entity.components.BaseStateComponent.state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseStateComponent.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#rtd.entity.components.BaseStateComponent.time" title="Permalink to this definition"></a></dt>
+<dd><p>this might not remain here</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.components.EmptyEntityInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.components.</span></span><span class="sig-name descname"><span class="pre">EmptyEntityInfo</span></span><a class="headerlink" href="#rtd.entity.components.EmptyEntityInfo" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseInfoComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>EntityInfo This might go later</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.EmptyEntityInfo.dimension">
+<span class="sig-name descname"><span class="pre">dimension</span></span><a class="headerlink" href="#rtd.entity.components.EmptyEntityInfo.dimension" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.EmptyEntityInfo.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.EmptyEntityInfo.reset" title="Permalink to this definition"></a></dt>
+<dd><p>NOP</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.components.</span></span><span class="sig-name descname"><span class="pre">GenericEntityState</span></span><a class="headerlink" href="#rtd.entity.components.GenericEntityState" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseStateComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.GenericEntityState">
+<span class="sig-name descname"><span class="pre">GenericEntityState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">entity_info</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.GenericEntityState" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.entity_info">
+<span class="sig-name descname"><span class="pre">entity_info</span></span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.entity_info" title="Permalink to this definition"></a></dt>
+<dd><p>General information</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.n_states">
+<span class="sig-name descname"><span class="pre">n_states</span></span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.n_states" title="Permalink to this definition"></a></dt>
+<dd><p>state space representation</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.commit_state_data">
+<span class="sig-name descname"><span class="pre">commit_state_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">T_state</span></em>, <em class="sig-param"><span class="pre">Z_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.commit_state_data" title="Permalink to this definition"></a></dt>
+<dd><p>update the time and state</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.get_state">
+<span class="sig-name descname"><span class="pre">get_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.get_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.random_init">
+<span class="sig-name descname"><span class="pre">random_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">state_range</span></em>, <em class="sig-param"><span class="pre">save_to_options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.random_init" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.components.GenericEntityState.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">state</span></em>, <em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.components.GenericEntityState.set_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseControllerComponent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.components.</span></span><span class="sig-name descname"><span class="pre">BaseControllerComponent</span></span><a class="headerlink" href="#rtd.entity.components.BaseControllerComponent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>BaseControllerComponent Interface for an Entity Controller Component</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseControllerComponent.n_inputs">
+<span class="sig-name descname"><span class="pre">n_inputs</span></span><a class="headerlink" href="#rtd.entity.components.BaseControllerComponent.n_inputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseControllerComponent.robot_info">
+<span class="sig-name descname"><span class="pre">robot_info</span></span><a class="headerlink" href="#rtd.entity.components.BaseControllerComponent.robot_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseControllerComponent.robot_state">
+<span class="sig-name descname"><span class="pre">robot_state</span></span><a class="headerlink" href="#rtd.entity.components.BaseControllerComponent.robot_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseControllerComponent.trajectories">
+<span class="sig-name descname"><span class="pre">trajectories</span></span><a class="headerlink" href="#rtd.entity.components.BaseControllerComponent.trajectories" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseDynamicsComponent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.components.</span></span><span class="sig-name descname"><span class="pre">BaseDynamicsComponent</span></span><a class="headerlink" href="#rtd.entity.components.BaseDynamicsComponent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>BaseDynamicsComponent</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseDynamicsComponent.controller">
+<span class="sig-name descname"><span class="pre">controller</span></span><a class="headerlink" href="#rtd.entity.components.BaseDynamicsComponent.controller" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseDynamicsComponent.robot_info">
+<span class="sig-name descname"><span class="pre">robot_info</span></span><a class="headerlink" href="#rtd.entity.components.BaseDynamicsComponent.robot_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseDynamicsComponent.robot_state">
+<span class="sig-name descname"><span class="pre">robot_state</span></span><a class="headerlink" href="#rtd.entity.components.BaseDynamicsComponent.robot_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseInfoComponent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.components.</span></span><span class="sig-name descname"><span class="pre">BaseInfoComponent</span></span><a class="headerlink" href="#rtd.entity.components.BaseInfoComponent" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.UUID</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>EntityInfo This might go later</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.components.BaseInfoComponent.dimension">
+<span class="sig-name descname"><span class="pre">dimension</span></span><a class="headerlink" href="#rtd.entity.components.BaseInfoComponent.dimension" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+rtd.+entity.+box_obstacle">
+<span id="box-obstacle-components"></span><h2>Box Obstacle Components<a class="headerlink" href="#module-+rtd.+entity.+box_obstacle" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.box_obstacle.</span></span><span class="sig-name descname"><span class="pre">BoxPatchVisual</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch_visual.PatchVisualObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.BoxPatchVisual">
+<span class="sig-name descname"><span class="pre">BoxPatchVisual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">box_info</span></em>, <em class="sig-param"><span class="pre">box_state_component</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.BoxPatchVisual" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.animation_view">
+<span class="sig-name descname"><span class="pre">animation_view</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.animation_view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.box_info">
+<span class="sig-name descname"><span class="pre">box_info</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.box_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.box_state">
+<span class="sig-name descname"><span class="pre">box_state</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.box_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.patch_style">
+<span class="sig-name descname"><span class="pre">patch_style</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.patch_style" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.plot_patch_data">
+<span class="sig-name descname"><span class="pre">plot_patch_data</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.plot_patch_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.set_view_when_animating">
+<span class="sig-name descname"><span class="pre">set_view_when_animating</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.set_view_when_animating" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.create_plot_patch_data">
+<span class="sig-name descname"><span class="pre">create_plot_patch_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.create_plot_patch_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.plot_at_time">
+<span class="sig-name descname"><span class="pre">plot_at_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.plot_at_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchVisual.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchVisual.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.box_obstacle.</span></span><span class="sig-name descname"><span class="pre">BoxObstacleInfo</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseInfoComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Leftover Old Dependencies
+load_robot_params by extension -&gt; make it a class
+create_pz_bounding_boxes</p>
+<p>Notes
+links should become an independently validatable class
+joints should as well, or be a part of the links one</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.BoxObstacleInfo">
+<span class="sig-name descname"><span class="pre">BoxObstacleInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.BoxObstacleInfo" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.creation_buffer">
+<span class="sig-name descname"><span class="pre">creation_buffer</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.creation_buffer" title="Permalink to this definition"></a></dt>
+<dd><p>Buffer for when randomizing during creation time</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.dimension">
+<span class="sig-name descname"><span class="pre">dimension</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.dimension" title="Permalink to this definition"></a></dt>
+<dd><p>Default for 2D, but can be 3D</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.is_base_obstacle">
+<span class="sig-name descname"><span class="pre">is_base_obstacle</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.is_base_obstacle" title="Permalink to this definition"></a></dt>
+<dd><p>Is this the base of a robot?
+Exists for compat</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.side_lengths">
+<span class="sig-name descname"><span class="pre">side_lengths</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.side_lengths" title="Permalink to this definition"></a></dt>
+<dd><p>The x,y,z side lengths of the box</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd><p>Configurable options for this component</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleInfo.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleInfo.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.box_obstacle.</span></span><span class="sig-name descname"><span class="pre">BoxObstacleZonotope</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope.BoxObstacleZonotope">
+<span class="sig-name descname"><span class="pre">BoxObstacleZonotope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">box_info</span></em>, <em class="sig-param"><span class="pre">box_state_component</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope.BoxObstacleZonotope" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope.base_zonotope">
+<span class="sig-name descname"><span class="pre">base_zonotope</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope.base_zonotope" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope.box_info">
+<span class="sig-name descname"><span class="pre">box_info</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope.box_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope.box_state">
+<span class="sig-name descname"><span class="pre">box_state</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope.box_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope.get_zonotope">
+<span class="sig-name descname"><span class="pre">get_zonotope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope.get_zonotope" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxObstacleZonotope.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxObstacleZonotope.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.entity.box_obstacle.</span></span><span class="sig-name descname"><span class="pre">BoxPatchCollision</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch3d_collision.Patch3dDynamicObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.BoxPatchCollision">
+<span class="sig-name descname"><span class="pre">BoxPatchCollision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">box_info</span></em>, <em class="sig-param"><span class="pre">box_state_component</span></em>, <em class="sig-param"><span class="pre">verbose_level</span></em>, <em class="sig-param"><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.BoxPatchCollision" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.box_info">
+<span class="sig-name descname"><span class="pre">box_info</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.box_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.box_state">
+<span class="sig-name descname"><span class="pre">box_state</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.box_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.collision_patch_data">
+<span class="sig-name descname"><span class="pre">collision_patch_data</span></span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.collision_patch_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.create_collision_check_patch_data">
+<span class="sig-name descname"><span class="pre">create_collision_check_patch_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.create_collision_check_patch_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.getCollisionObject">
+<span class="sig-name descname"><span class="pre">getCollisionObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.getCollisionObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.entity.box_obstacle.BoxPatchCollision.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">~</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.entity.box_obstacle.BoxPatchCollision.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+armour.+agent">
+<span id="armour-components"></span><h2>Armour Components<a class="headerlink" href="#module-+armour.+agent" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourCadPatchVisual">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourCadPatchVisual</span></span><a class="headerlink" href="#armour.agent.ArmourCadPatchVisual" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">armour.agent.ArmourPatchVisual</span></code></p>
+<p>Extended form the ArmourPatchVisual component to plot CAD models
+instead. Lighting should NOT run in this.</p>
+<div class="members docutils container">
+<dl>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourCadPatchVisual.create_link_plot_patch_data">
+<span class="sig-name descname"><span class="pre">create_link_plot_patch_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourCadPatchVisual.create_link_plot_patch_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmourCadPatchVisual.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourCadPatchVisual.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmKinematics</span></span><a class="headerlink" href="#armour.agent.ArmKinematics" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>A collection of useful function for arm robot kinematics</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.ArmKinematics">
+<span class="sig-name descname"><span class="pre">ArmKinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">arm_state_component</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.ArmKinematics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.arm_info">
+<span class="sig-name descname"><span class="pre">arm_info</span></span><a class="headerlink" href="#armour.agent.ArmKinematics.arm_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.arm_state">
+<span class="sig-name descname"><span class="pre">arm_state</span></span><a class="headerlink" href="#armour.agent.ArmKinematics.arm_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.forward_kinematics">
+<span class="sig-name descname"><span class="pre">forward_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time_or_config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.forward_kinematics" title="Permalink to this definition"></a></dt>
+<dd><p>[R,T,J] = A.forward_kinematics(time_or_config)</p>
+<p>Given a time or configuration, return the link rotation
+and translation arrays R and T, and the joint locations J.
+Zach is watching me creepily</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.forward_kinematics_end_effector">
+<span class="sig-name descname"><span class="pre">forward_kinematics_end_effector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time_or_config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.forward_kinematics_end_effector" title="Permalink to this definition"></a></dt>
+<dd><p>ee_pos = forward_kinematics_end_effector(A,time_or_config)</p>
+<p>Return the position of the end effector as a location in
+workspace (either 2-D or 3-D), given an input configuration;
+the output is a vector of length A.dimension.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.get_end_effector_location">
+<span class="sig-name descname"><span class="pre">get_end_effector_location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">q</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.get_end_effector_location" title="Permalink to this definition"></a></dt>
+<dd><p>J = A.get_end_effector_location(q)</p>
+<p>Does what it says! Given a configuration q, this method
+returns the end effector location.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.get_joint_locations">
+<span class="sig-name descname"><span class="pre">get_joint_locations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">times_or_configs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.get_joint_locations" title="Permalink to this definition"></a></dt>
+<dd><p>J = A.get_joint_locations(times_or_configs)</p>
+<p>Return the joint locations in 2-D or 3-D space.</p>
+<p>If the input is a single time t in R, or a single
+configuration q in Q, the output is a d-by-n array, where
+n = A.n_links_and_joints and d = A.dimension.</p>
+<p>If the input is a 1-by-N vector of times or an n-by-N vector
+of configurations, the output is a 1-by-N cell array where
+each entry is the d-by-n array of joint locations for the
+corresponding time or configuration.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.get_joint_locations_from_configuration">
+<span class="sig-name descname"><span class="pre">get_joint_locations_from_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">q</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.get_joint_locations_from_configuration" title="Permalink to this definition"></a></dt>
+<dd><p>J = A.get_joint_locations_from_configuration(q)</p>
+<p>Return the joint locations just like A.get_joint_locations,
+but this is faster since it does not return the rotation
+matrices or translations of each joint, and can only take in
+a configuration.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.get_link_rotations_and_translations">
+<span class="sig-name descname"><span class="pre">get_link_rotations_and_translations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time_or_config</span></em>, <em class="sig-param"><span class="pre">cad_flag</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.get_link_rotations_and_translations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.inverse_kinematics">
+<span class="sig-name descname"><span class="pre">inverse_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">J</span></em>, <em class="sig-param"><span class="pre">q0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.inverse_kinematics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.inverse_kinematics_end_effector">
+<span class="sig-name descname"><span class="pre">inverse_kinematics_end_effector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">J</span></em>, <em class="sig-param"><span class="pre">q0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.inverse_kinematics_end_effector" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.inverse_kinematics_joint_locations">
+<span class="sig-name descname"><span class="pre">inverse_kinematics_joint_locations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">J</span></em>, <em class="sig-param"><span class="pre">q0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.inverse_kinematics_joint_locations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmKinematics.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmKinematics.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourAgentInfo</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseInfoComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.ArmourAgentInfo">
+<span class="sig-name descname"><span class="pre">ArmourAgentInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robot</span></em>, <em class="sig-param"><span class="pre">params</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.ArmourAgentInfo" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.M_min_eigenvalue">
+<span class="sig-name descname"><span class="pre">M_min_eigenvalue</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.M_min_eigenvalue" title="Permalink to this definition"></a></dt>
+<dd><p>Used for finding the ultimate bound (mass matrix)</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.body_joint_index">
+<span class="sig-name descname"><span class="pre">body_joint_index</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.body_joint_index" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.buffer_dist">
+<span class="sig-name descname"><span class="pre">buffer_dist</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.buffer_dist" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.dimension">
+<span class="sig-name descname"><span class="pre">dimension</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.dimension" title="Permalink to this definition"></a></dt>
+<dd><p>This is required to not change in this case</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.joints">
+<span class="sig-name descname"><span class="pre">joints</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.joints" title="Permalink to this definition"></a></dt>
+<dd><p>Struct array with type, axes, and location for the joints
+and position, velocity, and torque limits</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.kinematic_chain">
+<span class="sig-name descname"><span class="pre">kinematic_chain</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.kinematic_chain" title="Permalink to this definition"></a></dt>
+<dd><p>???</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.links">
+<span class="sig-name descname"><span class="pre">links</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.links" title="Permalink to this definition"></a></dt>
+<dd><p>Struct array with size, shape, mass?, and inertia matrix? information
+and poly zonotope</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.n_links_and_joints">
+<span class="sig-name descname"><span class="pre">n_links_and_joints</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.n_links_and_joints" title="Permalink to this definition"></a></dt>
+<dd><p>Useful parameters for our links and joints</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.num_q">
+<span class="sig-name descname"><span class="pre">num_q</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.num_q" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.params">
+<span class="sig-name descname"><span class="pre">params</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.params" title="Permalink to this definition"></a></dt>
+<dd><p>Consider converting to a class or embedding</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.reach_limits">
+<span class="sig-name descname"><span class="pre">reach_limits</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.reach_limits" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.robot">
+<span class="sig-name descname"><span class="pre">robot</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.robot" title="Permalink to this definition"></a></dt>
+<dd><p>Parameters of the robot</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.transmission_inertia">
+<span class="sig-name descname"><span class="pre">transmission_inertia</span></span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.transmission_inertia" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd><p>Configurable options for this component</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentInfo.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentInfo.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourController</span></span><a class="headerlink" href="#armour.agent.ArmourController" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseControllerComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.ArmourController">
+<span class="sig-name descname"><span class="pre">ArmourController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">arm_state_component</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.ArmourController" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.Kr">
+<span class="sig-name descname"><span class="pre">Kr</span></span><a class="headerlink" href="#armour.agent.ArmourController.Kr" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.V_max">
+<span class="sig-name descname"><span class="pre">V_max</span></span><a class="headerlink" href="#armour.agent.ArmourController.V_max" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.alpha_constant">
+<span class="sig-name descname"><span class="pre">alpha_constant</span></span><a class="headerlink" href="#armour.agent.ArmourController.alpha_constant" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.n_inputs">
+<span class="sig-name descname"><span class="pre">n_inputs</span></span><a class="headerlink" href="#armour.agent.ArmourController.n_inputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.r_norm_threshold">
+<span class="sig-name descname"><span class="pre">r_norm_threshold</span></span><a class="headerlink" href="#armour.agent.ArmourController.r_norm_threshold" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.robot_info">
+<span class="sig-name descname"><span class="pre">robot_info</span></span><a class="headerlink" href="#armour.agent.ArmourController.robot_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.robot_state">
+<span class="sig-name descname"><span class="pre">robot_state</span></span><a class="headerlink" href="#armour.agent.ArmourController.robot_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.trajectories">
+<span class="sig-name descname"><span class="pre">trajectories</span></span><a class="headerlink" href="#armour.agent.ArmourController.trajectories" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.ultimate_bound">
+<span class="sig-name descname"><span class="pre">ultimate_bound</span></span><a class="headerlink" href="#armour.agent.ArmourController.ultimate_bound" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.ultimate_bound_position">
+<span class="sig-name descname"><span class="pre">ultimate_bound_position</span></span><a class="headerlink" href="#armour.agent.ArmourController.ultimate_bound_position" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.ultimate_bound_velocity">
+<span class="sig-name descname"><span class="pre">ultimate_bound_velocity</span></span><a class="headerlink" href="#armour.agent.ArmourController.ultimate_bound_velocity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd><p>Configurable options for this component</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.getControlInputs">
+<span class="sig-name descname"><span class="pre">getControlInputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t</span></em>, <em class="sig-param"><span class="pre">z_meas</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.getControlInputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.rnea">
+<span class="sig-name descname"><span class="pre">rnea</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">q</span></em>, <em class="sig-param"><span class="pre">qd</span></em>, <em class="sig-param"><span class="pre">q_aux_d</span></em>, <em class="sig-param"><span class="pre">qdd</span></em>, <em class="sig-param"><span class="pre">use_gravity</span></em>, <em class="sig-param"><span class="pre">robot_params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.rnea" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.setTrajectory">
+<span class="sig-name descname"><span class="pre">setTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.setTrajectory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourController.ultimate_bound_check">
+<span class="sig-name descname"><span class="pre">ultimate_bound_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_check_step</span></em>, <em class="sig-param"><span class="pre">controller_log</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourController.ultimate_bound_check" title="Permalink to this definition"></a></dt>
+<dd><p>if no log, skip</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourPatchVisual</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch_visual.PatchVisualObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.ArmourPatchVisual">
+<span class="sig-name descname"><span class="pre">ArmourPatchVisual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">arm_state_component</span></em>, <em class="sig-param"><span class="pre">kinematics_component</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.ArmourPatchVisual" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.animation_view">
+<span class="sig-name descname"><span class="pre">animation_view</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.animation_view" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.arm_info">
+<span class="sig-name descname"><span class="pre">arm_info</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.arm_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.arm_state">
+<span class="sig-name descname"><span class="pre">arm_state</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.arm_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.kinematics">
+<span class="sig-name descname"><span class="pre">kinematics</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.kinematics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.link_plot_data">
+<span class="sig-name descname"><span class="pre">link_plot_data</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.link_plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.patch_style">
+<span class="sig-name descname"><span class="pre">patch_style</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.patch_style" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.plot_data">
+<span class="sig-name descname"><span class="pre">plot_data</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.plot_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.set_view_when_animating">
+<span class="sig-name descname"><span class="pre">set_view_when_animating</span></span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.set_view_when_animating" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.create_baselink_plot_patch_data">
+<span class="sig-name descname"><span class="pre">create_baselink_plot_patch_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.create_baselink_plot_patch_data" title="Permalink to this definition"></a></dt>
+<dd><p>create baselink cone for plotting</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.create_link_plot_patch_data">
+<span class="sig-name descname"><span class="pre">create_link_plot_patch_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.create_link_plot_patch_data" title="Permalink to this definition"></a></dt>
+<dd><p>This method fills in self.link_plot_data with a cell array of
+faces vectors (each 1-by-NF) and a cell array of vertices
+arrays (each NV-by-2).</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.get_axis_lims">
+<span class="sig-name descname"><span class="pre">get_axis_lims</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.get_axis_lims" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.plot" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.plot_at_time">
+<span class="sig-name descname"><span class="pre">plot_at_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.plot_at_time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.plot_baselink">
+<span class="sig-name descname"><span class="pre">plot_baselink</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.plot_baselink" title="Permalink to this definition"></a></dt>
+<dd><p>plot baselink</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.plot_links">
+<span class="sig-name descname"><span class="pre">plot_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time_or_config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.plot_links" title="Permalink to this definition"></a></dt>
+<dd><p>TEMP FIX FOR CADPATCHVISUAL</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchVisual.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchVisual.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourDynamics</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseDynamicsComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.ArmourDynamics">
+<span class="sig-name descname"><span class="pre">ArmourDynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">arm_state_component</span></em>, <em class="sig-param"><span class="pre">controller_component</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.ArmourDynamics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.controller">
+<span class="sig-name descname"><span class="pre">controller</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics.controller" title="Permalink to this definition"></a></dt>
+<dd><p>The controller used</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.controller_log">
+<span class="sig-name descname"><span class="pre">controller_log</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics.controller_log" title="Permalink to this definition"></a></dt>
+<dd><p>Logging</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.measurement_noise">
+<span class="sig-name descname"><span class="pre">measurement_noise</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics.measurement_noise" title="Permalink to this definition"></a></dt>
+<dd><p>Measurement Noise (This probably should eventually be its own
+class and type</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.robot_info">
+<span class="sig-name descname"><span class="pre">robot_info</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics.robot_info" title="Permalink to this definition"></a></dt>
+<dd><p>General information of the robot arm</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.robot_state">
+<span class="sig-name descname"><span class="pre">robot_state</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics.robot_state" title="Permalink to this definition"></a></dt>
+<dd><p>The state of the arm</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.time_discretization">
+<span class="sig-name descname"><span class="pre">time_discretization</span></span><a class="headerlink" href="#armour.agent.ArmourDynamics.time_discretization" title="Permalink to this definition"></a></dt>
+<dd><p>Other properties</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.calculate_dynamics">
+<span class="sig-name descname"><span class="pre">calculate_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">~</span></em>, <em class="sig-param"><span class="pre">q</span></em>, <em class="sig-param"><span class="pre">qd</span></em>, <em class="sig-param"><span class="pre">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.calculate_dynamics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.controller_input_check">
+<span class="sig-name descname"><span class="pre">controller_input_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_check_step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.controller_input_check" title="Permalink to this definition"></a></dt>
+<dd><p>if not logging, skip</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.dynamics">
+<span class="sig-name descname"><span class="pre">dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t</span></em>, <em class="sig-param"><span class="pre">state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.dynamics" title="Permalink to this definition"></a></dt>
+<dd><p>Rename variable for ease</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.generate_measurement_noise">
+<span class="sig-name descname"><span class="pre">generate_measurement_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_span</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.generate_measurement_noise" title="Permalink to this definition"></a></dt>
+<dd><p>Time for interpolation</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.get_measurement_noise">
+<span class="sig-name descname"><span class="pre">get_measurement_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_vec</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.get_measurement_noise" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.integrator">
+<span class="sig-name descname"><span class="pre">integrator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_dyn</span></em>, <em class="sig-param"><span class="pre">t_span</span></em>, <em class="sig-param"><span class="pre">z0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.integrator" title="Permalink to this definition"></a></dt>
+<dd><p>Setup a consistent form of process noise if wanted</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.move">
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_move</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.move" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourDynamics.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourDynamics.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourPatchCollision</span></span><a class="headerlink" href="#armour.agent.ArmourPatchCollision" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.sim.systems.patch3d_collision.Patch3dDynamicObject</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.ArmourPatchCollision">
+<span class="sig-name descname"><span class="pre">ArmourPatchCollision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">arm_state_component</span></em>, <em class="sig-param"><span class="pre">kinematics_component</span></em>, <em class="sig-param"><span class="pre">verbose_level</span></em>, <em class="sig-param"><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.ArmourPatchCollision" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.arm_info">
+<span class="sig-name descname"><span class="pre">arm_info</span></span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.arm_info" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.arm_state">
+<span class="sig-name descname"><span class="pre">arm_state</span></span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.arm_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.collision_patch_data">
+<span class="sig-name descname"><span class="pre">collision_patch_data</span></span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.collision_patch_data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.kinematics">
+<span class="sig-name descname"><span class="pre">kinematics</span></span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.kinematics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.create_collision_check_patch_data">
+<span class="sig-name descname"><span class="pre">create_collision_check_patch_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.create_collision_check_patch_data" title="Permalink to this definition"></a></dt>
+<dd><p>Create a cell array of faces vectors (each 1-by-NF) and a
+cell array of vertices arrays (each NV-by-2) to be used for
+collision checking.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.getCollisionObject">
+<span class="sig-name descname"><span class="pre">getCollisionObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.getCollisionObject" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourPatchCollision.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">~</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourPatchCollision.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">armour.agent.</span></span><span class="sig-name descname"><span class="pre">ArmourAgentState</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.entity.components.BaseStateComponent</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.Options</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.ArmourAgentState">
+<span class="sig-name descname"><span class="pre">ArmourAgentState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.ArmourAgentState" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.entity_info">
+<span class="sig-name descname"><span class="pre">entity_info</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.entity_info" title="Permalink to this definition"></a></dt>
+<dd><p>General information of the robot arm</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.n_states">
+<span class="sig-name descname"><span class="pre">n_states</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.n_states" title="Permalink to this definition"></a></dt>
+<dd><p>state space representation</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.position">
+<span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.position" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.position_indices">
+<span class="sig-name descname"><span class="pre">position_indices</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.position_indices" title="Permalink to this definition"></a></dt>
+<dd><p>indexes for state space</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.state">
+<span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.step_start_idxs">
+<span class="sig-name descname"><span class="pre">step_start_idxs</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.step_start_idxs" title="Permalink to this definition"></a></dt>
+<dd><p>Indexes for our checking of each step.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.time" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.velocity">
+<span class="sig-name descname"><span class="pre">velocity</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.velocity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.velocity_indices">
+<span class="sig-name descname"><span class="pre">velocity_indices</span></span><a class="headerlink" href="#armour.agent.ArmourAgentState.velocity_indices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.commit_state_data">
+<span class="sig-name descname"><span class="pre">commit_state_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">T_state</span></em>, <em class="sig-param"><span class="pre">Z_state</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.commit_state_data" title="Permalink to this definition"></a></dt>
+<dd><p>method: commit_move_data(T_state,Z_state)</p>
+<p>After moving the agent, commit the new state and input
+trajectories, and associated time vectors, to the agent’s
+state, time, input, and input_time properties.</p>
+</dd></dl>
+
+<dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.get_state">
+<span class="sig-name descname"><span class="pre">get_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.get_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.joint_limit_check">
+<span class="sig-name descname"><span class="pre">joint_limit_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_check_step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.joint_limit_check" title="Permalink to this definition"></a></dt>
+<dd><p>create time vector for checking</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.random_init">
+<span class="sig-name descname"><span class="pre">random_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.random_init" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="armour.agent.ArmourAgentState.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#armour.agent.ArmourAgentState.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+waitr.+agent">
+<span id="waitr-components"></span><h2>Waitr Components<a class="headerlink" href="#module-+waitr.+agent" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.agent.</span></span><span class="sig-name descname"><span class="pre">WaitrDynamics</span></span><a class="headerlink" href="#waitr.agent.WaitrDynamics" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">armour.agent.ArmourDynamics</span></code></p>
+<p>Wrapper for adding force checks</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics.WaitrDynamics">
+<span class="sig-name descname"><span class="pre">WaitrDynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">arm_info</span></em>, <em class="sig-param"><span class="pre">arm_state_component</span></em>, <em class="sig-param"><span class="pre">controller_component</span></em>, <em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrDynamics.WaitrDynamics" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics.surf_rad">
+<span class="sig-name descname"><span class="pre">surf_rad</span></span><a class="headerlink" href="#waitr.agent.WaitrDynamics.surf_rad" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics.u_s">
+<span class="sig-name descname"><span class="pre">u_s</span></span><a class="headerlink" href="#waitr.agent.WaitrDynamics.u_s" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat staticmethod">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics.defaultoptions">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">defaultoptions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrDynamics.defaultoptions" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics.grasp_constraint_check">
+<span class="sig-name descname"><span class="pre">grasp_constraint_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">t_check_step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrDynamics.grasp_constraint_check" title="Permalink to this definition"></a></dt>
+<dd><p>if not logging, skip</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrDynamics.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">optionsStruct</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrDynamics.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrMexController">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.agent.</span></span><span class="sig-name descname"><span class="pre">WaitrMexController</span></span><a class="headerlink" href="#waitr.agent.WaitrMexController" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">armour.agent.ArmourController</span></code></p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrMexController.WaitrMexController">
+<span class="sig-name descname"><span class="pre">WaitrMexController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrMexController.WaitrMexController" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrMexController.getControlInputs">
+<span class="sig-name descname"><span class="pre">getControlInputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrMexController.getControlInputs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrMexController.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrMexController.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrMexController.setTrajectory">
+<span class="sig-name descname"><span class="pre">setTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrMexController.setTrajectory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrMexController.ultimate_bound_check">
+<span class="sig-name descname"><span class="pre">ultimate_bound_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrMexController.ultimate_bound_check" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrAgentState">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">waitr.agent.</span></span><span class="sig-name descname"><span class="pre">WaitrAgentState</span></span><a class="headerlink" href="#waitr.agent.WaitrAgentState" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">armour.agent.ArmourAgentState</span></code></p>
+<p>Wrapper for adding force checks</p>
+<div class="members docutils container">
+<dl>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="waitr.agent.WaitrAgentState.random_init">
+<span class="sig-name descname"><span class="pre">random_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#waitr.agent.WaitrAgentState.random_init" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="entities.html" class="btn btn-neutral float-left" title="Entities and Agents" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="systems.html" class="btn btn-neutral float-right" title="Simulation Systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

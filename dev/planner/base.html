@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RTD Planner Interfaces and Base Classes &mdash; RTD-code MATLAB (dev) development version</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/katex-math.css?v=91adb8b6" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7aecf6dd"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=f281be69"></script>
+        <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Example RTD Planner Implementation of ARMOUR" href="armour.html" />
+    <link rel="prev" title="RTD Base Planner and Implementations" href="planner.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            RTD-code MATLAB (dev)
+          </a>
+              <div class="version">
+                development version
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../setup.html">Setup Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#general-setup">General Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#optional-components-for-mexed-functions">Optional Components for MEXed Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup.html#obtaining-urdfs">Obtaining URDFs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">RTD Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/sim/box2d_agent.html">Box2D Agent example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#usage">Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagent">BoxAgent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentinfo">BoxAgentInfo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/sim/box2d_agent.html#boxagentvisual">BoxAgentVisual</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="planner.html">RTD Base Planner and Implementations</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RTD Planner Interfaces and Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-rtd-planner">The RTD Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+planner.+reachsets">Reachable Sets Generation Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+trajectory">Trajectory Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-+rtd.+planner.+trajopt">Trajectory Optimization Interfaces &amp; Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="armour.html">Example RTD Planner Implementation of ARMOUR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="armour.html#the-base-armour-planner">The Base ARMOUR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="armour.html#module-+armour.+reachsets">Reachable Set Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="armour.html#module-+armour.+trajectory">Trajectory Types and Factory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="waitr.html">Example RTD Planner Implementation of WAITR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="waitr.html#the-base-waitr-planner">The Base WAITR Planner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="waitr.html#module-+waitr.+reachsets">Extra Reachable Sets not in ARMOUR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../simulation/simulation.html">RTD Simulation Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/entities.html">Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#base-entity-class-worldentity">Base Entity Class (WorldEntity)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#box-obstacle-entity">Box Obstacle Entity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#armour-agent">Armour Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/entities.html#waitr-agent">Waitr Agent</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/components.html">Components for Entities and Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+rtd.+entity.+components">Base Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+rtd.+entity.+box_obstacle">Box Obstacle Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+armour.+agent">Armour Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/components.html#module-+waitr.+agent">Waitr Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/systems.html">Simulation Systems</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#module-+rtd.+sim.+systems.+patch3d_collision">Patch3dCollisionSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#module-+rtd.+sim.+systems.+patch_visual">PatchVisualSystem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/systems.html#randomarmconfigurationgoal">RandomArmConfigurationGoal</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../simulation/simulations.html">Simulation Files and World Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#world-model-container">World Model Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#base-simulation">Base Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#armour-simulation">Armour Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simulation/simulations.html#waitr-simulation">Waitr Simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/utilities.html">RTD Code Utilities Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/mixins.html">RTD Code Mixin Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/containers.html">RTD Utility Container Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/types.html">Utility Types and Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities/utilities.html#module-+rtd.+util">General Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">RTD-code MATLAB (dev)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="planner.html">RTD Base Planner and Implementations</a></li>
+      <li class="breadcrumb-item active">RTD Planner Interfaces and Base Classes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/planner/base.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rtd-planner-interfaces-and-base-classes">
+<h1>RTD Planner Interfaces and Base Classes<a class="headerlink" href="#rtd-planner-interfaces-and-base-classes" title="Permalink to this heading"></a></h1>
+<p>The core components to any mid-level RTD Planner.</p>
+<section id="the-rtd-planner">
+<h2>The RTD Planner<a class="headerlink" href="#the-rtd-planner" title="Permalink to this heading"></a></h2>
+<p>This is an interface to specify the midlevel planner.
+It’s written to be relatively isolated from the rest of the simulation package.</p>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.RtdPlanner">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.</span></span><span class="sig-name descname"><span class="pre">RtdPlanner</span></span><a class="headerlink" href="#rtd.planner.RtdPlanner" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>This class specifies the overall planner</p>
+<p>It should set up anything for any special type of RTD planner.
+Construction of a special version of this should do the following:</p>
+<ul class="simple">
+<li><p>Construct OptimizationEngine(s) with parameters</p></li>
+<li><p>Construct ReachableSets for each reachable set and trajectory type</p></li>
+<li><p>Construct some Objective object for the problem at hand</p></li>
+<li><p>Determine/set RtdTrajOpt parameters and create it for each trajectory type</p></li>
+</ul>
+<p>Then on each waypoint, we call for a trajectory plan using
+<cite>planTrajectory</cite>. That will use RTD to solve for a trajectory.</p>
+</dd></dl>
+
+</section>
+<section id="module-+rtd.+planner.+reachsets">
+<span id="reachable-sets-generation-interfaces"></span><h2>Reachable Sets Generation Interfaces<a class="headerlink" href="#module-+rtd.+planner.+reachsets" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetGenerator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.reachsets.</span></span><span class="sig-name descname"><span class="pre">ReachSetGenerator</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Base class for the generation of reacheable sets for the planner</p>
+<p>The ReachSetGenerator class interfaces out the generation of reachable
+sets for the RTD planner. It contains a built-in cache which is enabled
+if <cite>cache_max_size &gt; 0</cite>. Caching is based on the <cite>uuid</cite> property of the
+robot’s state and any extra arguments passed through the
+<cite>getReachableSet</cite> method. This class can be used to encapsulate reachable
+sets generated offline, or the online computation of reachable sets. It
+acts as a generator for a single instance of ReachableSet</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Must have and define a <cite>cache_max_size</cite> property.
+Must implement the <cite>generateReachableSet(self, robotState, …)</cite>
+method. See help for more information.</p>
+</div>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetGenerator.cache">
+<span class="sig-name descname"><span class="pre">cache</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetGenerator.cache" title="Permalink to this definition"></a></dt>
+<dd><p>The cache of the generator</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetGenerator.cache_index">
+<span class="sig-name descname"><span class="pre">cache_index</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetGenerator.cache_index" title="Permalink to this definition"></a></dt>
+<dd><p>Current index of the cache</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetGenerator.cache_max_size">
+<span class="sig-name descname"><span class="pre">cache_max_size</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetGenerator.cache_max_size" title="Permalink to this definition"></a></dt>
+<dd><p>The maximum size of the built-in cache. Set to 0 to disable.
+Must be defined.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetGenerator.cache_size">
+<span class="sig-name descname"><span class="pre">cache_size</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetGenerator.cache_size" title="Permalink to this definition"></a></dt>
+<dd><p>Current size of the cache</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetGenerator.getReachableSet">
+<span class="sig-name descname"><span class="pre">getReachableSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotState</span></em>, <em class="sig-param"><span class="pre">varargin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetGenerator.getReachableSet" title="Permalink to this definition"></a></dt>
+<dd><p>Get a reachable set instance for the given robot state and passthrough arguments</p>
+<p>This function handles how to actually get the reachable set
+with built in caching of already generated instances. It will
+call <cite>generateReachableSet</cite> as needed. This is useful if we
+need to use one reachable set in another reachable set and we
+don’t want to regenerate it online. It performs caching based
+on the <cite>uuid</cite> property of the provided robotState and and the
+string cast of any additional arguments. If we don’t want to
+use the cache on one call, setting the Name-Value argument
+<cite>ignore_cache</cite> to true will bypass caching altogether.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>robotState</strong> (<em>rtd.entity.state.EntityState</em>) – Some state of used for generation / keying</p></li>
+<li><p><strong>varargin</strong> – Keyword arguments (passed through). See below</p></li>
+</ul>
+</dd>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ignore_cache</strong> (<em>logical</em>) – If set true, the cache is completely ignored</p></li>
+<li><p><strong>…</strong> – Any remaining arugments to passthrough to <cite>generateReachableSet</cite></p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The respective reachable set</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>rtd.planner.reachsets.ReachSetInstance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetInstance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.reachsets.</span></span><span class="sig-name descname"><span class="pre">ReachSetInstance</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetInstance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.UUID</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Base class for a single reachable set generated for some state + parameters</p>
+<p>This is just an individual instance of a reachable set. It should
+hold the necessary information to make a nonlinear constraint. If a
+generated nonlinear constraint function is not atomic (specifically, if
+it can change class properties, the cache for the respective
+<code class="xref mat mat-class docutils literal notranslate"><span class="pre">rtd.planner.reachsets.ReachSetGenerator</span></code>
+should be disabled by setting <cite>cache_max_size</cite> to 0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>genNLConstraint(self, worldState)</cite> should be implemented. This should
+return a function handle used for the optimizer as a nonlinear
+constraint. It should return 4 outputs: [c, ceq, gc, gceq], where
+<cite>c &lt;= 0</cite> and <cite>ceq = 0</cite> are the constraints, and <cite>gc</cite> and <cite>gceq</cite> are the
+gradients for the respective constraints.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>input_range</cite> and <cite>num_parameters</cite> properties must be defined.
+<cite>input_range</cite> is a 2 column array with min on the left and max on the
+right. If only one row is defined, it is expanded to <cite>num_parameters</cite>.
+If more rows than <cite>num_parameters</cite> are defined, the extra rows are
+considered slack variables and added to the optimization independently.</p>
+</div>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetInstance.input_range">
+<span class="sig-name descname"><span class="pre">input_range</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetInstance.input_range" title="Permalink to this definition"></a></dt>
+<dd><p>A 2 column array denoting the input minimum and maximums for the
+reachable set.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.reachsets.ReachSetInstance.num_parameters">
+<span class="sig-name descname"><span class="pre">num_parameters</span></span><a class="headerlink" href="#rtd.planner.reachsets.ReachSetInstance.num_parameters" title="Permalink to this definition"></a></dt>
+<dd><p>The number of main shared parameters used by this set. Generally,
+this should match the size of the final trajectory parameters.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+rtd.+trajectory">
+<span id="trajectory-interfaces"></span><h2>Trajectory Interfaces<a class="headerlink" href="#module-+rtd.+trajectory" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryFactory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.trajectory.</span></span><span class="sig-name descname"><span class="pre">TrajectoryFactory</span></span><a class="headerlink" href="#rtd.trajectory.TrajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Base class for the Trajectory factory object</p>
+<p>This should be used to initialize desired instaces of
+<code class="xref mat mat-class docutils literal notranslate"><span class="pre">rtd.trajectory.Trajectory</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>createTrajectory(self, robotState, rsInstances, trajectoryParams,
+options)</cite> should be implemented. Check help for more information</p>
+</div>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryFactory.trajOptProps">
+<span class="sig-name descname"><span class="pre">trajOptProps</span></span><a class="headerlink" href="#rtd.trajectory.TrajectoryFactory.trajOptProps" title="Permalink to this definition"></a></dt>
+<dd><p>Properties from the trajectory optimization, which also describe
+properties for a trajectory.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.trajectory.Trajectory">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.trajectory.</span></span><span class="sig-name descname"><span class="pre">Trajectory</span></span><a class="headerlink" href="#rtd.trajectory.Trajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Base class for a parameterized trajectory.</p>
+<p>This encapsulates the conversion of parameters used in optimization to
+the actual trajectory generated from those parameters. This can also be
+used by an <code class="xref mat mat-class docutils literal notranslate"><span class="pre">rtd.planner.trajopt.Objective</span></code> object as part
+of the objective function call. It should be generated with some
+<code class="xref mat mat-class docutils literal notranslate"><span class="pre">rtd.trajectory.TrajectoryFactory</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The functions <cite>validate(self, throwOnError)</cite>, <cite>setParameters(self,
+trajectoryParams, options)</cite>, and <cite>getCommand(self, time)</cite> should all be
+implemented. Check help to find more information.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Many of these functions should be implemented with argument validation
+to either provide default values or provide additional Name-Value
+arguments more easily.</p>
+</div>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.trajectory.Trajectory.startTime">
+<span class="sig-name descname"><span class="pre">startTime</span></span><a class="headerlink" href="#rtd.trajectory.Trajectory.startTime" title="Permalink to this definition"></a></dt>
+<dd><p>The time at which this trajectory is valid</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.trajectory.Trajectory.trajectoryParams">
+<span class="sig-name descname"><span class="pre">trajectoryParams</span></span><a class="headerlink" href="#rtd.trajectory.Trajectory.trajectoryParams" title="Permalink to this definition"></a></dt>
+<dd><p>The parameters used for this trajectory</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.trajectory.Trajectory.vectorized">
+<span class="sig-name descname"><span class="pre">vectorized</span></span><a class="headerlink" href="#rtd.trajectory.Trajectory.vectorized" title="Permalink to this definition"></a></dt>
+<dd><p>Set to true if this trajectory supports getting commands for a
+time vector instead of just a single moment in time.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.trajectory.</span></span><span class="sig-name descname"><span class="pre">TrajectoryContainer</span></span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Container class for holding a set of trajectories and consolidating their commands</p>
+<p>TrajectoryContainer is a class that holds a set of trajectories and
+provides a method to generate a command based on the time. This class is
+ensure that the commands are generated based on the correct trajectory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>setInitialTrajectory</cite> must be called before any other methods are
+called. The return type of the initial trajectory must be the same as
+the return type of the other trajectories.</p>
+</div>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.startTimes">
+<span class="sig-name descname"><span class="pre">startTimes</span></span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.startTimes" title="Permalink to this definition"></a></dt>
+<dd><p>startTimes is a vector of start times for each trajectory
+The last element is always inf to ensure that the last trajectory is always used</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.trajectories">
+<span class="sig-name descname"><span class="pre">trajectories</span></span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.trajectories" title="Permalink to this definition"></a></dt>
+<dd><p>trajectories is a cell array of trajectories that correspond to the start times</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.clear" title="Permalink to this definition"></a></dt>
+<dd><p>clears the container</p>
+<p><cite>clear</cite> clears the container and resets it to the initial state.
+It’s expected that there is already some initial trajectory set.
+If not, a warning is shown.</p>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.getCommand">
+<span class="sig-name descname"><span class="pre">getCommand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">time</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.getCommand" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a command based on the time</p>
+<p><cite>getCommand</cite> generates a command based on the time. The command is
+generated based on the trajectory that is active at the time. If the
+time is before the start of the first trajectory, then the command is
+generated based on the initial trajectory. If the time is after the end
+of the last trajectory, then the command is generated based on the last
+trajectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time</strong> (<em>double</em>) – The times to generate the commands for</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated commands</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.isValid">
+<span class="sig-name descname"><span class="pre">isValid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">throwIfInvalid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.isValid" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if the container is valid</p>
+<p><cite>isValid</cite> checks if the container is valid. If <cite>throwIfInvalid</cite> is
+true, then an error is thrown if the container is invalid. The container
+is considered invalid if the initial trajectory hasn’t been set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>throwIfInvalid</strong> (<em>logical, optional</em>) – If true, an error is thrown if the container is invalid</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the container is valid, false otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>valid (logical)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidContainer</span></code></span> – If the container is invalid and <cite>throwIfInvalid</cite> is true</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.setInitialTrajectory">
+<span class="sig-name descname"><span class="pre">setInitialTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">initialTrajectory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.setInitialTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>sets the initial trajectory for the container</p>
+<p>setInitialTrajectory sets the initial trajectory for the container.
+This method must be called before any other methods are called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>initialTrajectory</strong> (<em>rtd.trajectory.Trajectory</em>) – The initial trajectory</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">BadInitialTrajectory</span></code></span> – If the initial trajectory is invalid or doesn’t start at 0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.trajectory.TrajectoryContainer.setTrajectory">
+<span class="sig-name descname"><span class="pre">setTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajectory</span></em>, <em class="sig-param"><span class="pre">throwIfInvalid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.trajectory.TrajectoryContainer.setTrajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Sets a new trajectory for the container to the end</p>
+<p><cite>setTrajectory</cite> sets a new trajectory for the container to the end.
+The new trajectory must start at the same time or after the end of the
+last trajectory. If the new trajectory is invalid, a warning is shown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectory</strong> (<em>rtd.trajectory.Trajectory</em>) – The new trajectory to add</p></li>
+<li><p><strong>throwIfInvalid</strong> (<em>logical, optional</em>) – If true, an error is thrown if the trajectory is invalid</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><code class="xref mat mat-exc docutils literal notranslate"><span class="pre">InvalidTrajectory</span></code></span> – If the new trajectory is invalid or starts before the end of the last trajectory and <cite>throwIfInvalid</cite> is true</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-+rtd.+planner.+trajopt">
+<span id="trajectory-optimization-interfaces-components"></span><h2>Trajectory Optimization Interfaces &amp; Components<a class="headerlink" href="#module-+rtd.+planner.+trajopt" title="Permalink to this heading"></a></h2>
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.OptimizationEngine">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">OptimizationEngine</span></span><a class="headerlink" href="#rtd.planner.trajopt.OptimizationEngine" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Base class for any sort of nonlinear optimizer used.</p>
+<p>This class should be used to create a parameterized instance of some
+nonlinear optimizer. For example, in MATLAB, this would be fmincon.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Must implement <cite>performOptimization</cite>. See help for more details.</p>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">TrajOptProps</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Struct of core trajectory optimizer properties.</p>
+<p>These are the consistent properties we use across RTD for trajectory
+optimization, and they’re used all across the codebase.</p>
+<div class="members docutils container">
+<dl>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps.doTimeout">
+<span class="sig-name descname"><span class="pre">doTimeout</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps.doTimeout" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not the timeout the optimization if it is taking too
+long.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps.horizonTime">
+<span class="sig-name descname"><span class="pre">horizonTime</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps.horizonTime" title="Permalink to this definition"></a></dt>
+<dd><p>The time of the overall trajectory until stop.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps.planTime">
+<span class="sig-name descname"><span class="pre">planTime</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps.planTime" title="Permalink to this definition"></a></dt>
+<dd><p>The time duration of the nominal plan. Braking action should
+occur in horizonTime-planTime.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps.randomInit">
+<span class="sig-name descname"><span class="pre">randomInit</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps.randomInit" title="Permalink to this definition"></a></dt>
+<dd><p>Whether or not unknown or extra parameters (slack variables or if
+no initial guess is given) should be randomized or zero
+initialized.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps.timeForCost">
+<span class="sig-name descname"><span class="pre">timeForCost</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps.timeForCost" title="Permalink to this definition"></a></dt>
+<dd><p>The time used for evaluation in the cost function.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.TrajOptProps.timeoutTime">
+<span class="sig-name descname"><span class="pre">timeoutTime</span></span><a class="headerlink" href="#rtd.planner.trajopt.TrajOptProps.timeoutTime" title="Permalink to this definition"></a></dt>
+<dd><p>The time at which the optimization should timeout.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.Waypoint">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">Waypoint</span></span><a class="headerlink" href="#rtd.planner.trajopt.Waypoint" title="Permalink to this definition"></a></dt>
+<dd><p>Unused class, but it remains in case abstraction is needed for waypoints.</p>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">RtdTrajOpt</span></span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.util.mixins.NamedClass</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Core trajectory optimization routine for RTD</p>
+<p>This object handles the necessary calls to perform the actual trajectory
+optimization when requested. It calls the generators for the reachble
+sets and combines all the resulting nonlinear constraints in the end.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This only optimizes for a single <cite>rtd.planner.trajopt.Objective</cite>
+object. If you want to optimize for more than one objective, either use
+multiple <cite>RtdTrajOpt</cite> objects, or design a single objective that combines
+the multiple objectives.</p>
+</div>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.RtdTrajOpt">
+<span class="sig-name descname"><span class="pre">RtdTrajOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajOptProps</span></em>, <em class="sig-param"><span class="pre">reachableSets</span></em>, <em class="sig-param"><span class="pre">objective</span></em>, <em class="sig-param"><span class="pre">optimizationEngine</span></em>, <em class="sig-param"><span class="pre">trajectoryFactory</span></em>, <em class="sig-param"><span class="pre">options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.RtdTrajOpt" title="Permalink to this definition"></a></dt>
+<dd><p>Construct the RtdTrajOpt object.</p>
+<p>Store all the handles to objects that we want to use.
+This should encapsulate the main trajectory optimization
+aspection of RTD &amp; ideally need very little specialization
+between versions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajOptProps</strong> (<em>rtd.planner.trajopt.TrajOptProps</em>)</p></li>
+<li><p><strong>robot</strong> (<em>rtd.sim.world.WorldEntity</em>)</p></li>
+<li><p><strong>reachableSets</strong> (<em>struct</em>)</p></li>
+<li><p><strong>objective</strong> (<em>rtd.planner.trajopt.Objective</em>)</p></li>
+<li><p><strong>optimizationEngine</strong> (<em>rtd.planner.trajopt.OptimizationEngine</em>)</p></li>
+<li><p><strong>trajectoryFactory</strong> (<em>rtd.trajectory.TrajectoryFactory</em>)</p></li>
+<li><p><strong>options</strong> – Keyword arguments. See below.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Keyword Arguments</dt><dd><p>verboseLevel (rtd.util.types.LogLevel): The log level to use for this object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.objective">
+<span class="sig-name descname"><span class="pre">objective</span></span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.objective" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.optimizationEngine">
+<span class="sig-name descname"><span class="pre">optimizationEngine</span></span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.optimizationEngine" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.reachableSets">
+<span class="sig-name descname"><span class="pre">reachableSets</span></span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.reachableSets" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.trajOptProps">
+<span class="sig-name descname"><span class="pre">trajOptProps</span></span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.trajOptProps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.trajectoryFactory">
+<span class="sig-name descname"><span class="pre">trajectoryFactory</span></span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.trajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.RtdTrajOpt.solveTrajOpt">
+<span class="sig-name descname"><span class="pre">solveTrajOpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotState</span></em>, <em class="sig-param"><span class="pre">worldState</span></em>, <em class="sig-param"><span class="pre">waypoint</span></em>, <em class="sig-param"><span class="pre">initialGuess</span></em>, <em class="sig-param"><span class="pre">rsAdditionalArgs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.RtdTrajOpt.solveTrajOpt" title="Permalink to this definition"></a></dt>
+<dd><p>Execute the solver for trajectory optimization.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The returned <cite>info</cite> struct has the following entries:
+worldState, robotState, rsInstances, nlconCallbacks,
+objectiveCallback, waypoint, bounds, num_parameters, guess,
+trajectory, cost.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Additional arguments for a reachable set should be in a
+struct form. These are converted to extra Name-Value
+arguments for the respective reachable set.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>robotState</strong> – State of the robot.</p></li>
+<li><p><strong>worldState</strong> – Observed state of the world for the reachable sets</p></li>
+<li><p><strong>waypoint</strong> – Waypoint we want to optimize to</p></li>
+<li><p><strong>initialGuess</strong> (<em>rtd.trajectory.Trajectory</em>) – Past trajectory to use as an initial guess</p></li>
+<li><p><strong>rsAdditionalArgs</strong> (<em>Optional struct</em>) – additional arguments to pass to the reachable sets, by set name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>trajectory</cite> is an instance of the trajectory object that
+corresponds to the solved trajectory optimization. If it
+wasn’t successful, this will either be an invalid
+trajectory of empty. <cite>cost</cite> is the final cost of the
+objective used. <cite>info</cite> is a struct of optimization data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[trajectory(rtd.trajectory.Trajectory), cost(double), info(struct)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.GenericArmObjective">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">GenericArmObjective</span></span><a class="headerlink" href="#rtd.planner.trajopt.GenericArmObjective" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.trajopt.Objective</span></code></p>
+<p>A general configuration-space objective object for arm robots.</p>
+<p>This objective generalizes the joint space objective used for ArmTD and
+allows us to use any joint-space trajectory for ArmTD based trajopt
+ptoblems. It should be setup in the planner itself and the handle for
+this object passed to the trajopt problem.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.GenericArmObjective.GenericArmObjective">
+<span class="sig-name descname"><span class="pre">GenericArmObjective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajOptProps</span></em>, <em class="sig-param"><span class="pre">trajectoryFactory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.GenericArmObjective.GenericArmObjective" title="Permalink to this definition"></a></dt>
+<dd><p>Constructs this objective function generator.</p>
+<p>Provide a trajectory factory object which creates unique
+trajectory objects with each call and the properties of the
+overall trajopt problem, from which the time for the cost is
+used with some trajectory to create the objective.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajOptProps</strong> (<em>rtd.planner.trajopt.TrajOptProps</em>)</p></li>
+<li><p><strong>trajectoryFactory</strong> (<em>rtd.trajectory.TrajectoryFactory</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.GenericArmObjective.t_cost">
+<span class="sig-name descname"><span class="pre">t_cost</span></span><a class="headerlink" href="#rtd.planner.trajopt.GenericArmObjective.t_cost" title="Permalink to this definition"></a></dt>
+<dd><p>The time at which to compare waypoint to.</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.GenericArmObjective.trajectoryFactory">
+<span class="sig-name descname"><span class="pre">trajectoryFactory</span></span><a class="headerlink" href="#rtd.planner.trajopt.GenericArmObjective.trajectoryFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Handle to a trajectory factory to get the trajectory to optimize</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.GenericArmObjective.genObjective">
+<span class="sig-name descname"><span class="pre">genObjective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">robotState</span></em>, <em class="sig-param"><span class="pre">waypoint</span></em>, <em class="sig-param"><span class="pre">reachableSets</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.GenericArmObjective.genObjective" title="Permalink to this definition"></a></dt>
+<dd><p>Given the information, generate a handle for an objective function</p>
+<p>This creates a function_handle with two return values, where
+<cite>function [cost, grad_cost] = objectiveCallback(params)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>robotState</strong> – The starting state of the robot for this optimization</p></li>
+<li><p><strong>waypoint</strong> – The waypoint we want to optimize towards</p></li>
+<li><p><strong>reachableSets</strong> – Instance of the reachable sets used for the objective.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a function handle to be use for the objective callback of the optimizer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function_handle</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.Objective">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">Objective</span></span><a class="headerlink" href="#rtd.planner.trajopt.Objective" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">handle</span></code></p>
+<p>Base interface for creating the objective to optimize for the trajopt problem</p>
+<p>This should be extended and used to create an objective callback function
+for the optmization engine. Any necessary transformations or special
+function calls can take place inside the object.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Must implement <cite>genObjective(self, robotState, waypoint,
+reachableSets)</cite>. See help for more details.</p>
+</div>
+</dd></dl>
+
+<dl class="mat class">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.FminconOptimizationEngine">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">rtd.planner.trajopt.</span></span><span class="sig-name descname"><span class="pre">FminconOptimizationEngine</span></span><a class="headerlink" href="#rtd.planner.trajopt.FminconOptimizationEngine" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rtd.planner.trajopt.OptimizationEngine</span></code></p>
+<p>The fmincon call for MATLAB encapsulated as an OptimizationEngine</p>
+<p>This class wraps the fmincon call to the format expected for some
+OptimizationEngine. It includes our recommended default fmincon options
+from one of our projects and handles optimization timeout if requested.</p>
+<div class="members docutils container">
+<dl>
+<dt>Constructor Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.FminconOptimizationEngine.FminconOptimizationEngine">
+<span class="sig-name descname"><span class="pre">FminconOptimizationEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">trajOptProps</span></em>, <em class="sig-param"><span class="pre">extra_options</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.FminconOptimizationEngine.FminconOptimizationEngine" title="Permalink to this definition"></a></dt>
+<dd><p>Create an instance of this object.</p>
+<p>This also merges any options for fmincon if provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajOptProps</strong> (<em>rtd.planner.trajopt.TrajOptProps</em>)</p></li>
+<li><p><strong>extra_options</strong> – Extra options as a struct or optimoptions for fmincon</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+<dt>Property Summary</dt><dd><dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.FminconOptimizationEngine.options">
+<span class="sig-name descname"><span class="pre">options</span></span><a class="headerlink" href="#rtd.planner.trajopt.FminconOptimizationEngine.options" title="Permalink to this definition"></a></dt>
+<dd><p>Fmincon options</p>
+</dd></dl>
+
+<dl class="mat attribute">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.FminconOptimizationEngine.trajOptProps">
+<span class="sig-name descname"><span class="pre">trajOptProps</span></span><a class="headerlink" href="#rtd.planner.trajopt.FminconOptimizationEngine.trajOptProps" title="Permalink to this definition"></a></dt>
+<dd><p>general trajectory optimiation properties</p>
+</dd></dl>
+
+</dd>
+<dt>Method Summary</dt><dd><dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.FminconOptimizationEngine.performOptimization">
+<span class="sig-name descname"><span class="pre">performOptimization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">initialGuess</span></em>, <em class="sig-param"><span class="pre">objectiveCallback</span></em>, <em class="sig-param"><span class="pre">constraintCallback</span></em>, <em class="sig-param"><span class="pre">boundsStruct</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.FminconOptimizationEngine.performOptimization" title="Permalink to this definition"></a></dt>
+<dd><p>Use fmincon to perform the optimization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initialGuess</strong> – An initial guess vector used for the optimization. May not be the correct size and should be accounted for if not.</p></li>
+<li><p><strong>objectiveCallback</strong> – A callback for the objective function of this specific optimization</p></li>
+<li><p><strong>constraintCallback</strong> – A callback for the nonlinear constraints, where the return time is expected to be [c, ceq, gc, gceq].</p></li>
+<li><p><strong>boundsStruct</strong> – A struct containing input and output bounds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>success</cite>
+is if the optimization was successful or didn’t time out.
+<cite>parameters</cite> are the trajectory parameters to use. <cite>cost</cite> is
+the final cost for the parameters found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[success(logical), parameters(double), cost(double)]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="mat method">
+<dt class="sig sig-object mat" id="rtd.planner.trajopt.FminconOptimizationEngine.timeout_fcn">
+<span class="sig-name descname"><span class="pre">timeout_fcn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">startTime</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rtd.planner.trajopt.FminconOptimizationEngine.timeout_fcn" title="Permalink to this definition"></a></dt>
+<dd><p>Utlity timeout function for fmincon</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>startTime</strong> – initial time, given by <cite>tic</cite></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>whether or not to stop now, based on trajOptProps</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>logical</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="planner.html" class="btn btn-neutral float-left" title="RTD Base Planner and Implementations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="armour.html" class="btn btn-neutral float-right" title="Example RTD Planner Implementation of ARMOUR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ROAHM Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
