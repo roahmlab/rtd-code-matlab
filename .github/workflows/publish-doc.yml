@@ -17,11 +17,19 @@ jobs:
       - name: 'Checkout the repo'
         uses: actions/checkout@v4
 
-      - name: 'Run the buildscript'
+      - name: 'Run the buildscript if we are on a tag'
         # Workaround to keep tty working
         # https://github.com/gfx/example-github-actions-with-tty
         shell: 'script -q -e -c "bash {0}"'
-        run: ./docs/build-docs.sh ${{ fromJSON('{"tag":"html","branch":"html -e VERSION=${{ github.ref_name }}"}')[github.ref_type] }}
+        if: github.ref_type == 'tag'
+        run: ./docs/build-docs.sh html -e VERSION=${{ github.ref_name }}
+
+      - name: 'Run the regular buildscript if we are not on a tag'
+        # Workaround to keep tty working
+        # https://github.com/gfx/example-github-actions-with-tty
+        shell: 'script -q -e -c "bash {0}"'
+        if: github.ref_type != 'tag'
+        run: ./docs/build-docs.sh html
       
       # Cache the build so we can deploy it
       - name: 'cache built docs'
